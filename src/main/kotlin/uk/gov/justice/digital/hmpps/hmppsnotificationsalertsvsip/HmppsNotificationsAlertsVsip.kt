@@ -1,11 +1,11 @@
-package uk.gov.justice.digital.hmpps.hmppstemplatepackagename
+package uk.gov.justice.digital.hmpps.hmppsnotificationsalertsvsip
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication()
-class HmppsTemplateKotlin
+class HmppsNotificationsAlertsVsip
 
 fun main(args: Array<String>) {
-  runApplication<HmppsTemplateKotlin>(*args)
+  runApplication<HmppsNotificationsAlertsVsip>(*args)
 }
