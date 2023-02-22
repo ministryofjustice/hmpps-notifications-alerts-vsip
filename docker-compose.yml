@@ -1,45 +1,17 @@
-version: '3.1'
+version: "3"
 services:
-
-  redis:
-    image: 'redis:6.2'
-    networks:
-      - hmpps
-    container_name: redis
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+  hmpps-template-kotlin:
+    build:
+      context: .
+    network_mode: "host"
+    container_name: hmpps-template-kotlin
     ports:
-      - '6379:6379'
-
-  hmpps-auth:
-    image: quay.io/hmpps/hmpps-auth:latest
-    networks:
-      - hmpps
-    container_name: hmpps-auth
-    ports:
-      - "9090:8080"
+      - "8081:8080"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ping"]
     environment:
+      - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=dev
-      - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
-
-  app:
-    build: .
-    networks:
-      - hmpps
-    depends_on: [redis]
-    ports:
-      - "3000:3000"
-    environment:
-      - REDIS_HOST=redis
-      - HMPPS_AUTH_EXTERNAL_URL=http://localhost:9090/auth
-      - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
-      # These will need to match new creds in the seed auth service auth
-      - API_CLIENT_ID=client-id
-      - API_CLIENT_SECRET=client-secret
-      - SYSTEM_CLIENT_ID=system-client-id
-      - SYSTEM_CLIENT_SECRET=system-client-secret
 
 networks:
   hmpps:

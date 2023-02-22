@@ -1,32 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>ministryofjustice/hmpps-renovate-config:node"],
+  "extends": ["github>ministryofjustice/hmpps-renovate-config:jvm"],
   "prBodyTemplate": "{{{table}}}{{{notes}}}{{{warnings}}}{{{controls}}}",
   "packageRules": [
     {
-      "matchManagers": ["npm"],
-      "rangeStrategy": "bump"
-    },
-    {
-      "matchManagers": ["npm"],
+      "matchManagers": ["gradle"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "all non major NPM dependencies",
-      "groupSlug": "all-npm-minor-patch",
-      "stabilityDays": 3
-    },
-    {
-      "matchPackageNames": ["typescript", "govuk-frontend"],
-      "rangeStrategy": "bump",
-      "stabilityDays": 0
-    },
-    {
-      "matchManagers": ["npm"],
-      "matchPackageNames": ["@types/node"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
+      "groupName": "all non major Gradle dependencies",
+      "groupSlug": "all-gradle-minor-patch"
     }
-  ],
-  "vulnerabilityAlerts": {
-    "stabilityDays": 0
-  }
+  ]
 }
