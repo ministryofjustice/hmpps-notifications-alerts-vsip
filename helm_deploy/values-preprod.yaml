@@ -3,7 +3,7 @@
 
 generic-service:
   ingress:
-    host: hmpps-notifications-alerts-vsip-preprod.hmpps.service.justice.gov.uk
+    host: hmpps-notifi-alerts-vsip-preprod.prison.service.justice.gov.uk
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
