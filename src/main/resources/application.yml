@@ -1,10 +1,10 @@
 info.app:
-  name: HMPPS Template Kotlin
+  name: Hmpps Notifications Alerts Vsip
   version: 1.0
 
 spring:
   application:
-    name: hmpps-template-kotlin
+    name: hmpps-notifications-alerts-vsip
   codec:
     max-in-memory-size: 10MB
 
