@@ -8,6 +8,7 @@ generic-service:
     host: hmpps-notifi-alerts-vsip-dev.prison.service.justice.gov.uk
 
   env:
+    SPRING_PROFILES_ACTIVE: "stdout"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
