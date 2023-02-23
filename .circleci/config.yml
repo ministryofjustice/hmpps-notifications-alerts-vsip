@@ -71,17 +71,17 @@ workflows:
           type: approval
           requires:
             - deploy_dev
-            - hmpps/deploy_env:
-                name: deploy_staging
-                env: "staging"
-                jira_update: true
-                jira_env_type: staging
-                context:
-                  - hmpps-common-vars
-                  - hmpps-notifications-alerts-vsip-stage
-                requires:
-                  - request-staging-approval
-                helm_timeout: 5m
+      - hmpps/deploy_env:
+          name: deploy_staging
+          env: "staging"
+          jira_update: true
+          jira_env_type: staging
+          context:
+           - hmpps-common-vars
+           - hmpps-notifications-alerts-vsip-stage
+          requires:
+           - request-staging-approval
+          helm_timeout: 5m
 #      - request-preprod-approval:
 #          type: approval
 #          requires:
