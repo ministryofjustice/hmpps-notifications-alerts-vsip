@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter
 
 class InfoTest : IntegrationTestBase() {
 
+  // TODO re enable when Dev ops is complete
   // @Test
   fun `Info page is accessible`() {
     webTestClient.get()
@@ -18,6 +19,7 @@ class InfoTest : IntegrationTestBase() {
       .jsonPath("build.name").isEqualTo("hmpps-notifications-alerts-vsip")
   }
 
+  // TODO re enable when Dev ops is complete
   // @Test
   fun `Info page reports version`() {
     webTestClient.get().uri("/info")
