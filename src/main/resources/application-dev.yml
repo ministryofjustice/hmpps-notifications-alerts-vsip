@@ -1,0 +1,15 @@
+server:
+  shutdown: immediate
+
+hmpps.sqs:
+  provider: localstack
+  queues:
+    prisonvisitsnotificationalerts:
+      queueName: hmpps_prison_visits_notification_alerts_queue
+      dlqName: hmpps_prison_visits_notification_alerts_dlq
+      subscribeTopicId: domainevents
+  topics:
+    domainevents:
+      arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
+
+hmpps.auth.url: https://sign-in-dev.hmpps.service.justice.gov.uk/auth

@@ -4,3 +4,26 @@ server:
 management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
+
+hmpps:
+  auth:
+    url: http://localhost:8090/auth
+    timeout: 10s
+
+hmpps.sqs:
+  provider: localstack
+  queues:
+    prisonvisitsnotificationalerts:
+      queueName: ${random.uuid}
+      dlqName: ${random.uuid}
+      subscribeTopicId: domainevents
+      dlqMaxReceiveCount: 1
+      visibilityTimeout: 1
+  topics:
+    domainevents:
+      arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
+
+feature:
+  event:
+    prison-visit:
+      cancelled.test: false

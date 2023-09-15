@@ -1,6 +1,10 @@
 info.app:
-  name: Hmpps Notifications Alerts Vsip
+  name: hmpps notifications alerts vsip
   version: 1.0
+  description: VSIP notifications alerts sends out notifications to various actors that use the system
+  contact:
+    name: Visit Someone in Prison
+    email: prisonvisitsbooking@digital.justice.gov.uk
 
 spring:
   application:
@@ -17,6 +21,24 @@ spring:
     group:
       test:
         - "stdout"
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
+      client:
+        registration:
+          other-hmpps-apis:
+            provider: hmpps-auth
+            client-id: ${system.client.id}
+            client-secret: ${system.client.secret}
+            authorization-grant-type: client_credentials
+            scope: read
+
+        provider:
+          hmpps-auth:
+            token-uri: ${hmpps.auth.url}/oauth/token
 
 server:
   port: 8080
@@ -49,3 +71,19 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+
+hmpps:
+  auth:
+    timeout: 10s
+
+
+
+
+
+
+
+
+
+
+
