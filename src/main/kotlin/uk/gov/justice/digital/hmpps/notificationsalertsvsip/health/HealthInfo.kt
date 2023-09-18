@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsnotificationsalertsvsip.health
+package uk.gov.justice.digital.hmpps.notificationsalertsvsip.health
 
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator

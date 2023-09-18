@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsnotificationsalertsvsip
+package uk.gov.justice.digital.hmpps.notificationsalertsvsip
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

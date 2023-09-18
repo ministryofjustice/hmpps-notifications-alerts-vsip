@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsnotificationsalertsvsip.health
+package uk.gov.justice.digital.hmpps.notificationsalertsvsip.health
 
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
