@@ -4,7 +4,7 @@ services:
     image: localstack/localstack:1.3
     networks:
       - hmpps
-    container_name: localstack-external-vsip-notifications-alerts
+    container_name: localstack-hmpps-notifications-alerts-vsip
     ports:
       - "4566:4566"
     environment:
