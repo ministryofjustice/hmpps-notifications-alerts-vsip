@@ -76,14 +76,3 @@ management:
 hmpps:
   auth:
     timeout: 10s
-
-
-
-
-
-
-
-
-
-
-
