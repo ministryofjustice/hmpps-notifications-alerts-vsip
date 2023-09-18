@@ -12,7 +12,7 @@
         </layout>
     </appender>
 
-    <logger name="uk.gov.justice.digital.hmpps.hmppsnotificationsalertsvsip.HmppsNotificationsAlertsVsipKt"
+    <logger name="uk.gov.justice.digital.hmpps.notificationsalertsvsip.hmpps.notificationsalertsvsipKt"
             additivity="false" level="DEBUG">
         <appender-ref ref="consoleAppender"/>
     </logger>
