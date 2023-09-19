@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.HmppsAuthExtension
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.DomainEventListenerService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PRISON_VISITS_NOTIFICATION_ALERTS_QUEUE_CONFIG_KEY
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.EventFeatureSwitch
@@ -64,6 +65,9 @@ abstract class EventsIntegrationTestBase {
 
   @SpyBean
   lateinit var eventFeatureSwitch: EventFeatureSwitch
+
+  @SpyBean
+  lateinit var notificationService: NotificationService
 
   @SpyBean
   lateinit var prisonVisitBookedEventNotifierSpy: PrisonVisitBookedEventNotifier
@@ -139,10 +143,10 @@ abstract class EventsIntegrationTestBase {
     return "{\"eventType\":\"$eventType\",\"additionalInformation\":$additionalInformation}"
   }
 
-  fun createAdditionalInformationJson(effectiveDate: String, expiryDate: String? = null): String {
+  fun createAdditionalInformationJson(bookingReference: String): String {
     val builder = StringBuilder()
     builder.append("{")
-    // TODO Must be in JSON format
+    builder.append("\"reference\":\"$bookingReference\"")
     builder.append("}")
     return builder.toString()
   }
