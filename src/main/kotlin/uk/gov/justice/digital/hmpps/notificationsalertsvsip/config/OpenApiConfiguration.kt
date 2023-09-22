@@ -30,7 +30,7 @@ class OpenApiConfiguration(
   private val buildVersion: String = buildProperties.version
 
   @Value("\${info.app.description}")
-  private val description: String = "VSIP Orchestration service used by VSIP frontend to make external API calls and collate responses."
+  private val description: String = "VSIP notifications service is a notify users via various channels to changes to visits"
 
   @Value("\${info.app.contact.name}")
   private val contactName: String = "Prison Visits Booking Project"
