@@ -2,7 +2,7 @@
 generic-service:
   nameOverride: hmpps-notifications-alerts-vsip
   serviceAccountName: visit-someone-in-prison
-
+  productId: "DPS035"
   replicaCount: 4
 
   image:
