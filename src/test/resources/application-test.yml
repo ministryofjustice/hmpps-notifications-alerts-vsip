@@ -27,3 +27,18 @@ feature:
   event:
     prison-visit:
       cancelled.test: false
+
+visit-scheduler:
+  api:
+    url: http://localhost:8092
+    timeout: 10s
+
+prison-register:
+  api:
+    url: http://localhost:8096
+
+notify:
+  sms:
+    enabled: false
+  api:
+    key: "test"
