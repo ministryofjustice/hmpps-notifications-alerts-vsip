@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationService.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 
@@ -16,7 +17,7 @@ class PrisonVisitCancelledEventNotifier(
 ) : EventNotifier(objectMapper) {
   override fun processEvent(domainEvent: DomainEvent) {
     val visitAdditionalInfo: VisitAdditionalInfo = objectMapper.readValue(domainEvent.additionalInformation)
-    LOG.debug("Enter processEvent visitAdditionalInfo Info:$visitAdditionalInfo")
-    notificationService.sendVisitCancelledMessage(visitAdditionalInfo.bookingReference)
+    LOG.debug("Enter cancel event with info {}", visitAdditionalInfo)
+    notificationService.sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo.bookingReference)
   }
 }

@@ -18,15 +18,35 @@ class WebClientConfiguration(
 
   @Value("\${hmpps.auth.url}")
   private val hmppsAuthUrl: String,
+
+  @Value("\${visit-scheduler.api.url}")
+  private val visitSchedulerBaseUrl: String,
+
+  @Value("\${prison-register.api.url}")
+  private val prisonRegisterBaseUrl: String,
 ) {
   private enum class HmppsAuthClientRegistrationId(val clientRegistrationId: String) {
     HMPPS_AUTH_CLIENT("other-hmpps-apis"),
+    VISIT_SCHEDULER("other-hmpps-apis"),
+    PRISON_REGISTER_CLIENT("other-hmpps-apis"),
   }
 
   @Bean
   fun hmppsAuthWebClient(authorizedClientManager: OAuth2AuthorizedClientManager): WebClient {
     val oauth2Client = getOauth2Client(authorizedClientManager, HmppsAuthClientRegistrationId.HMPPS_AUTH_CLIENT.clientRegistrationId)
     return getWebClient(hmppsAuthUrl, oauth2Client)
+  }
+
+  @Bean
+  fun visitSchedulerWebClient(authorizedClientManager: OAuth2AuthorizedClientManager): WebClient {
+    val oauth2Client = getOauth2Client(authorizedClientManager, HmppsAuthClientRegistrationId.VISIT_SCHEDULER.clientRegistrationId)
+    return getWebClient(visitSchedulerBaseUrl, oauth2Client)
+  }
+
+  @Bean
+  fun prisonRegisterWebClient(authorizedClientManager: OAuth2AuthorizedClientManager): WebClient {
+    val oauth2Client = getOauth2Client(authorizedClientManager, HmppsAuthClientRegistrationId.PRISON_REGISTER_CLIENT.clientRegistrationId)
+    return getWebClient(prisonRegisterBaseUrl, oauth2Client)
   }
 
   private fun getOauth2Client(authorizedClientManager: OAuth2AuthorizedClientManager, clientRegistrationId: String): ServletOAuth2AuthorizedClientExchangeFilterFunction {
