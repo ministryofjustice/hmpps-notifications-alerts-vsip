@@ -30,12 +30,12 @@ class PrisonRegisterMockServer(@Autowired private val objectMapper: ObjectMapper
     )
   }
 
-  fun stubGetPrisonContactDetails(prisonCode: String, prisonContactDetailsDto: PrisonContactDetailsDto?, httpStatus: HttpStatus = HttpStatus.NOT_FOUND) {
+  fun stubGetPrisonSocialVisitContactDetails(prisonCode: String, prisonContactDetailsDto: PrisonContactDetailsDto?, httpStatus: HttpStatus = HttpStatus.NOT_FOUND) {
     val responseBuilder = aResponse()
       .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 
     stubFor(
-      get("/secure/prisons/id/$prisonCode/department/contact-details")
+      get("/secure/prisons/id/$prisonCode/department/contact-details?departmentType=SOCIAL_VISIT")
         .willReturn(
           if (prisonContactDetailsDto == null) {
             responseBuilder

@@ -173,7 +173,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
-    prisonRegisterMockServer.stubGetPrisonContactDetails(prison.prisonId, prisonContactDetailsDto)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
@@ -205,7 +205,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
-    prisonRegisterMockServer.stubGetPrisonContactDetails(prison.prisonId, null, HttpStatus.NOT_FOUND)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null, HttpStatus.NOT_FOUND)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
