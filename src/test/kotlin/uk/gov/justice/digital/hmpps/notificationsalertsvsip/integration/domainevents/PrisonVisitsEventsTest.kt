@@ -85,11 +85,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("1234-5678-9012"),
         eq(visit.visitContact!!.telephone),
         check {
-          Assertions.assertThat(it["prison"]).isEqualTo(prison.prisonName)
-          Assertions.assertThat(it["time"]).isEqualTo("10:30 AM")
-          Assertions.assertThat(it["dayofweek"]).isEqualTo("Thursday")
-          Assertions.assertThat(it["date"]).isEqualTo("30 November 2023")
-          Assertions.assertThat(it["ref number"]).isEqualTo(bookingReference)
+          assertSmsDetails(prisonName = prison.prisonName, time = "10:30 AM", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = null, it)
         },
       )
     }
@@ -134,11 +130,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("5678-9012-3456"),
         eq(visit.visitContact!!.telephone),
         check {
-          Assertions.assertThat(it["prison"]).isEqualTo(prison.prisonName)
-          Assertions.assertThat(it["time"]).isEqualTo("10:30 AM")
-          Assertions.assertThat(it["dayofweek"]).isEqualTo("Thursday")
-          Assertions.assertThat(it["date"]).isEqualTo("30 November 2023")
-          Assertions.assertThat(it["ref number"]).isEqualTo(bookingReference)
+          assertSmsDetails(prisonName = prison.prisonName, time = "10:30 AM", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = null, it)
         },
       )
     }
@@ -184,11 +176,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("7890-1234-5678"),
         eq(visit.visitContact!!.telephone),
         check {
-          Assertions.assertThat(it["prison"]).isEqualTo(prison.prisonName)
-          Assertions.assertThat(it["time"]).isEqualTo("10:30 AM")
-          Assertions.assertThat(it["date"]).isEqualTo("30 November 2023")
-          Assertions.assertThat(it["ref number"]).isEqualTo(bookingReference)
-          Assertions.assertThat(it["prison phone number"]).isEqualTo(prisonContactDetailsDto.phoneNumber)
+          assertSmsDetails(prisonName = prison.prisonName, time = "10:30 AM", dayOfWeek = null, date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
         },
       )
     }
@@ -216,11 +204,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("9012-3456-7890"),
         eq(visit.visitContact!!.telephone),
         check {
-          Assertions.assertThat(it["prison"]).isEqualTo(prison.prisonName)
-          Assertions.assertThat(it["time"]).isEqualTo("10:30 AM")
-          Assertions.assertThat(it["date"]).isEqualTo("30 November 2023")
-          Assertions.assertThat(it["ref number"]).isEqualTo(bookingReference)
-          Assertions.assertThat(it["prison phone number"]).isNull()
+          assertSmsDetails(prisonName = prison.prisonName, time = "10:30 AM", dayOfWeek = null, date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = null, it)
         },
       )
     }
@@ -242,5 +226,14 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "aa-xx-wn-ml") }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+  }
+
+  private fun assertSmsDetails(prisonName: String, time: String, dayOfWeek: String?, date: String, bookingReference: String, prisonPhoneNumber: String?, parameters: Map<String, String>) {
+    Assertions.assertThat(parameters["prison"]).isEqualTo(prisonName)
+    Assertions.assertThat(parameters["time"]).isEqualTo(time)
+    Assertions.assertThat(parameters["dayofweek"]).isEqualTo(dayOfWeek)
+    Assertions.assertThat(parameters["date"]).isEqualTo(date)
+    Assertions.assertThat(parameters["prison phone number"]).isEqualTo(prisonPhoneNumber)
+    Assertions.assertThat(parameters["ref number"]).isEqualTo(bookingReference)
   }
 }

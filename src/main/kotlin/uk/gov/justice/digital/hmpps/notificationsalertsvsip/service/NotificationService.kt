@@ -3,7 +3,9 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.client.PrisonRegisterClient
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.client.VisitSchedulerClient
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
@@ -83,12 +85,16 @@ class NotificationService(
   }
 
   private fun getVisit(bookingReference: String): VisitDto? {
-    return try {
-      visitSchedulerClient.getVisitByReference(bookingReference)
+    try {
+      return visitSchedulerClient.getVisitByReference(bookingReference)
     } catch (e: Exception) {
       // if there was an error getting the visit return null
-      LOG.error("no visit found for visit with booking reference - $bookingReference")
-      null
+      if (e is WebClientResponseException && e.statusCode == HttpStatus.NOT_FOUND) {
+        LOG.error("no visit found with booking reference - $bookingReference")
+        return null
+      }
+
+      throw e
     }
   }
 
@@ -97,7 +103,7 @@ class NotificationService(
       prisonRegisterClient.getSocialVisitContact(prisonCode)?.phoneNumber
     } catch (e: Exception) {
       // if there was an error getting the social visit contact return null
-      LOG.info("no contact number returned for prison - $prisonCode")
+      LOG.info("no social visit contact number returned for prison - $prisonCode")
       null
     }
   }
