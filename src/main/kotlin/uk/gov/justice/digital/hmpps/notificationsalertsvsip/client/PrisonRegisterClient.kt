@@ -14,7 +14,7 @@ class PrisonRegisterClient(
   @Qualifier("prisonRegisterWebClient") private val webClient: WebClient,
   @Value("\${prison-register.api.timeout:10s}") private val apiTimeout: Duration,
 ) {
-  companion object{
+  companion object {
     const val DEPARTMENT_TYPE = "SOCIAL_VISIT"
   }
   fun getPrison(prisonCode: String): PrisonDto? {
@@ -26,8 +26,8 @@ class PrisonRegisterClient(
 
   fun getSocialVisitContact(prisonCode: String): PrisonContactDetailsDto? {
     return webClient.get().uri("/secure/prisons/id/$prisonCode/department/contact-details") {
-        it.queryParam("departmentType", DEPARTMENT_TYPE).build()
-      }
+      it.queryParam("departmentType", DEPARTMENT_TYPE).build()
+    }
       .retrieve()
       .bodyToMono<PrisonContactDetailsDto>()
       .block(apiTimeout)
