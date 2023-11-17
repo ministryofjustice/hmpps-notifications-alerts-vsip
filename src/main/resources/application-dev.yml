@@ -20,5 +20,5 @@ hmpps:
         arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
 
 visit-scheduler.api.url: http://localhost:8081
-prisoner-contact.registry.url: https://prisoner-contact-registry-dev.prison.service.justice.gov.uk
+prison-register.api.url: https://prison-register-dev.hmpps.service.justice.gov.uk
 notify.sms.enabled: true
