@@ -31,6 +31,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.2.0")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
   implementation("org.springdoc:springdoc-openapi-starter-common:2.2.0")
+  implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
 
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
