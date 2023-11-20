@@ -63,7 +63,7 @@ class NotificationService(
                 "prison" to getPrisonName(visit.prisonCode),
                 "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
                 "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
-                "ref number" to visit.reference,
+                "reference" to visit.reference,
                 "prison phone number" to prisonContactNumber,
               ),
             )
@@ -75,7 +75,7 @@ class NotificationService(
                 "prison" to getPrisonName(visit.prisonCode),
                 "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
                 "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
-                "ref number" to visit.reference,
+                "reference" to visit.reference,
               ),
             )
           }
