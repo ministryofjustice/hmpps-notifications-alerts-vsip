@@ -87,6 +87,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         check {
           assertSmsDetailsBookOrUpdate(prisonName = prison.prisonName, time = "10:30 AM", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, parameters = it)
         },
+        eq(bookingReference),
       )
     }
   }
@@ -106,7 +107,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any(), any()) }
   }
 
   @Test
@@ -132,6 +133,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         check {
           assertSmsDetailsBookOrUpdate(prisonName = prison.prisonName, time = "10:30 AM", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, parameters = it)
         },
+        eq(bookingReference),
       )
     }
   }
@@ -151,7 +153,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any(), any()) }
   }
 
   @Test
@@ -178,6 +180,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         check {
           assertSmsDetailsCancel(prisonName = prison.prisonName, time = "10:30 AM", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
         },
+        eq(bookingReference),
       )
     }
   }
@@ -206,6 +209,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         check {
           assertSmsDetailsCancel(prisonName = prison.prisonName, time = "10:30 AM", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = null, it)
         },
+        eq(bookingReference),
       )
     }
   }
@@ -225,7 +229,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "aa-xx-wn-ml") }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any(), any()) }
   }
 
   private fun assertSmsDetailsBookOrUpdate(prisonName: String, time: String, dayOfWeek: String, date: String, bookingReference: String, parameters: Map<String, String>) {
