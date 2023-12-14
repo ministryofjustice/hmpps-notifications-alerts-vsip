@@ -50,6 +50,7 @@ class NotificationService(
             "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
             "ref number" to visit.reference,
           ),
+          visit.reference,
         )
 
         VisitEventType.CANCELLED -> {
@@ -66,6 +67,7 @@ class NotificationService(
                 "reference" to visit.reference,
                 "prison phone number" to prisonContactNumber,
               ),
+              visit.reference,
             )
           } else {
             smsSenderService.sendSms(
@@ -77,6 +79,7 @@ class NotificationService(
                 "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
                 "reference" to visit.reference,
               ),
+              visit.reference,
             )
           }
         }

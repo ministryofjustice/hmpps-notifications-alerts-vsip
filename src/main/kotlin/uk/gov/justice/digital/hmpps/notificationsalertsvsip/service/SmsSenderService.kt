@@ -16,9 +16,9 @@ class SmsSenderService(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun sendSms(templateID: String, phoneNumber: String, personalisation: Map<String, String>) {
+  fun sendSms(templateID: String, phoneNumber: String, personalisation: Map<String, String>, reference: String) {
     if (enabled) {
-      notificationClient.sendSms(templateID, phoneNumber, personalisation, null)
+      notificationClient.sendSms(templateID, phoneNumber, personalisation, reference)
     } else {
       LOG.info("Sending SMS has been disabled.")
     }
