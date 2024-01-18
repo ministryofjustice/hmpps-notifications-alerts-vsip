@@ -1,7 +1,7 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.10.1"
-  kotlin("plugin.spring") version "1.9.21"
-  id("org.jetbrains.kotlin.plugin.noarg") version "1.9.21"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.14.1"
+  kotlin("plugin.spring") version "1.9.22"
+  id("org.jetbrains.kotlin.plugin.noarg") version "1.9.22"
 }
 
 configurations {
@@ -26,16 +26,16 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
   implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:1.32.0")
 
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0")
-  implementation("org.springframework.data:spring-data-commons:3.2.0")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1")
+  implementation("org.springframework.data:spring-data-commons:3.2.2")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.3.0")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
   implementation("org.springdoc:springdoc-openapi-starter-common:2.3.0")
-  implementation("uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE")
+  implementation("uk.gov.service.notify:notifications-java-client:5.0.0-RELEASE")
 
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.19")
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.20")
   testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.testcontainers:localstack:1.19.3")

@@ -26,7 +26,7 @@ class NotificationService(
   private companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
     private const val SMS_DATE_PATTERN = "dd MMMM yyyy"
-    private const val SMS_TIME_PATTERN = "hh:mm a"
+    private const val SMS_TIME_PATTERN = "h:mma"
     private const val SMS_DAY_OF_WEEK_PATTERN = "EEEE"
   }
 
@@ -130,7 +130,7 @@ class NotificationService(
   }
 
   private fun getFormattedTime(visitStartTime: LocalTime): String {
-    return visitStartTime.format(DateTimeFormatter.ofPattern(SMS_TIME_PATTERN)).uppercase()
+    return visitStartTime.format(DateTimeFormatter.ofPattern(SMS_TIME_PATTERN)).lowercase()
   }
 
   private fun getFormattedDayOfWeek(visitDate: LocalDate): String {
