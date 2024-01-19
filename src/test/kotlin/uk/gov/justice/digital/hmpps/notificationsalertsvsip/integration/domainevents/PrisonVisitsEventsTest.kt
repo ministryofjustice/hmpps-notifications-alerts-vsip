@@ -70,7 +70,6 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       telephoneNumber = "01234567890",
     )
 
-
     visit4 = createVisitDto(
       bookingReference = "qq-yy-xx-kk",
       visitDate = LocalDate.of(2024, 1, 1),
@@ -346,7 +345,6 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       )
     }
   }
-
 
   @Test
   fun `when visit cancelled message is received then cancel message is sent with the right time format  when start time minutes is 01`() {
