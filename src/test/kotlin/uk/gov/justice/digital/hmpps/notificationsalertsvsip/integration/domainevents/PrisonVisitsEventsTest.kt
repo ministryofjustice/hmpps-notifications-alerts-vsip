@@ -37,6 +37,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
   lateinit var visit: VisitDto
   lateinit var visit2: VisitDto
   lateinit var visit3: VisitDto
+  lateinit var visit4: VisitDto
   lateinit var prison: PrisonDto
   lateinit var prisonContactDetailsDto: PrisonContactDetailsDto
 
@@ -64,6 +65,16 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       bookingReference = "zz-yy-xx-kk",
       visitDate = LocalDate.of(2023, 11, 30),
       visitTime = LocalTime.of(8, 0),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      contactName = "John Smith",
+      telephoneNumber = "01234567890",
+    )
+
+
+    visit4 = createVisitDto(
+      bookingReference = "qq-yy-xx-kk",
+      visitDate = LocalDate.of(2024, 1, 1),
+      visitTime = LocalTime.of(0, 1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       contactName = "John Smith",
       telephoneNumber = "01234567890",
@@ -103,7 +114,35 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit booked message is received then booking message is sent in the right time format`() {
+  fun `when visit booked message is received then booking message is sent in the right time format when start time minutes is 01`() {
+    // Given
+    val bookingReference = visit4.reference
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, visit4)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+
+    // Then
+    await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "qq-yy-xx-kk") }
+
+    await untilAsserted {
+      verify(smsSenderService, times(1)).sendSms(
+        eq("1234-5678-9012"),
+        eq(visit.visitContact!!.telephone),
+        check {
+          assertSmsDetailsBookOrUpdate(prisonName = prison.prisonName, time = "12:01am", dayOfWeek = "Monday", date = "01 January 2024", bookingReference = bookingReference, parameters = it)
+        },
+        eq(bookingReference),
+      )
+    }
+  }
+
+  @Test
+  fun `when visit booked message is received then booking message is sent in the right time format when start time minutes is 00`() {
     // Given
     val bookingReference = visit3.reference
     val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
@@ -123,7 +162,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("1234-5678-9012"),
         eq(visit.visitContact!!.telephone),
         check {
-          assertSmsDetailsBookOrUpdate(prisonName = prison.prisonName, time = "8:00am", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, parameters = it)
+          assertSmsDetailsBookOrUpdate(prisonName = prison.prisonName, time = "8am", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, parameters = it)
         },
         eq(bookingReference),
       )
@@ -177,7 +216,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit updated message is received then update message is sent with th right time format`() {
+  fun `when visit updated message is received then update message is sent with th right time format when start time minutes is 00`() {
     // Given
     val bookingReference = visit3.reference
     val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
@@ -197,7 +236,35 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("5678-9012-3456"),
         eq(visit.visitContact!!.telephone),
         check {
-          assertSmsDetailsBookOrUpdate(prisonName = prison.prisonName, time = "8:00am", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, parameters = it)
+          assertSmsDetailsBookOrUpdate(prisonName = prison.prisonName, time = "8am", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, parameters = it)
+        },
+        eq(bookingReference),
+      )
+    }
+  }
+
+  @Test
+  fun `when visit updated message is received then update message is sent with th right time format when start time minutes is 01`() {
+    // Given
+    val bookingReference = visit4.reference
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, visit4)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+
+    // Then
+    await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "qq-yy-xx-kk") }
+
+    await untilAsserted {
+      verify(smsSenderService, times(1)).sendSms(
+        eq("5678-9012-3456"),
+        eq(visit.visitContact!!.telephone),
+        check {
+          assertSmsDetailsBookOrUpdate(prisonName = prison.prisonName, time = "12:01am", dayOfWeek = "Monday", date = "01 January 2024", bookingReference = bookingReference, parameters = it)
         },
         eq(bookingReference),
       )
@@ -252,7 +319,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit cancelled message is received then cancel message is sent with the right time format`() {
+  fun `when visit cancelled message is received then cancel message is sent with the right time format  when start time minutes is 00`() {
     // Given
     val bookingReference = visit3.reference
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson("zz-yy-xx-kk"))
@@ -273,7 +340,37 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("7890-1234-5678"),
         eq(visit.visitContact!!.telephone),
         check {
-          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "8:00am", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
+          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "8am", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
+        },
+        eq(bookingReference),
+      )
+    }
+  }
+
+
+  @Test
+  fun `when visit cancelled message is received then cancel message is sent with the right time format  when start time minutes is 01`() {
+    // Given
+    val bookingReference = visit4.reference
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson("qq-yy-xx-kk"))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, visit4)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "qq-yy-xx-kk") }
+
+    await untilAsserted {
+      verify(smsSenderService, times(1)).sendSms(
+        eq("7890-1234-5678"),
+        eq(visit.visitContact!!.telephone),
+        check {
+          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "12:01am", date = "01 January 2024", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
         },
         eq(bookingReference),
       )
