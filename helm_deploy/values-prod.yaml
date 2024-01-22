@@ -2,7 +2,7 @@
 # Per environment values which override defaults in hmpps-notifications-alerts-vsip/values.yaml
 
 generic-service:
-  replicaCount: 4
+  replicaCount: 2
 
   ingress:
     host: hmpps-notifi-alerts-vsip.prison.service.justice.gov.uk
