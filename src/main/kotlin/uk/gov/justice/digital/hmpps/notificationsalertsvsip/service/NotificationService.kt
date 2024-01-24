@@ -56,30 +56,27 @@ class NotificationService(
 
         VisitEventType.CANCELLED -> {
           val prisonContactNumber = getPrisonSocialVisitsContactNumber(visit.prisonCode)
+          val cancelSmsValuesMap = mutableMapOf(
+            "prison" to getPrisonName(visit.prisonCode),
+            "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
+            "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
+            "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
+            "reference" to visit.reference,
+          )
 
           if (prisonContactNumber != null) {
+            cancelSmsValuesMap["prison phone number"] = prisonContactNumber
             smsSenderService.sendSms(
               visitCancelTemplateId,
               telephoneNumber,
-              mapOf(
-                "prison" to getPrisonName(visit.prisonCode),
-                "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
-                "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
-                "reference" to visit.reference,
-                "prison phone number" to prisonContactNumber,
-              ),
+              cancelSmsValuesMap.toMap(),
               visit.reference,
             )
           } else {
             smsSenderService.sendSms(
               visitCancelNoPrisonNumberTemplateId,
               telephoneNumber,
-              mapOf(
-                "prison" to getPrisonName(visit.prisonCode),
-                "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
-                "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
-                "reference" to visit.reference,
-              ),
+              cancelSmsValuesMap.toMap(),
               visit.reference,
             )
           }
