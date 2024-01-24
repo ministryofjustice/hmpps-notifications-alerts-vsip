@@ -310,7 +310,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("7890-1234-5678"),
         eq(visit.visitContact!!.telephone),
         check {
-          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "10:30am", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
+          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "10:30am", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
         },
         eq(bookingReference),
       )
@@ -339,7 +339,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("7890-1234-5678"),
         eq(visit.visitContact!!.telephone),
         check {
-          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "8am", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
+          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "8am", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
         },
         eq(bookingReference),
       )
@@ -368,7 +368,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("7890-1234-5678"),
         eq(visit.visitContact!!.telephone),
         check {
-          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "12:01am", date = "01 January 2024", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
+          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "12:01am", dayOfWeek = "Monday", date = "01 January 2024", bookingReference = bookingReference, prisonPhoneNumber = prisonContactDetailsDto.phoneNumber, it)
         },
         eq(bookingReference),
       )
@@ -397,7 +397,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
         eq("9012-3456-7890"),
         eq(visit.visitContact!!.telephone),
         check {
-          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "10:30am", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = null, it)
+          assertSmsDetailsCancel(prisonName = prison.prisonName, time = "10:30am", dayOfWeek = "Thursday", date = "30 November 2023", bookingReference = bookingReference, prisonPhoneNumber = null, it)
         },
         eq(bookingReference),
       )
@@ -430,10 +430,11 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     Assertions.assertThat(parameters["ref number"]).isEqualTo(bookingReference)
   }
 
-  private fun assertSmsDetailsCancel(prisonName: String, time: String, date: String, bookingReference: String, prisonPhoneNumber: String?, parameters: Map<String, String>) {
+  private fun assertSmsDetailsCancel(prisonName: String, time: String, dayOfWeek: String, date: String, bookingReference: String, prisonPhoneNumber: String?, parameters: Map<String, String>) {
     Assertions.assertThat(parameters["prison"]).isEqualTo(prisonName)
     Assertions.assertThat(parameters["time"]).isEqualTo(time)
     Assertions.assertThat(parameters["date"]).isEqualTo(date)
+    Assertions.assertThat(parameters["dayofweek"]).isEqualTo(dayOfWeek)
     Assertions.assertThat(parameters["prison phone number"]).isEqualTo(prisonPhoneNumber)
     Assertions.assertThat(parameters["reference"]).isEqualTo(bookingReference)
   }
