@@ -166,13 +166,13 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, contactName: String, telephoneNumber: String?): VisitDto {
+  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto?): VisitDto {
     return VisitDto(
       reference = bookingReference,
       prisonCode = prisonCode,
       startTimestamp = visitDate.atTime(visitTime),
       endTimestamp = visitDate.atTime(visitTime).plus(duration),
-      visitContact = if (telephoneNumber != null) ContactDto(contactName, telephoneNumber) else null,
+      visitContact = visitContact,
     )
   }
 }

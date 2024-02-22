@@ -22,3 +22,4 @@ hmpps:
 visit-scheduler.api.url: http://localhost:8081
 prison-register.api.url: https://prison-register-dev.hmpps.service.justice.gov.uk
 notify.sms.enabled: true
+notify.api.key: dummy-api-key

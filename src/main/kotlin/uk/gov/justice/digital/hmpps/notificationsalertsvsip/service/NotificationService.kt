@@ -41,43 +41,49 @@ class NotificationService(
 
     visit?.let {
       if (visit.startTimestamp > LocalDateTime.now()) {
-        val telephoneNumber = visit.visitContact?.telephone
-        if (!telephoneNumber.isNullOrEmpty()) {
-          val prisonName = getPrisonName(visit.prisonCode)
-          val templateId: String
-          val visitDetailsMap = mutableMapOf(
-            "prison" to prisonName,
-            "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
-            "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
-            "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
-          )
+        if (visit.visitContact != null) {
+          val telephoneNumber = visit.visitContact.telephone
+          if (telephoneNumber.isNotEmpty()) {
+            val prisonName = getPrisonName(visit.prisonCode)
+            val templateId: String
+            val visitDetailsMap = mutableMapOf(
+              "prison" to prisonName,
+              "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
+              "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
+              "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
+            )
 
-          when (visitEventType) {
-            VisitEventType.BOOKED, VisitEventType.UPDATED -> {
-              templateId = getNotificationTemplateId(visitEventType)
-              visitDetailsMap["ref number"] = visit.reference
-            }
+            when (visitEventType) {
+              VisitEventType.BOOKED, VisitEventType.UPDATED -> {
+                templateId = getNotificationTemplateId(visitEventType)
+                visitDetailsMap["ref number"] = visit.reference
+              }
 
-            VisitEventType.CANCELLED -> {
-              val prisonContactNumber: String? = getPrisonSocialVisitsContactNumber(visit.prisonCode)
-              val prisonPhoneNumberAvailable = !prisonContactNumber.isNullOrEmpty()
-              templateId = getNotificationTemplateId(visitEventType, prisonPhoneNumberAvailable)
-              visitDetailsMap["reference"] = visit.reference
+              VisitEventType.CANCELLED -> {
+                val prisonContactNumber: String? = getPrisonSocialVisitsContactNumber(visit.prisonCode)
+                val prisonPhoneNumberAvailable = !prisonContactNumber.isNullOrEmpty()
+                templateId = getNotificationTemplateId(visitEventType, prisonPhoneNumberAvailable)
+                visitDetailsMap["reference"] = visit.reference
 
-              if (prisonPhoneNumberAvailable) {
-                visitDetailsMap["prison phone number"] = prisonContactNumber!!
+                if (prisonPhoneNumberAvailable) {
+                  visitDetailsMap["prison phone number"] = prisonContactNumber!!
+                }
               }
             }
-          }
 
-          // send the SMS
-          smsSenderService.sendSms(
-            templateId,
-            telephoneNumber,
-            visitDetailsMap.toMap(),
-            visit.reference,
-          )
+            // send the SMS
+            smsSenderService.sendSms(
+              templateId,
+              telephoneNumber,
+              visitDetailsMap.toMap(),
+              visit.reference,
+            )
+          }
+        } else {
+          LOG.info("No visit contact exists for visit reference - ${visit.reference}")
         }
+      } else {
+        LOG.info("Visit with reference - ${visit.reference} is in the past.")
       }
     }
   }

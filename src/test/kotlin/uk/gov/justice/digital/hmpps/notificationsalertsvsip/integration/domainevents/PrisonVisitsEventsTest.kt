@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestPropertySource
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonContactDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationService.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_BOOKED
@@ -51,8 +52,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       visitDate = LocalDate.now().plusMonths(1),
       visitTime = LocalTime.of(10, 30),
       duration = Duration.of(30, ChronoUnit.MINUTES),
-      contactName = "John Smith",
-      telephoneNumber = "01234567890",
+      visitContact = ContactDto("John Smith", "01234567890"),
     )
 
     visit2 = createVisitDto(
@@ -60,8 +60,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       visitDate = LocalDate.now().plusDays(3),
       visitTime = LocalTime.of(10, 30),
       duration = Duration.of(30, ChronoUnit.MINUTES),
-      contactName = "John Smith",
-      telephoneNumber = "01234567890",
+      visitContact = ContactDto("John Smith", "01234567890"),
     )
 
     visit3 = createVisitDto(
@@ -69,8 +68,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       visitDate = LocalDate.now().plusWeeks(2),
       visitTime = LocalTime.of(8, 0),
       duration = Duration.of(30, ChronoUnit.MINUTES),
-      contactName = "John Smith",
-      telephoneNumber = "01234567890",
+      visitContact = ContactDto("John Smith", "01234567890"),
     )
 
     visit4 = createVisitDto(
@@ -78,8 +76,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       visitDate = LocalDate.now().plusDays(1),
       visitTime = LocalTime.of(0, 1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
-      contactName = "John Smith",
-      telephoneNumber = "01234567890",
+      visitContact = ContactDto("John Smith", "01234567890"),
     )
 
     pastDatedVisit = createVisitDto(
@@ -87,8 +84,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       visitDate = LocalDate.now(),
       visitTime = LocalTime.now().minusMinutes(1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
-      contactName = "John Smith",
-      telephoneNumber = "01234567890",
+      visitContact = ContactDto("John Smith", "01234567890"),
     )
 
     noContactVisit = createVisitDto(
@@ -96,8 +92,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       visitDate = LocalDate.now(),
       visitTime = LocalTime.now().minusMinutes(1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
-      contactName = "John Smith",
-      telephoneNumber = null,
+      visitContact = null,
     )
 
     prison = PrisonDto("HEI", "Hewell", true)
