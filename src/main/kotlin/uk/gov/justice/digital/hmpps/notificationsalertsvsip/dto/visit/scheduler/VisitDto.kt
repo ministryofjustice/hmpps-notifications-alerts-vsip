@@ -19,6 +19,6 @@ data class VisitDto(
   val startTimestamp: LocalDateTime,
   @Schema(description = "The finishing date and time of the visit", example = "2018-12-01T13:45:00", required = true)
   val endTimestamp: LocalDateTime,
-  @Schema(description = "Visit Notes", required = false)
-  val visitContact: ContactDto? = null,
+  @Schema(description = "Visit Contact", required = true)
+  val visitContact: ContactDto,
 )
