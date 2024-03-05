@@ -166,7 +166,7 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto?): VisitDto {
+  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto): VisitDto {
     return VisitDto(
       reference = bookingReference,
       prisonCode = prisonCode,

@@ -92,7 +92,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       visitDate = LocalDate.now(),
       visitTime = LocalTime.now().minusMinutes(1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
-      visitContact = null,
+      visitContact = ContactDto("John Smith", null),
     )
 
     prison = PrisonDto("HEI", "Hewell", true)
@@ -122,7 +122,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("1234-5678-9012"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsBookOrUpdate(
             prisonName = prison.prisonName,
@@ -160,7 +160,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("1234-5678-9012"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsBookOrUpdate(
             prisonName = prison.prisonName,
@@ -198,7 +198,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("1234-5678-9012"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsBookOrUpdate(
             prisonName = prison.prisonName,
@@ -290,7 +290,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("5678-9012-3456"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsBookOrUpdate(
             prisonName = prison.prisonName,
@@ -328,7 +328,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("5678-9012-3456"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsBookOrUpdate(
             prisonName = prison.prisonName,
@@ -366,7 +366,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("5678-9012-3456"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsBookOrUpdate(
             prisonName = prison.prisonName,
@@ -459,7 +459,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("7890-1234-5678"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsCancel(
             prisonName = prison.prisonName,
@@ -499,7 +499,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("7890-1234-5678"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsCancel(
             prisonName = prison.prisonName,
@@ -539,7 +539,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("7890-1234-5678"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsCancel(
             prisonName = prison.prisonName,
@@ -579,7 +579,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(smsSenderService, times(1)).sendSms(
         eq("9012-3456-7890"),
-        eq(visit.visitContact!!.telephone),
+        eq(visit.visitContact.telephone!!),
         check {
           assertSmsDetailsCancel(
             prisonName = prison.prisonName,
