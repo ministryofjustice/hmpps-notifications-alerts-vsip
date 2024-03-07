@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
   kotlin("plugin.spring") version "1.9.22"
   id("org.jetbrains.kotlin.plugin.noarg") version "1.9.22"
 }
@@ -27,7 +27,7 @@ dependencies {
   implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.1.0")
 
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1")
-  implementation("org.springframework.data:spring-data-commons:3.2.2")
+  implementation("org.springframework.data:spring-data-commons:3.2.3")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.3.0")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
   implementation("org.springdoc:springdoc-openapi-starter-common:2.3.0")
@@ -35,10 +35,10 @@ dependencies {
 
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.20")
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.21")
   testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
   testImplementation("org.mockito:mockito-inline:5.2.0")
-  testImplementation("org.testcontainers:localstack:1.19.5")
+  testImplementation("org.testcontainers:localstack:1.19.7")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
   testImplementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
