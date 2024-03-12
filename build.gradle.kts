@@ -26,7 +26,7 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
   implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.1.0")
 
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.2")
   implementation("org.springframework.data:spring-data-commons:3.2.3")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.3.0")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
