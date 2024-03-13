@@ -41,7 +41,7 @@ class NotificationService(
 
     visit?.let {
       if (visit.startTimestamp > LocalDateTime.now()) {
-        val telephoneNumber = visit.visitContact?.telephone
+        val telephoneNumber = visit.visitContact.telephone
         if (!telephoneNumber.isNullOrEmpty()) {
           val prisonName = getPrisonName(visit.prisonCode)
           val templateId: String
@@ -77,7 +77,11 @@ class NotificationService(
             visitDetailsMap.toMap(),
             visit.reference,
           )
+        } else {
+          LOG.info("No telephone number exists for contact on visit reference - ${visit.reference}")
         }
+      } else {
+        LOG.info("Visit with reference - ${visit.reference} is in the past.")
       }
     }
   }
