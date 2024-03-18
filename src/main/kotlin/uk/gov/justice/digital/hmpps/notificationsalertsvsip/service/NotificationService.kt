@@ -26,7 +26,7 @@ class NotificationService(
 ) {
   private companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
-    private const val SMS_DATE_PATTERN = "dd MMMM yyyy"
+    private const val SMS_DATE_PATTERN = "d MMMM yyyy"
     private const val SMS_TIME_PATTERN = "h:mma"
     private const val SMS_TIME_PATTERN_WHEN_MNIUTES_IS_ZERO = "ha"
     private const val SMS_DAY_OF_WEEK_PATTERN = "EEEE"
