@@ -35,6 +35,9 @@ import java.time.temporal.ChronoUnit
   ],
 )
 class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
+  companion object {
+    const val EXPECTED_DATE_PATTERN = "d MMMM yyyy"
+  }
 
   lateinit var visit: VisitDto
   lateinit var visit2: VisitDto
@@ -42,6 +45,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
   lateinit var visit4: VisitDto
   lateinit var pastDatedVisit: VisitDto
   lateinit var noContactVisit: VisitDto
+  lateinit var singleDigitDateVisit: VisitDto
   lateinit var prison: PrisonDto
   lateinit var prisonContactDetailsDto: PrisonContactDetailsDto
 
@@ -95,6 +99,14 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("John Smith", null),
     )
 
+    singleDigitDateVisit = createVisitDto(
+      bookingReference = "bb-cc-dd-xd",
+      visitDate = LocalDate.now().plusYears(1).withMonth(1).withDayOfMonth(1),
+      visitTime = LocalTime.of(1, 5),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("John Smith", "01234567890"),
+    )
+
     prison = PrisonDto("HEI", "Hewell", true)
 
     prisonContactDetailsDto = PrisonContactDetailsDto(phoneNumber = "0111222333")
@@ -112,7 +124,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     val visitDate = visit.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -150,7 +162,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit4)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     val visitDate = visit4.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -188,7 +200,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit3)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     val visitDate = visit3.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -280,7 +292,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     val visitDate = visit.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -318,7 +330,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit3)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     val visitDate = visit3.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -356,7 +368,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit4)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     val visitDate = visit4.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -449,7 +461,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     val visitDate = visit.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -489,7 +501,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     val visitDate = visit3.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -529,7 +541,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     val visitDate = visit4.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -569,7 +581,7 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null, HttpStatus.NOT_FOUND)
     val visitDate = visit.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     // Then
@@ -648,6 +660,128 @@ class PrisonVisitsEventsTest : EventsIntegrationTestBase() {
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "bb-cc-dd-zz") }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any(), any()) }
+  }
+
+  @Test
+  fun `when single digit visit date booked then message is sent out with the right visit date format`() {
+    // Given
+    val bookingReference = singleDigitDateVisit.reference
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, singleDigitDateVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    val visitYear = singleDigitDateVisit.startTimestamp.toLocalDate().year
+
+    // expected visit date should not be 2 digits
+    val expectedVisitDate = "1 January $visitYear"
+    val expectedDayOfWeek = singleDigitDateVisit.startTimestamp.toLocalDate().dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+
+    // Then
+    await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bb-cc-dd-xd") }
+
+    await untilAsserted {
+      verify(smsSenderService, times(1)).sendSms(
+        eq("1234-5678-9012"),
+        eq(singleDigitDateVisit.visitContact.telephone!!),
+        check {
+          assertSmsDetailsBookOrUpdate(
+            prisonName = prison.prisonName,
+            time = "1:05am",
+            dayOfWeek = expectedDayOfWeek,
+            date = expectedVisitDate,
+            bookingReference = bookingReference,
+            parameters = it,
+          )
+        },
+        eq(bookingReference),
+      )
+    }
+  }
+
+  @Test
+  fun `when visit date updated to a single digit date then message is sent out with the right visit date format`() {
+    // Given
+    val bookingReference = singleDigitDateVisit.reference
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, singleDigitDateVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    val visitYear = singleDigitDateVisit.startTimestamp.toLocalDate().year
+
+    // expected visit date should not be 2 digits
+    val expectedVisitDate = "1 January $visitYear"
+    val expectedDayOfWeek = singleDigitDateVisit.startTimestamp.toLocalDate().dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+
+    // Then
+    await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "bb-cc-dd-xd") }
+
+    await untilAsserted {
+      verify(smsSenderService, times(1)).sendSms(
+        eq("5678-9012-3456"),
+        eq(singleDigitDateVisit.visitContact.telephone!!),
+        check {
+          assertSmsDetailsBookOrUpdate(
+            prisonName = prison.prisonName,
+            time = "1:05am",
+            dayOfWeek = expectedDayOfWeek,
+            date = expectedVisitDate,
+            bookingReference = bookingReference,
+            parameters = it,
+          )
+        },
+        eq(bookingReference),
+      )
+    }
+  }
+
+  @Test
+  fun `when single digit visit date cancelled then message is sent out with the right visit date format`() {
+    // Given
+    val bookingReference = singleDigitDateVisit.reference
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(bookingReference))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, singleDigitDateVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+
+    val visitYear = singleDigitDateVisit.startTimestamp.toLocalDate().year
+    // expected visit date should not be 2 digits
+    val expectedVisitDate = "1 January $visitYear"
+    val expectedDayOfWeek = singleDigitDateVisit.startTimestamp.toLocalDate().dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "bb-cc-dd-xd") }
+
+    await untilAsserted {
+      verify(smsSenderService, times(1)).sendSms(
+        eq("7890-1234-5678"),
+        eq(singleDigitDateVisit.visitContact.telephone!!),
+        check {
+          assertSmsDetailsCancel(
+            prisonName = prison.prisonName,
+            time = "1:05am",
+            dayOfWeek = expectedDayOfWeek,
+            date = expectedVisitDate,
+            bookingReference = bookingReference,
+            prisonPhoneNumber = prisonContactDetailsDto.phoneNumber,
+            parameters = it,
+          )
+        },
+        eq(bookingReference),
+      )
+    }
   }
 
   private fun assertSmsDetailsBookOrUpdate(prisonName: String, time: String, dayOfWeek: String, date: String, bookingReference: String, parameters: Map<String, String>) {
