@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.5"
   kotlin("plugin.spring") version "1.9.22"
   id("org.jetbrains.kotlin.plugin.noarg") version "1.9.22"
 }
@@ -19,18 +19,18 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-cache")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:3.1.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:3.1.2")
 
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.1.0")
+  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.2.0")
 
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.2")
-  implementation("org.springframework.data:spring-data-commons:3.2.3")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.3.0")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
-  implementation("org.springdoc:springdoc-openapi-starter-common:2.3.0")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0")
+  implementation("org.springframework.data:spring-data-commons:3.2.4")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.5.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+  implementation("org.springdoc:springdoc-openapi-starter-common:2.5.0")
   implementation("uk.gov.service.notify:notifications-java-client:5.0.0-RELEASE")
 
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -39,7 +39,7 @@ dependencies {
   testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.testcontainers:localstack:1.19.7")
-  testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
+  testImplementation("org.awaitility:awaitility-kotlin:4.2.1")
   testImplementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("io.jsonwebtoken:jjwt:0.12.5")
