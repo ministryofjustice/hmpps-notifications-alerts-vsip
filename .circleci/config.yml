@@ -36,20 +36,31 @@ jobs:
 
 workflows:
   version: 2
-  build-test-and-deploy:
+
+  build-test-deploy-main:
     jobs:
       - validate:
           filters:
             tags:
               ignore: /.*/
+            branches:
+              only:
+                - main
+
       - hmpps/helm_lint:
           name: helm_lint
+          filters:
+            branches:
+              only:
+                - main
+
       - hmpps/build_multiplatform_docker:
           name: build_docker
           filters:
             branches:
               only:
                 - main
+
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
@@ -62,34 +73,41 @@ workflows:
             - validate
             - build_docker
             - helm_lint
-      - request-staging-approval:
-          type: approval
-          requires:
-            - deploy_dev
+
       - hmpps/deploy_env:
           name: deploy_staging
           env: "staging"
           context:
             - hmpps-common-vars
             - hmpps-notifications-alerts-vsip-stage
+          filters:
+            branches:
+              only:
+                - main
           requires:
-            - request-staging-approval
-      - request-preprod-approval:
-          type: approval
-          requires:
-            - deploy_staging
+            - deploy_dev
+
       - hmpps/deploy_env:
           name: deploy_preprod
           env: "preprod"
           context:
             - hmpps-common-vars
             - hmpps-notifications-alerts-vsip-preprod
+          filters:
+            branches:
+              only:
+                - main
           requires:
             - request-preprod-approval
-      - request-prod-approval:
+      - request-preprod-approval:
           type: approval
           requires:
-            - deploy_preprod
+            - deploy_staging
+          filters:
+            branches:
+              only:
+                - main
+
       - hmpps/deploy_env:
           name: deploy_prod
           env: "prod"
@@ -98,66 +116,85 @@ workflows:
           context:
             - hmpps-common-vars
             - hmpps-notifications-alerts-vsip-prod
+          filters:
+            branches:
+              only:
+                - main
           requires:
             - request-prod-approval
+      - request-prod-approval:
+          type: approval
+          requires:
+            - deploy_preprod
+          filters:
+            branches:
+              only:
+                - main
 
-  build-test-deploy-develop-branch:
+  build-test-deploy-feature:
     jobs:
       - validate:
           filters:
             tags:
               ignore: /.*/
+            branches:
+              ignore:
+                - main
+
       - hmpps/helm_lint:
           name: helm_lint
+          filters:
+            branches:
+              ignore:
+                - main
+
       - hmpps/build_multiplatform_docker:
           name: build_docker
           filters:
             branches:
-              only:
-                - develop
-      - request-dev-approval:
-          type: approval
-          filters:
-            branches:
-              only:
-                - develop
+              ignore:
+                - main
+
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
           context: hmpps-common-vars
           filters:
             branches:
-              only:
-                - develop
+              ignore:
+                - main
           requires:
             - validate
             - build_docker
             - helm_lint
             - request-dev-approval
-      - request-staging-approval:
+      - request-dev-approval:
           type: approval
-          requires:
-            - deploy_dev
+          filters:
+            branches:
+              ignore:
+                - main
+
       - hmpps/deploy_env:
           name: deploy_staging
           env: "staging"
           context:
             - hmpps-common-vars
             - hmpps-notifications-alerts-vsip-stage
+          filters:
+            branches:
+              ignore:
+                - main
           requires:
             - request-staging-approval
-      - request-preprod-approval:
+      - request-staging-approval:
           type: approval
           requires:
-            - deploy_staging
-      - hmpps/deploy_env:
-          name: deploy_preprod
-          env: "preprod"
-          context:
-            - hmpps-common-vars
-            - hmpps-notifications-alerts-vsip-preprod
-          requires:
-            - request-preprod-approval
+            - deploy_dev
+          filters:
+            branches:
+              ignore:
+                - main
 
   security:
     triggers:
