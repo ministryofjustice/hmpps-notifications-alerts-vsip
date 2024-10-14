@@ -23,7 +23,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-cache")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.5.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.0.1")
 
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
