@@ -28,7 +28,7 @@ dependencies {
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.8.0")
+  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.9.0")
 
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0")
   implementation("org.springframework.data:spring-data-commons:3.3.4")
