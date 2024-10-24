@@ -36,8 +36,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
   implementation("org.springdoc:springdoc-openapi-starter-common:2.6.0")
   implementation("uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE")
-
-  annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+  implementation("org.springframework.boot:spring-boot-configuration-processor")
 
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.22")
   testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
