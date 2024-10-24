@@ -4,7 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.SmsTemplatesConfig
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
@@ -17,7 +17,7 @@ class SmsSenderService(
   @Value("\${notify.sms.enabled:}") private val enabled: Boolean,
   val notificationClient: NotificationClient,
   val prisonRegisterService: PrisonRegisterService,
-  val smsTemplatesConfig: SmsTemplatesConfig,
+  val templatesConfig: TemplatesConfig,
   val dateUtils: DateUtils,
 ) {
   private companion object {
@@ -41,7 +41,7 @@ class SmsSenderService(
       }
 
       notificationClient.sendSms(
-        smsTemplatesConfig.templates[sendSmsNotificationDto.templateName.name],
+        templatesConfig.smsTemplates[sendSmsNotificationDto.templateName.name],
         visit.visitContact.telephone,
         sendSmsNotificationDto.templateVars,
         visit.reference,

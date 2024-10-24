@@ -10,4 +10,6 @@ data class ContactDto(
   val name: String,
   @Schema(description = "Contact Phone Number", example = "01234 567890", required = false)
   val telephone: String? = null,
+  @Schema(description = "Contact Email", example = "example@email.com", required = false)
+  val email: String? = null,
 )

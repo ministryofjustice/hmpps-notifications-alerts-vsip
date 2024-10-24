@@ -40,5 +40,7 @@ prison-register:
 notify:
   sms:
     enabled: true
+  email:
+    enabled: true
   api:
     key: "test"
