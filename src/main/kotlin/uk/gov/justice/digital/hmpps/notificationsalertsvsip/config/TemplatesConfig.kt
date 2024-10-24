@@ -6,9 +6,12 @@ import org.springframework.stereotype.Component
 import org.springframework.validation.annotation.Validated
 
 @Component
-@ConfigurationProperties(prefix = "notify.sms")
+@ConfigurationProperties(prefix = "notify")
 @Validated
-class SmsTemplatesConfig {
+class TemplatesConfig {
   @NotNull
-  var templates: MutableMap<String, String> = HashMap()
+  var smsTemplates: MutableMap<String, String> = HashMap()
+
+  @NotNull
+  var emailTemplates: MutableMap<String, String> = HashMap()
 }

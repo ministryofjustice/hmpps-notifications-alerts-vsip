@@ -10,6 +10,7 @@ import java.time.LocalDateTime
 class NotificationService(
   val visitSchedulerService: VisitSchedulerService,
   val smsSenderService: SmsSenderService,
+  val emailSenderService: EmailSenderService,
 ) {
   private companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
@@ -20,10 +21,20 @@ class NotificationService(
 
     val visit = visitSchedulerService.getVisit(bookingReference)
     visit?.let {
-      if (visit.startTimestamp > LocalDateTime.now() && !visit.visitContact.telephone.isNullOrEmpty()) {
-        smsSenderService.sendSms(visit, visitEventType)
+      if (visit.startTimestamp > LocalDateTime.now()) {
+        if (!visit.visitContact.telephone.isNullOrEmpty()) {
+          smsSenderService.sendSms(visit, visitEventType)
+        } else {
+          LOG.info("No telephone number exists for contact on visit reference - ${visit.reference}")
+        }
+
+        if (!visit.visitContact.email.isNullOrEmpty()) {
+          emailSenderService.sendEmail(visit, visitEventType)
+        } else {
+          LOG.info("No email exists for contact on visit reference - ${visit.reference}")
+        }
       } else {
-        LOG.info("Visit in past or no telephone number exists for contact on visit reference - ${visit.reference}")
+        LOG.info("Visit in past - ${visit.reference}")
       }
     }
   }

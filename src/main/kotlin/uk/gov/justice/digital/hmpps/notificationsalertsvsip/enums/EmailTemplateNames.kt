@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums
 
-enum class VisitEventType {
-  BOOKED,
-  UPDATED,
-  CANCELLED,
+enum class EmailTemplateNames {
+  VISIT_BOOKING,
 }

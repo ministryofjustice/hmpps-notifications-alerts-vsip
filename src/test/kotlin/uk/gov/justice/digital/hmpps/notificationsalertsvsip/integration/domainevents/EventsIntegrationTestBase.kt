@@ -17,7 +17,7 @@ import org.springframework.test.context.DynamicPropertySource
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.SmsTemplatesConfig
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
@@ -88,7 +88,7 @@ abstract class EventsIntegrationTestBase {
   lateinit var smsSenderService: SmsSenderService
 
   @SpyBean
-  lateinit var smsTemplatesConfig: SmsTemplatesConfig
+  lateinit var templatesConfig: TemplatesConfig
 
   @SpyBean
   lateinit var prisonVisitBookedEventNotifierSpy: PrisonVisitBookedEventNotifier
