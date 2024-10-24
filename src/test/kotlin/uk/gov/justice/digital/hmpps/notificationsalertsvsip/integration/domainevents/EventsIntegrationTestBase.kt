@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
@@ -16,6 +17,7 @@ import org.springframework.test.context.DynamicPropertySource
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.SmsTemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
@@ -36,6 +38,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.no
 import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
+import uk.gov.service.notify.NotificationClient
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
@@ -85,6 +88,9 @@ abstract class EventsIntegrationTestBase {
   lateinit var smsSenderService: SmsSenderService
 
   @SpyBean
+  lateinit var smsTemplatesConfig: SmsTemplatesConfig
+
+  @SpyBean
   lateinit var prisonVisitBookedEventNotifierSpy: PrisonVisitBookedEventNotifier
 
   @SpyBean
@@ -92,6 +98,9 @@ abstract class EventsIntegrationTestBase {
 
   @SpyBean
   lateinit var prisonVisitCancelledEventNotifierSpy: PrisonVisitCancelledEventNotifier
+
+  @MockBean
+  lateinit var notificationClient: NotificationClient
 
   @Autowired
   protected lateinit var objectMapper: ObjectMapper
