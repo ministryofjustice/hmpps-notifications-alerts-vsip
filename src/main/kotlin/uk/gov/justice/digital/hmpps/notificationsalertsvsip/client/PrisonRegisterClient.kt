@@ -2,15 +2,14 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.client
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.client.VisitSchedulerClient.Companion.LOG
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonContactDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.ClientUtils.Companion.isNotFoundError
 import java.time.Duration
 
 @Component
@@ -61,7 +60,4 @@ class PrisonRegisterClient(
       }
       .block(apiTimeout)
   }
-
-  fun isNotFoundError(e: Throwable?) =
-    e is WebClientResponseException && e.statusCode == NOT_FOUND
 }
