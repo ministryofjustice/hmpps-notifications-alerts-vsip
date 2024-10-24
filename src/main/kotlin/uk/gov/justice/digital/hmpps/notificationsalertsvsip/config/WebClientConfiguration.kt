@@ -16,9 +16,6 @@ import org.springframework.web.reactive.function.client.WebClient
 @Configuration
 class WebClientConfiguration(
 
-  @Value("\${hmpps.auth.url}")
-  private val hmppsAuthUrl: String,
-
   @Value("\${visit-scheduler.api.url}")
   private val visitSchedulerBaseUrl: String,
 
@@ -26,15 +23,8 @@ class WebClientConfiguration(
   private val prisonRegisterBaseUrl: String,
 ) {
   private enum class HmppsAuthClientRegistrationId(val clientRegistrationId: String) {
-    HMPPS_AUTH_CLIENT("other-hmpps-apis"),
     VISIT_SCHEDULER("other-hmpps-apis"),
     PRISON_REGISTER_CLIENT("other-hmpps-apis"),
-  }
-
-  @Bean
-  fun hmppsAuthWebClient(authorizedClientManager: OAuth2AuthorizedClientManager): WebClient {
-    val oauth2Client = getOauth2Client(authorizedClientManager, HmppsAuthClientRegistrationId.HMPPS_AUTH_CLIENT.clientRegistrationId)
-    return getWebClient(hmppsAuthUrl, oauth2Client)
   }
 
   @Bean
