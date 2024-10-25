@@ -20,10 +20,13 @@ import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.HmppsAuthExtension
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonRegisterMockServer
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonerContactRegistryMockServer
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonerOffenderSearchMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.VisitSchedulerMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.DomainEventListenerService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationService
@@ -43,6 +46,8 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 
+// TODO: VB-4332 - Add mock servers for 2 new clients and stub their endpoints.
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @ExtendWith(HmppsAuthExtension::class)
@@ -53,6 +58,8 @@ abstract class EventsIntegrationTestBase {
     private val objectMapper: ObjectMapper = ObjectMapper().registerModule(JavaTimeModule())
     val visitSchedulerMockServer = VisitSchedulerMockServer(objectMapper)
     val prisonRegisterMockServer = PrisonRegisterMockServer(objectMapper)
+    val prisonerContactRegisterMockServer = PrisonerContactRegistryMockServer(objectMapper)
+    val prisonerOffenderSearchMockServer = PrisonerOffenderSearchMockServer(objectMapper)
 
     @JvmStatic
     @DynamicPropertySource
@@ -65,6 +72,8 @@ abstract class EventsIntegrationTestBase {
     fun startMocks() {
       visitSchedulerMockServer.start()
       prisonRegisterMockServer.start()
+      prisonerContactRegisterMockServer.start()
+      prisonerOffenderSearchMockServer.start()
     }
 
     @AfterAll
@@ -72,6 +81,8 @@ abstract class EventsIntegrationTestBase {
     fun stopMocks() {
       visitSchedulerMockServer.stop()
       prisonRegisterMockServer.stop()
+      prisonerContactRegisterMockServer.stop()
+      prisonerOffenderSearchMockServer.stop()
     }
   }
 
@@ -175,13 +186,15 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto): VisitDto {
+  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN): VisitDto {
     return VisitDto(
       reference = bookingReference,
       prisonCode = prisonCode,
       startTimestamp = visitDate.atTime(visitTime),
       endTimestamp = visitDate.atTime(visitTime).plus(duration),
       visitContact = visitContact,
+      prisonerId = prisonerId,
+      visitRestriction = visitRestriction,
     )
   }
 }

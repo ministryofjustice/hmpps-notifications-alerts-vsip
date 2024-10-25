@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotific
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils
 import uk.gov.service.notify.NotificationClient
 
@@ -17,6 +18,8 @@ class EmailSenderService(
   @Value("\${notify.email.enabled:}") private val enabled: Boolean,
   val notificationClient: NotificationClient,
   val prisonRegisterService: PrisonRegisterService,
+  val prisonerSearchService: PrisonerSearchService,
+  val prisonerContactRegistryService: PrisonerContactRegistryService,
   val templatesConfig: TemplatesConfig,
   val dateUtils: DateUtils,
 ) {
@@ -31,9 +34,9 @@ class EmailSenderService(
           handleBookedEvent(visit)
         }
 
-        // TODO VB-4332: Implement other event types in next tickets(UPDATED, CANCELLED)
         else -> {
-          throw IllegalArgumentException("Unsupported visit event type for EMAIL: $visitEventType")
+          LOG.error("visit event type $visitEventType is unsupported")
+          return Unit
         }
       }
 
@@ -49,23 +52,24 @@ class EmailSenderService(
   }
 
   private fun handleBookedEvent(visit: VisitDto): SendEmailNotificationDto {
-    val templateVars = getCommonEmailTemplateVars(visit)
-    templateVars["ref number"] = visit.reference
+    val templateVars = mutableMapOf(
+      "ref number" to visit.reference,
+      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
+      "time" to dateUtils.getFormattedTime(visit.startTimestamp.toLocalTime()),
+      "end time" to dateUtils.getFormattedTime(visit.endTimestamp.toLocalTime()),
+      "arrival time" to "45",
+      "dayofweek" to dateUtils.getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
+      "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
+      "main contact name" to visit.visitContact.name,
+      "closed visit" to (visit.visitRestriction == VisitRestriction.CLOSED).toString(),
+      "phone" to (prisonRegisterService.getPrisonSocialVisitsContactNumber(visit.prisonCode) ?: "No phone number"),
+      "prisoner" to (prisonerSearchService.getPrisoner(visit.prisonerId) ?: "Prisoner"),
+      // TODO VB-4332: Format this.
+      "visitors" to prisonerContactRegistryService.getPrisonerContacts(visit.prisonerId).toString(),
+    )
 
     val templateName = EmailTemplateNames.VISIT_BOOKING
 
     return SendEmailNotificationDto(templateName = templateName, templateVars = templateVars)
-  }
-
-  private fun getCommonEmailTemplateVars(visit: VisitDto): MutableMap<String, String> {
-    val templateVars = mutableMapOf(
-      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
-      "time" to dateUtils.getFormattedTime(visit.startTimestamp.toLocalTime()),
-      "dayofweek" to dateUtils.getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
-      "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
-      // TODO VB-4332: Add other email template vars (See JIRA Ticket).
-    )
-
-    return templateVars
   }
 }
