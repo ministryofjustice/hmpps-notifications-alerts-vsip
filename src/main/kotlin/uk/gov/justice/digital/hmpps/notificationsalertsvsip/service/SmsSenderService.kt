@@ -83,14 +83,13 @@ class SmsSenderService(
   }
 
   private fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, String> {
-    val prisonName = prisonRegisterService.getPrisonName(visit.prisonCode)
-
     val templateVars = mutableMapOf(
-      "prison" to prisonName,
+      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
       "time" to dateUtils.getFormattedTime(visit.startTimestamp.toLocalTime()),
       "dayofweek" to dateUtils.getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
       "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
     )
+
     return templateVars
   }
 }

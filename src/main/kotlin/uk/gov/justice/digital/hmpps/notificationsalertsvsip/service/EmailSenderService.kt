@@ -66,7 +66,7 @@ class EmailSenderService(
       "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
       "main contact name" to visit.visitContact.name,
       "closed visit" to (visit.visitRestriction == VisitRestriction.CLOSED).toString(),
-      "prisoner" to (prisonerSearchService.getPrisoner(visit.prisonerId) ?: "Prisoner"),
+      "prisoner" to getPrisoner(visit),
       "visitors" to getVisitors(visit),
     )
     templateVars.putAll(getPrisonContactDetails(visit))
@@ -74,6 +74,12 @@ class EmailSenderService(
     val templateName = EmailTemplateNames.VISIT_BOOKING
 
     return SendEmailNotificationDto(templateName = templateName, templateVars = templateVars)
+  }
+
+  private fun getPrisoner(visit: VisitDto): String {
+    return prisonerSearchService.getPrisoner(visit.prisonerId)?.let {
+      it.firstName + " " + it.lastName
+    } ?: "Prisoner"
   }
 
   private fun getVisitors(visit: VisitDto): List<String> {
