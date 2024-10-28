@@ -31,5 +31,10 @@ prisoner:
       url: https://prisoner-search-dev.prison.service.justice.gov.uk
       timeout: 10s
 
-notify.sms.enabled: true
+notify:
+  sms:
+    enabled: true
+  email:
+    enabled: true
+
 notify.api.key: dummy-api-key
