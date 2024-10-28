@@ -8,4 +8,6 @@ class PrisonContactDetailsDto(
   val emailAddress: String? = null,
   @Schema(description = "Phone Number", example = "01234567890", required = false)
   val phoneNumber: String? = null,
+  @Schema(description = "Web address of prison", required = false)
+  val webAddress: String? = null,
 )

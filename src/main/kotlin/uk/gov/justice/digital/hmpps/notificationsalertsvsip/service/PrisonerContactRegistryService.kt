@@ -21,8 +21,6 @@ class PrisonerContactRegistryService(
 
     val visitorIds = visit.visitors.map { it.nomisPersonId.toString() }
 
-    // TODO: VB-4332 - Loop over returned contacts and only map / return ones that match VisitDto (need to add visitors to visitDto).
-    //  Add integration test to only capture visitors who are on the visitDto.
     return contacts?.filter { contact ->
       contact.personId in visitorIds
     } ?: emptyList()

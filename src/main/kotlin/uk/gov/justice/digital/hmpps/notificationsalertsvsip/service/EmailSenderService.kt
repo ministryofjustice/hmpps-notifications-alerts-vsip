@@ -66,24 +66,32 @@ class EmailSenderService(
       "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
       "main contact name" to visit.visitContact.name,
       "closed visit" to (visit.visitRestriction == VisitRestriction.CLOSED).toString(),
-      "phone" to (prisonRegisterService.getPrisonSocialVisitsContactNumber(visit.prisonCode) ?: "No phone number"),
       "prisoner" to (prisonerSearchService.getPrisoner(visit.prisonerId) ?: "Prisoner"),
       "visitors" to getVisitors(visit),
     )
+    templateVars.putAll(getPrisonContactDetails(visit))
 
     val templateName = EmailTemplateNames.VISIT_BOOKING
 
     return SendEmailNotificationDto(templateName = templateName, templateVars = templateVars)
   }
 
-  private fun getVisitors(visit: VisitDto): List<PrisonerVisitorPersonalisationDto> {
+  private fun getVisitors(visit: VisitDto): List<String> {
     return prisonerContactRegistryService.getPrisonerContacts(visit).map {
       PrisonerVisitorPersonalisationDto(
         firstNameText = it.firstName,
         lastNameText = it.lastName,
-        ageText = "Age: " + calculateAge(it),
-      )
+        ageText = calculateAge(it),
+      ).toString()
     }
+  }
+
+  private fun getPrisonContactDetails(visit: VisitDto): Map<String, String> {
+    val prisonContactDetails = prisonRegisterService.getPrisonSocialVisitsContactDetails(visit.prisonCode)
+    return mutableMapOf(
+      "phone" to (prisonContactDetails?.phoneNumber ?: "No phone number"),
+      "website" to (prisonContactDetails?.webAddress ?: ""),
+    )
   }
 
   private fun calculateAge(visitor: PrisonerContactRegistryContactDto): String {

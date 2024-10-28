@@ -73,7 +73,7 @@ class SmsSenderService(
     val templateVars = getCommonTemplateVars(visit)
     templateVars["reference"] = visit.reference
 
-    val prisonContactNumber: String? = prisonRegisterService.getPrisonSocialVisitsContactNumber(visit.prisonCode)
+    val prisonContactNumber: String? = prisonRegisterService.getPrisonSocialVisitsContactDetails(visit.prisonCode)?.phoneNumber
     if (!prisonContactNumber.isNullOrEmpty()) {
       templateVars["prison phone number"] = prisonContactNumber
       return SendSmsNotificationDto(templateName = SmsTemplateNames.VISIT_CANCEL, templateVars = templateVars)
