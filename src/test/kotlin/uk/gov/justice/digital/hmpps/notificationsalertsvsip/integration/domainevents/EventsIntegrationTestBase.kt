@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.LocalStackContainer.setLocalStackProperties
@@ -29,6 +30,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.Pri
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonerOffenderSearchMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.VisitSchedulerMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.DomainEventListenerService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PRISON_VISITS_NOTIFICATION_ALERTS_QUEUE_CONFIG_KEY
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.SmsSenderService
@@ -46,14 +48,13 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 
-// TODO: VB-4332 - Add mock servers for 2 new clients and stub their endpoints.
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @ExtendWith(HmppsAuthExtension::class)
 abstract class EventsIntegrationTestBase {
 
   companion object {
+    const val EXPECTED_DATE_PATTERN = "d MMMM yyyy"
     private val localStackContainer = LocalStackContainer.instance
     private val objectMapper: ObjectMapper = ObjectMapper().registerModule(JavaTimeModule())
     val visitSchedulerMockServer = VisitSchedulerMockServer(objectMapper)
@@ -97,6 +98,9 @@ abstract class EventsIntegrationTestBase {
 
   @SpyBean
   lateinit var smsSenderService: SmsSenderService
+
+  @SpyBean
+  lateinit var emailSenderService: EmailSenderService
 
   @SpyBean
   lateinit var templatesConfig: TemplatesConfig
@@ -186,7 +190,7 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN): VisitDto {
+  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>): VisitDto {
     return VisitDto(
       reference = bookingReference,
       prisonCode = prisonCode,
@@ -195,6 +199,7 @@ abstract class EventsIntegrationTestBase {
       visitContact = visitContact,
       prisonerId = prisonerId,
       visitRestriction = visitRestriction,
+      visitors = visitors,
     )
   }
 }

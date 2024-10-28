@@ -44,6 +44,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.of(10, 30),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     visit2 = createVisitDto(
@@ -52,6 +53,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.of(8, 0),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     visit3 = createVisitDto(
@@ -60,6 +62,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.of(0, 1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     pastDatedVisit = createVisitDto(
@@ -68,6 +71,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.now().minusMinutes(1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     noContactVisit = createVisitDto(
@@ -76,6 +80,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.now().minusMinutes(1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", null),
+      visitors = emptyList(),
     )
 
     singleDigitDateVisit = createVisitDto(
@@ -84,6 +89,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.of(1, 5),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     prison = PrisonDto("HEI", "Hewell", true)

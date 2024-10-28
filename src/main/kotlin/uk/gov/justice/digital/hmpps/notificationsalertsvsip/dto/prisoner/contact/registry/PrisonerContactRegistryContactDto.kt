@@ -4,7 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
 
 @Schema(description = "A contact for a prisoner")
-data class PrisonerContactRegistryDto(
+data class PrisonerContactRegistryContactDto(
+  @Schema(description = "The identifier of the contact", example = "5871791")
+  val personId: String,
+
   @Schema(description = "First name", example = "John", required = true)
   val firstName: String,
 

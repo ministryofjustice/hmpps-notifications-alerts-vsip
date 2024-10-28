@@ -6,12 +6,16 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.personalisations.PrisonerVisitorPersonalisationDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils
 import uk.gov.service.notify.NotificationClient
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @Service
 class EmailSenderService(
@@ -64,12 +68,27 @@ class EmailSenderService(
       "closed visit" to (visit.visitRestriction == VisitRestriction.CLOSED).toString(),
       "phone" to (prisonRegisterService.getPrisonSocialVisitsContactNumber(visit.prisonCode) ?: "No phone number"),
       "prisoner" to (prisonerSearchService.getPrisoner(visit.prisonerId) ?: "Prisoner"),
-      // TODO VB-4332: Format this.
-      "visitors" to prisonerContactRegistryService.getPrisonerContacts(visit.prisonerId).toString(),
+      "visitors" to getVisitors(visit),
     )
 
     val templateName = EmailTemplateNames.VISIT_BOOKING
 
     return SendEmailNotificationDto(templateName = templateName, templateVars = templateVars)
+  }
+
+  private fun getVisitors(visit: VisitDto): List<PrisonerVisitorPersonalisationDto> {
+    return prisonerContactRegistryService.getPrisonerContacts(visit).map {
+      PrisonerVisitorPersonalisationDto(
+        firstNameText = it.firstName,
+        lastNameText = it.lastName,
+        ageText = "Age: " + calculateAge(it),
+      )
+    }
+  }
+
+  private fun calculateAge(visitor: PrisonerContactRegistryContactDto): String {
+    return visitor.dateOfBirth?.let {
+      ChronoUnit.YEARS.between(it, LocalDate.now()).toInt().toString()
+    } ?: "Unknown"
   }
 }

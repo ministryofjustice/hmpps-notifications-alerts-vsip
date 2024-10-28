@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.ClientUtils.Companion.isNotFoundError
 import java.time.Duration
 
@@ -21,12 +21,12 @@ class PrisonerContactRegistryClient(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun getPrisonersSocialContacts(prisonerId: String): List<PrisonerContactRegistryDto>? {
-    val uri = "/v2/prisoners/{prisonerId}/contacts/social?withAddress=false"
+  fun getPrisonersSocialContacts(prisonerId: String): List<PrisonerContactRegistryContactDto>? {
+    val uri = "/v2/prisoners/$prisonerId/contacts/social?withAddress=false"
     return webClient.get()
       .uri(uri)
       .retrieve()
-      .bodyToMono<List<PrisonerContactRegistryDto>>()
+      .bodyToMono<List<PrisonerContactRegistryContactDto>>()
       .onErrorResume { e ->
         if (!isNotFoundError(e)) {
           LOG.error("getPrisonersSocialContacts Failed for get request $uri")

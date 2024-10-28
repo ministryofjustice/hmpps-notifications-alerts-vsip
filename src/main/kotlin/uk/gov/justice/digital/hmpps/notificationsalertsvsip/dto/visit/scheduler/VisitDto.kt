@@ -26,4 +26,6 @@ data class VisitDto(
   val visitContact: ContactDto,
   @Schema(description = "Visit Restriction", example = "OPEN", required = true)
   val visitRestriction: VisitRestriction,
+  @Schema(description = "List of visitors associated with the visit", required = true)
+  val visitors: List<VisitorDto> = listOf(),
 )
