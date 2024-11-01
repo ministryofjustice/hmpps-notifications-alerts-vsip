@@ -9,4 +9,8 @@ data class PrisonerSearchResultDto(
 
   @Schema(description = "Prisoner last name", example = "Smith", required = true)
   val lastName: String,
-)
+) {
+  override fun toString(): String {
+    return "$firstName $lastName"
+  }
+}

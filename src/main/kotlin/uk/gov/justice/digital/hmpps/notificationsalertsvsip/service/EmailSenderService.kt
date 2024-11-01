@@ -77,8 +77,8 @@ class EmailSenderService(
   }
 
   private fun getPrisoner(visit: VisitDto): String {
-    return prisonerSearchService.getPrisoner(visit.prisonerId)?.let {
-      it.firstName + " " + it.lastName
+    return prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
+      return prisoner.toString()
     } ?: "Prisoner"
   }
 
