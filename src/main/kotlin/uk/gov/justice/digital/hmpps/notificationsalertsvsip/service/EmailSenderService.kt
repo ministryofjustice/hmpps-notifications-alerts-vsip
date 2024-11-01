@@ -44,12 +44,14 @@ class EmailSenderService(
         }
       }
 
-      notificationClient.sendEmail(
+      LOG.info("Calling notification client")
+      val response = notificationClient.sendEmail(
         templatesConfig.emailTemplates[sendEmailNotificationDto.templateName.name],
         visit.visitContact.email,
         sendEmailNotificationDto.templateVars,
         visit.reference,
       )
+      LOG.info("Calling notification client finished with response ${response.notificationId}")
     } else {
       LOG.info("Sending Email has been disabled.")
     }
@@ -73,6 +75,7 @@ class EmailSenderService(
 
     val templateName = EmailTemplateNames.VISIT_BOOKING
 
+    LOG.info("Sending Email template: $templateName")
     return SendEmailNotificationDto(templateName = templateName, templateVars = templateVars)
   }
 
