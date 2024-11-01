@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils
 import uk.gov.service.notify.NotificationClient
+import uk.gov.service.notify.NotificationClientException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -45,13 +46,17 @@ class EmailSenderService(
       }
 
       LOG.info("Calling notification client")
-      val response = notificationClient.sendEmail(
-        templatesConfig.emailTemplates[sendEmailNotificationDto.templateName.name],
-        visit.visitContact.email,
-        sendEmailNotificationDto.templateVars,
-        visit.reference,
-      )
-      LOG.info("Calling notification client finished with response ${response.notificationId}")
+      try {
+        val response = notificationClient.sendEmail(
+          templatesConfig.emailTemplates[sendEmailNotificationDto.templateName.name],
+          visit.visitContact.email,
+          sendEmailNotificationDto.templateVars,
+          visit.reference,
+        )
+        LOG.info("Calling notification client finished with response ${response.notificationId}")
+      } catch (e: NotificationClientException) {
+        LOG.error("Error sending email with exception: $e")
+      }
     } else {
       LOG.info("Sending Email has been disabled.")
     }
