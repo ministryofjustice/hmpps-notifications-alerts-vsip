@@ -6,6 +6,6 @@ data class PrisonerVisitorPersonalisationDto(
   val ageText: String,
 ) {
   override fun toString(): String {
-    return "$firstNameText $lastNameText - $ageText years old"
+    return "$firstNameText $lastNameText ($ageText)"
   }
 }

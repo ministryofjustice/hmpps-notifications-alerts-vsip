@@ -114,8 +114,8 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     )
 
     prisonVisitors = listOf(
-      "Visitor One - 29 years old",
-      "Visitor Two - Unknown years old",
+      "Visitor One (29 years old)",
+      "Visitor Two (age not known)",
     )
 
     prisonContactDetailsDto = PrisonContactDetailsDto(phoneNumber = "0111222333", webAddress = "website")
@@ -143,7 +143,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "closed visit" to "false",
-      "prisoner" to prisonerSearchResult.firstName + " " + prisonerSearchResult.lastName,
+      "opening sentence" to "Your visit to see Prisoner One",
       "visitors" to prisonVisitors,
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
@@ -200,7 +200,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "closed visit" to "false",
-      "prisoner" to prisonerSearchResult.firstName + " " + prisonerSearchResult.lastName,
+      "opening sentence" to "Your visit to see Prisoner One",
       "visitors" to prisonVisitors,
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
@@ -249,7 +249,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "closed visit" to "false",
-      "prisoner" to prisonerSearchResult.firstName + " " + prisonerSearchResult.lastName,
+      "opening sentence" to "Your visit to see Prisoner One",
       "visitors" to prisonVisitors,
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
@@ -345,7 +345,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "closed visit" to "false",
-      "prisoner" to prisonerSearchResult.firstName + " " + prisonerSearchResult.lastName,
+      "opening sentence" to "Your visit to see Prisoner One",
       "visitors" to prisonVisitors,
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
@@ -374,10 +374,60 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit booked message is received but contact registry doesn't find visitors then booking email is sent without them`() {
+  fun `when visit booked message is received but and only matching visitors are on the booking email`() {
+    // Given
+    val bookingReference = visitWithOneVisitor.reference
+    prisonVisitors = listOf("Visitor One (29 years old)")
+
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
+    val visitDate = visitWithOneVisitor.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateVars = mutableMapOf<String, Any>(
+      "ref number" to bookingReference,
+      "prison" to prison.prisonName,
+      "time" to "10:30am",
+      "end time" to "11am",
+      "arrival time" to "45",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "main contact name" to "Contact One",
+      "closed visit" to "false",
+      "opening sentence" to "Your visit to see Prisoner One",
+      "visitors" to prisonVisitors,
+      "phone" to prisonContactDetailsDto.phoneNumber!!,
+      "website" to prisonContactDetailsDto.webAddress!!,
+    )
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, visitWithOneVisitor)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(visitWithOneVisitor.prisonerId, prisonerSearchResult)
+    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visitWithOneVisitor.prisonerId, prisonerContactsResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+
+    // Then
+    await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bi-vn-wn-ml") }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visitWithOneVisitor, VisitEventType.BOOKED) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendEmail(
+        templateId,
+        visitWithOneVisitor.visitContact.email,
+        templateVars,
+        visitWithOneVisitor.reference,
+      )
+    }
+  }
+
+  @Test
+  fun `when visit booked message is received and prisoner-contact-registry returns an error, booking email is still sent`() {
     // Given
     val bookingReference = visit.reference
-    prisonVisitors = emptyList()
 
     val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
     val jsonSqsMessage = createSQSMessage(domainEvent)
@@ -396,8 +446,8 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "closed visit" to "false",
-      "prisoner" to prisonerSearchResult.firstName + " " + prisonerSearchResult.lastName,
-      "visitors" to prisonVisitors,
+      "opening sentence" to "Your visit to see Prisoner One",
+      "visitors" to listOf("You can view visitor information in the bookings section of your GOV.UK One Login"),
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
@@ -425,16 +475,15 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit booked message is received but and only matching visitors are on the booking email`() {
+  fun `when visit booked message is received and prisoner-search returns an error, booking email is still sent`() {
     // Given
-    val bookingReference = visitWithOneVisitor.reference
-    prisonVisitors = listOf("Visitor One - 29 years old")
+    val bookingReference = visit.reference
 
     val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
-    val visitDate = visitWithOneVisitor.startTimestamp.toLocalDate()
+    val visitDate = visit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateVars = mutableMapOf<String, Any>(
@@ -447,7 +496,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "closed visit" to "false",
-      "prisoner" to prisonerSearchResult.firstName + " " + prisonerSearchResult.lastName,
+      "opening sentence" to "Your visit to the prison",
       "visitors" to prisonVisitors,
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
@@ -455,22 +504,22 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    visitSchedulerMockServer.stubGetVisit(bookingReference, visitWithOneVisitor)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
-    prisonerOffenderSearchMockServer.stubGetPrisoner(visitWithOneVisitor.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visitWithOneVisitor.prisonerId, prisonerContactsResult)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, null)
+    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit.prisonerId, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visitWithOneVisitor, VisitEventType.BOOKED) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.BOOKED) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
-        visitWithOneVisitor.visitContact.email,
+        visit.visitContact.email,
         templateVars,
-        visitWithOneVisitor.reference,
+        visit.reference,
       )
     }
   }

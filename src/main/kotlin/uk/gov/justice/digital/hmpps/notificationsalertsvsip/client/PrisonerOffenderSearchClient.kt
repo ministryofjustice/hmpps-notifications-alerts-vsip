@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.search.PrisonerSearchResultDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.ClientUtils.Companion.isNotFoundError
 import java.time.Duration
 
 @Component
@@ -31,15 +30,9 @@ class PrisonerOffenderSearchClient(
       .accept(MediaType.APPLICATION_JSON)
       .retrieve()
       .bodyToMono(PRISONER_SEARCH_RESULT_DTO)
-      .onErrorResume {
-          e ->
-        if (!isNotFoundError(e)) {
-          LOG.error("getPrisoner Failed get request $uri")
-          Mono.error(e)
-        } else {
-          LOG.info("getPrisoner Not Found get request $uri")
-          return@onErrorResume Mono.empty()
-        }
+      .onErrorResume { e ->
+        LOG.error("getPrisoner Failed get request $uri, with exception $e")
+        return@onErrorResume Mono.empty()
       }
       .block(apiTimeout)
   }

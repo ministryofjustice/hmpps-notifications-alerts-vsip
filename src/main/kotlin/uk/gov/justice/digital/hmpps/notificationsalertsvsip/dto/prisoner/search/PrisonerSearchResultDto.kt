@@ -11,6 +11,6 @@ data class PrisonerSearchResultDto(
   val lastName: String,
 ) {
   override fun toString(): String {
-    return "$firstName $lastName"
+    return "Your visit to see $firstName $lastName"
   }
 }

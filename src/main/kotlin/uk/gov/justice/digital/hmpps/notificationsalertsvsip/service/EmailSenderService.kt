@@ -30,6 +30,7 @@ class EmailSenderService(
 ) {
   private companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
+    const val GOV_UK_PRISON_PAGE = "https://www.gov.uk/government/collections/prisons-in-england-and-wales"
   }
 
   fun sendEmail(visit: VisitDto, visitEventType: VisitEventType) {
@@ -73,7 +74,7 @@ class EmailSenderService(
       "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
       "main contact name" to visit.visitContact.name,
       "closed visit" to (visit.visitRestriction == VisitRestriction.CLOSED).toString(),
-      "prisoner" to getPrisoner(visit),
+      "opening sentence" to getPrisoner(visit),
       "visitors" to getVisitors(visit),
     )
     templateVars.putAll(getPrisonContactDetails(visit))
@@ -87,30 +88,35 @@ class EmailSenderService(
   private fun getPrisoner(visit: VisitDto): String {
     return prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
       return prisoner.toString()
-    } ?: "Prisoner"
+    } ?: "Your visit to the prison"
   }
 
   private fun getVisitors(visit: VisitDto): List<String> {
-    return prisonerContactRegistryService.getPrisonerContacts(visit).map {
-      PrisonerVisitorPersonalisationDto(
-        firstNameText = it.firstName,
-        lastNameText = it.lastName,
-        ageText = calculateAge(it),
-      ).toString()
+    val visitors = prisonerContactRegistryService.getPrisonerContacts(visit)
+    return if (visitors.isNotEmpty()) {
+      visitors.map {
+        PrisonerVisitorPersonalisationDto(
+          firstNameText = it.firstName,
+          lastNameText = it.lastName,
+          ageText = calculateAge(it),
+        ).toString()
+      }
+    } else {
+      listOf("You can view visitor information in the bookings section of your GOV.UK One Login")
     }
   }
 
   private fun getPrisonContactDetails(visit: VisitDto): Map<String, String> {
     val prisonContactDetails = prisonRegisterService.getPrisonSocialVisitsContactDetails(visit.prisonCode)
     return mutableMapOf(
-      "phone" to (prisonContactDetails?.phoneNumber ?: "No phone number"),
-      "website" to (prisonContactDetails?.webAddress ?: ""),
+      "phone" to (prisonContactDetails?.phoneNumber ?: GOV_UK_PRISON_PAGE),
+      "website" to (prisonContactDetails?.webAddress ?: GOV_UK_PRISON_PAGE),
     )
   }
 
   private fun calculateAge(visitor: PrisonerContactRegistryContactDto): String {
     return visitor.dateOfBirth?.let {
-      ChronoUnit.YEARS.between(it, LocalDate.now()).toInt().toString()
-    } ?: "Unknown"
+      ChronoUnit.YEARS.between(it, LocalDate.now()).toInt().toString() + " years old"
+    } ?: "age not known"
   }
 }

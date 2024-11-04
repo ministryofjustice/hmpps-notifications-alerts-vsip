@@ -9,7 +9,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.ClientUtils.Companion.isNotFoundError
 import java.time.Duration
 
 @Component
@@ -28,13 +27,8 @@ class PrisonerContactRegistryClient(
       .retrieve()
       .bodyToMono<List<PrisonerContactRegistryContactDto>>()
       .onErrorResume { e ->
-        if (!isNotFoundError(e)) {
-          LOG.error("getPrisonersSocialContacts Failed for get request $uri")
-          Mono.error(e)
-        } else {
-          LOG.error("getPrisonersSocialContacts NOT_FOUND for get request $uri")
-          return@onErrorResume Mono.empty()
-        }
+        LOG.error("getPrisonersSocialContacts for get request $uri, with exception $e")
+        return@onErrorResume Mono.empty()
       }
       .block(apiTimeout)
   }
