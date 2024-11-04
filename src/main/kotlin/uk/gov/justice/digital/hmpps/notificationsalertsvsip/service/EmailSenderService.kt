@@ -87,7 +87,7 @@ class EmailSenderService(
 
   private fun getPrisoner(visit: VisitDto): String {
     return prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
-      return prisoner.toString()
+      return "Your visit to see $prisoner"
     } ?: "Your visit to the prison"
   }
 
