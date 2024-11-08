@@ -12,7 +12,10 @@ generic-service:
     SPRING_PROFILES_ACTIVE: "stdout"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     VISIT-SCHEDULER_API_URL: https://visit-scheduler.prison.service.justice.gov.uk
+    PRISONER_OFFENDER_SEARCH_URL: https://prisoner-search.prison.service.justice.gov.uk
+    PRISONER-CONTACT_REGISTRY_URL: https://prisoner-contact-registry.prison.service.justice.gov.uk
     PRISON-REGISTER_API_URL: https://prison-register.hmpps.service.justice.gov.uk
+    NOTIFY_EMAIL_ENABLED: "false"
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts

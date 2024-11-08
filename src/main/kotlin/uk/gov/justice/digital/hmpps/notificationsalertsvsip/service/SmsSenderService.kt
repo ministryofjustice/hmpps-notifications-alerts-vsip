@@ -4,7 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.SmsTemplatesConfig
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
@@ -17,7 +17,7 @@ class SmsSenderService(
   @Value("\${notify.sms.enabled:}") private val enabled: Boolean,
   val notificationClient: NotificationClient,
   val prisonRegisterService: PrisonRegisterService,
-  val smsTemplatesConfig: SmsTemplatesConfig,
+  val templatesConfig: TemplatesConfig,
   val dateUtils: DateUtils,
 ) {
   private companion object {
@@ -41,7 +41,7 @@ class SmsSenderService(
       }
 
       notificationClient.sendSms(
-        smsTemplatesConfig.templates[sendSmsNotificationDto.templateName.name],
+        templatesConfig.smsTemplates[sendSmsNotificationDto.templateName.name],
         visit.visitContact.telephone,
         sendSmsNotificationDto.templateVars,
         visit.reference,
@@ -73,7 +73,7 @@ class SmsSenderService(
     val templateVars = getCommonTemplateVars(visit)
     templateVars["reference"] = visit.reference
 
-    val prisonContactNumber: String? = prisonRegisterService.getPrisonSocialVisitsContactNumber(visit.prisonCode)
+    val prisonContactNumber: String? = prisonRegisterService.getPrisonSocialVisitsContactDetails(visit.prisonCode)?.phoneNumber
     if (!prisonContactNumber.isNullOrEmpty()) {
       templateVars["prison phone number"] = prisonContactNumber
       return SendSmsNotificationDto(templateName = SmsTemplateNames.VISIT_CANCEL, templateVars = templateVars)
@@ -83,14 +83,13 @@ class SmsSenderService(
   }
 
   private fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, String> {
-    val prisonName = prisonRegisterService.getPrisonName(visit.prisonCode)
-
     val templateVars = mutableMapOf(
-      "prison" to prisonName,
+      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
       "time" to dateUtils.getFormattedTime(visit.startTimestamp.toLocalTime()),
       "dayofweek" to dateUtils.getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
       "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
     )
+
     return templateVars
   }
 }

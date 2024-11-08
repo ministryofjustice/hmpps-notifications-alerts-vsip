@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import java.time.LocalDateTime
 
 @Schema(description = "Visit")
@@ -11,6 +12,8 @@ import java.time.LocalDateTime
 data class VisitDto(
   @Schema(description = "Visit Reference", example = "v9-d7-ed-7u", required = true)
   val reference: String,
+  @Schema(description = "Prisoner Id", example = "AF34567G", required = true)
+  val prisonerId: String,
   @JsonProperty("prisonId")
   @JsonAlias("prisonCode")
   @Schema(description = "Prison Id", example = "MDI", required = true)
@@ -21,4 +24,8 @@ data class VisitDto(
   val endTimestamp: LocalDateTime,
   @Schema(description = "Visit Contact", required = true)
   val visitContact: ContactDto,
+  @Schema(description = "Visit Restriction", example = "OPEN", required = true)
+  val visitRestriction: VisitRestriction,
+  @Schema(description = "List of visitors associated with the visit", required = true)
+  val visitors: List<VisitorDto> = listOf(),
 )

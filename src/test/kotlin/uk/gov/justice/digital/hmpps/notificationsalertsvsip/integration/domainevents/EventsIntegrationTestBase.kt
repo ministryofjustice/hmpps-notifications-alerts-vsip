@@ -17,15 +17,20 @@ import org.springframework.test.context.DynamicPropertySource
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.SmsTemplatesConfig
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.HmppsAuthExtension
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonRegisterMockServer
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonerContactRegistryMockServer
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonerOffenderSearchMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.VisitSchedulerMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.DomainEventListenerService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PRISON_VISITS_NOTIFICATION_ALERTS_QUEUE_CONFIG_KEY
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.SmsSenderService
@@ -49,10 +54,13 @@ import java.time.LocalTime
 abstract class EventsIntegrationTestBase {
 
   companion object {
+    const val EXPECTED_DATE_PATTERN = "d MMMM yyyy"
     private val localStackContainer = LocalStackContainer.instance
     private val objectMapper: ObjectMapper = ObjectMapper().registerModule(JavaTimeModule())
     val visitSchedulerMockServer = VisitSchedulerMockServer(objectMapper)
     val prisonRegisterMockServer = PrisonRegisterMockServer(objectMapper)
+    val prisonerContactRegisterMockServer = PrisonerContactRegistryMockServer(objectMapper)
+    val prisonerOffenderSearchMockServer = PrisonerOffenderSearchMockServer(objectMapper)
 
     @JvmStatic
     @DynamicPropertySource
@@ -65,6 +73,8 @@ abstract class EventsIntegrationTestBase {
     fun startMocks() {
       visitSchedulerMockServer.start()
       prisonRegisterMockServer.start()
+      prisonerContactRegisterMockServer.start()
+      prisonerOffenderSearchMockServer.start()
     }
 
     @AfterAll
@@ -72,6 +82,8 @@ abstract class EventsIntegrationTestBase {
     fun stopMocks() {
       visitSchedulerMockServer.stop()
       prisonRegisterMockServer.stop()
+      prisonerContactRegisterMockServer.stop()
+      prisonerOffenderSearchMockServer.stop()
     }
   }
 
@@ -88,7 +100,10 @@ abstract class EventsIntegrationTestBase {
   lateinit var smsSenderService: SmsSenderService
 
   @SpyBean
-  lateinit var smsTemplatesConfig: SmsTemplatesConfig
+  lateinit var emailSenderService: EmailSenderService
+
+  @SpyBean
+  lateinit var templatesConfig: TemplatesConfig
 
   @SpyBean
   lateinit var prisonVisitBookedEventNotifierSpy: PrisonVisitBookedEventNotifier
@@ -175,13 +190,16 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto): VisitDto {
+  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>): VisitDto {
     return VisitDto(
       reference = bookingReference,
       prisonCode = prisonCode,
       startTimestamp = visitDate.atTime(visitTime),
       endTimestamp = visitDate.atTime(visitTime).plus(duration),
       visitContact = visitContact,
+      prisonerId = prisonerId,
+      visitRestriction = visitRestriction,
+      visitors = visitors,
     )
   }
 }

@@ -33,12 +33,25 @@ visit-scheduler:
     url: http://localhost:8092
     timeout: 10s
 
+prisoner:
+  offender:
+    search:
+      url: http://localhost:8093
+      timeout: 10s
+
+prisoner-contact:
+  registry:
+    url: http://localhost:8095
+    timeout: 10s
+
 prison-register:
   api:
     url: http://localhost:8096
 
 notify:
   sms:
+    enabled: true
+  email:
     enabled: true
   api:
     key: "test"

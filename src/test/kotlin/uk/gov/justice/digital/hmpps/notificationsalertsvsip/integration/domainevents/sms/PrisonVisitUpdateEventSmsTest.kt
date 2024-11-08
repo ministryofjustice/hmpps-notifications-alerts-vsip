@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents
+package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.sms
 
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_CHANGED
 import java.time.Duration
 import java.time.LocalDate
@@ -21,7 +22,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
+class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
   companion object {
     const val EXPECTED_DATE_PATTERN = "d MMMM yyyy"
   }
@@ -43,6 +44,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.of(10, 30),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     visit2 = createVisitDto(
@@ -51,6 +53,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.of(8, 0),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     visit3 = createVisitDto(
@@ -59,6 +62,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.of(0, 1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     pastDatedVisit = createVisitDto(
@@ -67,6 +71,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.now().minusMinutes(1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     noContactVisit = createVisitDto(
@@ -75,6 +80,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.now().minusMinutes(1),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", null),
+      visitors = emptyList(),
     )
 
     singleDigitDateVisit = createVisitDto(
@@ -83,6 +89,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
       visitTime = LocalTime.of(1, 5),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
     )
 
     prison = PrisonDto("HEI", "Hewell", true)
@@ -99,7 +106,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
     val visitDate = visit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateId = smsTemplatesConfig.templates[SmsTemplateNames.VISIT_UPDATE.name]
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_UPDATE.name]
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
       "time" to "10:30am",
@@ -136,7 +143,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
     val visitDate = visit2.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateId = smsTemplatesConfig.templates[SmsTemplateNames.VISIT_UPDATE.name]
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_UPDATE.name]
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
       "time" to "8am",
@@ -173,7 +180,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
     val visitDate = visit3.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateId = smsTemplatesConfig.templates[SmsTemplateNames.VISIT_UPDATE.name]
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_UPDATE.name]
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
       "time" to "12:01am",
@@ -265,7 +272,7 @@ class PrisonVisitUpdateEventTest : EventsIntegrationTestBase() {
     // expected visit date should not be 2 digits
     val expectedVisitDate = "1 January $visitYear"
     val expectedDayOfWeek = singleDigitDateVisit.startTimestamp.toLocalDate().dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateId = smsTemplatesConfig.templates[SmsTemplateNames.VISIT_UPDATE.name]
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_UPDATE.name]
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
       "time" to "1:05am",
