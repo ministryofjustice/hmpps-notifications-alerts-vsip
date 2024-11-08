@@ -54,7 +54,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
-      )
+    )
 
     noContactVisit = createVisitDto(
       bookingReference = "bb-cc-dd-zz",
@@ -64,7 +64,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("John Smith", null, null),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
-      )
+    )
 
     singleDigitDateVisit = createVisitDto(
       bookingReference = "bb-cc-dd-xd",
@@ -74,14 +74,13 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
-      )
+    )
 
     prison = PrisonDto("HEI", "Hewell", true)
 
     prisonerSearchResult = PrisonerSearchResultDto("Prisoner", "One")
 
     prisonContactDetailsDto = PrisonContactDetailsDto(phoneNumber = "0111222333", webAddress = "website")
-
   }
 
   @Test
