@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConf
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.OutcomeStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.LocalStackContainer.setLocalStackProperties
@@ -190,7 +191,7 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>): VisitDto {
+  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>, outcomeStatus: OutcomeStatus? = null): VisitDto {
     return VisitDto(
       reference = bookingReference,
       prisonCode = prisonCode,
@@ -200,6 +201,7 @@ abstract class EventsIntegrationTestBase {
       prisonerId = prisonerId,
       visitRestriction = visitRestriction,
       visitors = visitors,
+      outcomeStatus = outcomeStatus,
     )
   }
 }

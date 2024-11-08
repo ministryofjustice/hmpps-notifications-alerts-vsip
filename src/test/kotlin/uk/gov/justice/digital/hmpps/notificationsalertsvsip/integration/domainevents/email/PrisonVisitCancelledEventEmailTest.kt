@@ -8,6 +8,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonContactDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.search.PrisonerSearchResultDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
@@ -15,6 +16,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.OutcomeStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_CANCELLED
 import java.time.Duration
@@ -30,6 +32,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   lateinit var singleDigitDateVisit: VisitDto
   lateinit var prison: PrisonDto
   lateinit var prisonerSearchResult: PrisonerSearchResultDto
+  lateinit var prisonContactDetailsDto: PrisonContactDetailsDto
 
   @BeforeEach
   internal fun setUp() {
@@ -40,6 +43,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
     )
 
     pastDatedVisit = createVisitDto(
@@ -49,7 +53,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-    )
+      outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
+      )
 
     noContactVisit = createVisitDto(
       bookingReference = "bb-cc-dd-zz",
@@ -58,7 +63,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", null, null),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-    )
+      outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
+      )
 
     singleDigitDateVisit = createVisitDto(
       bookingReference = "bb-cc-dd-xd",
@@ -67,11 +73,15 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-    )
+      outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
+      )
 
     prison = PrisonDto("HEI", "Hewell", true)
 
     prisonerSearchResult = PrisonerSearchResultDto("Prisoner", "One")
+
+    prisonContactDetailsDto = PrisonContactDetailsDto(phoneNumber = "0111222333", webAddress = "website")
+
   }
 
   @Test
@@ -93,6 +103,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "opening sentence" to "Your visit to see Prisoner One",
+      "phone" to prisonContactDetailsDto.phoneNumber!!,
+      "website" to prisonContactDetailsDto.webAddress!!,
     )
 
     // When
@@ -134,6 +146,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "opening sentence" to "Your visit to see Prisoner One",
+      "phone" to prisonContactDetailsDto.phoneNumber!!,
+      "website" to prisonContactDetailsDto.webAddress!!,
     )
 
     // When
@@ -141,6 +155,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, singleDigitDateVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(singleDigitDateVisit.prisonerId, prisonerSearchResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
@@ -175,6 +190,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "opening sentence" to "Your visit to the prison",
+      "phone" to prisonContactDetailsDto.phoneNumber!!,
+      "website" to prisonContactDetailsDto.webAddress!!,
     )
 
     // When
@@ -182,6 +199,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, null)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
@@ -208,6 +226,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, null, HttpStatus.NOT_FOUND)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
@@ -226,6 +245,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, null, HttpStatus.NOT_FOUND)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
@@ -244,6 +264,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, null, HttpStatus.NOT_FOUND)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }

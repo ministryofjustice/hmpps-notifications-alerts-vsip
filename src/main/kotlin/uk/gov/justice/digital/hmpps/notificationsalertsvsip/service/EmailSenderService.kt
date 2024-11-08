@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.BOOKED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.CANCELLED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.UPDATED
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.OutcomeStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils
 import uk.gov.service.notify.NotificationClient
@@ -85,18 +86,40 @@ class EmailSenderService(
       ),
     )
 
-    templateVars.putAll(getPrisonContactDetails(visit))
-
     return SendEmailNotificationDto(templateName = EmailTemplateNames.VISIT_BOOKING, templateVars = templateVars)
   }
 
   private fun handleCancelledEvent(visit: VisitDto): SendEmailNotificationDto {
     LOG.info("handleCancelEmail entered")
-    return SendEmailNotificationDto(templateName = EmailTemplateNames.VISIT_CANCELLED, templateVars = getCommonTemplateVars(visit))
+    return SendEmailNotificationDto(
+      templateName = getCancelledEmailTemplateName(visit.outcomeStatus!!),
+      templateVars = getCommonTemplateVars(visit),
+    )
+  }
+
+  private fun getCancelledEmailTemplateName(visitOutcome: OutcomeStatus): EmailTemplateNames {
+    return when (visitOutcome) {
+      OutcomeStatus.PRISONER_CANCELLED -> {
+        EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER
+      }
+
+      OutcomeStatus.ESTABLISHMENT_CANCELLED, OutcomeStatus.DETAILS_CHANGED_AFTER_BOOKING, OutcomeStatus.ADMINISTRATIVE_ERROR -> {
+        EmailTemplateNames.VISIT_CANCELLED_BY_PRISON
+      }
+
+      OutcomeStatus.VISITOR_CANCELLED -> {
+        EmailTemplateNames.VISIT_CANCELLED
+      }
+
+      else -> {
+        LOG.error("visit cancellation type $visitOutcome is unsupported, defaulting to standard cancellation template ${EmailTemplateNames.VISIT_CANCELLED}")
+        EmailTemplateNames.VISIT_CANCELLED
+      }
+    }
   }
 
   private fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, Any> {
-    return mutableMapOf(
+    val templateVars: MutableMap<String, Any> = mutableMapOf(
       "ref number" to visit.reference,
       "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
       "dayofweek" to dateUtils.getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
@@ -104,6 +127,9 @@ class EmailSenderService(
       "main contact name" to visit.visitContact.name,
       "opening sentence" to getPrisoner(visit),
     )
+    templateVars.putAll(getPrisonContactDetails(visit))
+
+    return templateVars
   }
 
   private fun getPrisoner(visit: VisitDto): String {
