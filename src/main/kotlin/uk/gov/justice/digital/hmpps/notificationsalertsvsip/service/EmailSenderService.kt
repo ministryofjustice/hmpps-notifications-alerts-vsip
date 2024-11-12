@@ -72,7 +72,7 @@ class EmailSenderService(
   }
 
   private fun handleBookedEvent(visit: VisitDto): SendEmailNotificationDto {
-    LOG.info("handleBookedEvent email entered")
+    LOG.info("handleBookedEvent (email) - Entered")
 
     val templateVars = getCommonTemplateVars(visit)
 
@@ -90,7 +90,8 @@ class EmailSenderService(
   }
 
   private fun handleCancelledEvent(visit: VisitDto): SendEmailNotificationDto {
-    LOG.info("handleCancelEmail entered")
+    LOG.info("handleCancelledEvent (email) - Entered")
+
     return SendEmailNotificationDto(
       templateName = getCancelledEmailTemplateName(visit.outcomeStatus!!),
       templateVars = getCommonTemplateVars(visit),
