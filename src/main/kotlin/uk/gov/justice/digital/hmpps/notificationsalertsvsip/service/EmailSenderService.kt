@@ -113,6 +113,7 @@ class EmailSenderService(
       }
 
       else -> {
+        // TODO: Confirm what we want to happen if another cancellation reason comes in? No template? Default template?
         LOG.error("visit cancellation type $visitOutcome is unsupported, defaulting to standard cancellation template ${EmailTemplateNames.VISIT_CANCELLED}")
         EmailTemplateNames.VISIT_CANCELLED
       }
@@ -126,17 +127,23 @@ class EmailSenderService(
       "dayofweek" to dateUtils.getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
       "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
       "main contact name" to visit.visitContact.name,
-      "opening sentence" to getPrisoner(visit),
     )
+    templateVars.putAll(getPrisoner(visit))
     templateVars.putAll(getPrisonContactDetails(visit))
 
     return templateVars
   }
 
-  private fun getPrisoner(visit: VisitDto): String {
+  private fun getPrisoner(visit: VisitDto): Map<String, Any> {
     return prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
-      return "Your visit to see $prisoner"
-    } ?: "Your visit to the prison"
+      return mutableMapOf(
+        Pair<String, Any>("opening sentence", "Your visit to see $prisoner"),
+        Pair<String, Any>("prisoner", "$prisoner"),
+      )
+    } ?: mutableMapOf(
+      Pair<String, Any>("opening sentence", "Your visit to the prison"),
+      Pair<String, Any>("prisoner", "the prisoner"),
+    )
   }
 
   private fun getVisitors(visit: VisitDto): List<String> {

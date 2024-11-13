@@ -30,6 +30,9 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   lateinit var pastDatedVisit: VisitDto
   lateinit var noContactVisit: VisitDto
   lateinit var singleDigitDateVisit: VisitDto
+  lateinit var cancelledByPrisonerVisit: VisitDto
+  lateinit var cancelledByPrisonVisit: VisitDto
+  lateinit var unsupportedCancelledTypeVisit: VisitDto
   lateinit var prison: PrisonDto
   lateinit var prisonerSearchResult: PrisonerSearchResultDto
   lateinit var prisonContactDetailsDto: PrisonContactDetailsDto
@@ -76,6 +79,36 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
     )
 
+    cancelledByPrisonerVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("Contact One", email = "example@email.com"),
+      visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      outcomeStatus = OutcomeStatus.PRISONER_CANCELLED,
+    )
+
+    cancelledByPrisonVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("Contact One", email = "example@email.com"),
+      visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      outcomeStatus = OutcomeStatus.ESTABLISHMENT_CANCELLED,
+    )
+
+    unsupportedCancelledTypeVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("Contact One", email = "example@email.com"),
+      visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      outcomeStatus = OutcomeStatus.NOT_RECORDED,
+    )
+
     prison = PrisonDto("HEI", "Hewell", true)
 
     prisonerSearchResult = PrisonerSearchResultDto("Prisoner", "One")
@@ -102,6 +135,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "opening sentence" to "Your visit to see Prisoner One",
+      "prisoner" to "Prisoner One",
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
@@ -145,6 +179,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "opening sentence" to "Your visit to see Prisoner One",
+      "prisoner" to "Prisoner One",
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
@@ -171,6 +206,141 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
+  fun `when visit cancelled by prison then cancelled by prison email template is sent`() {
+    // Given
+    val bookingReference = cancelledByPrisonVisit.reference
+
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(bookingReference))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISON.name]
+    val visitDate = cancelledByPrisonVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateVars = mutableMapOf<String, Any>(
+      "ref number" to bookingReference,
+      "prison" to prison.prisonName,
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "main contact name" to "Contact One",
+      "opening sentence" to "Your visit to see Prisoner One",
+      "prisoner" to "Prisoner One",
+      "phone" to prisonContactDetailsDto.phoneNumber!!,
+      "website" to prisonContactDetailsDto.webAddress!!,
+    )
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, cancelledByPrisonVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(cancelledByPrisonVisit.prisonerId, prisonerSearchResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "bi-vn-wn-ml") }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(cancelledByPrisonVisit, VisitEventType.CANCELLED) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendEmail(
+        templateId,
+        cancelledByPrisonVisit.visitContact.email,
+        templateVars,
+        cancelledByPrisonVisit.reference,
+      )
+    }
+  }
+
+  @Test
+  fun `when visit cancelled by prisoner then cancelled by prison email template is sent`() {
+    // Given
+    val bookingReference = cancelledByPrisonerVisit.reference
+
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(bookingReference))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER.name]
+    val visitDate = cancelledByPrisonerVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateVars = mutableMapOf<String, Any>(
+      "ref number" to bookingReference,
+      "prison" to prison.prisonName,
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "main contact name" to "Contact One",
+      "opening sentence" to "Your visit to see Prisoner One",
+      "prisoner" to "Prisoner One",
+      "phone" to prisonContactDetailsDto.phoneNumber!!,
+      "website" to prisonContactDetailsDto.webAddress!!,
+    )
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, cancelledByPrisonerVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(cancelledByPrisonerVisit.prisonerId, prisonerSearchResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "bi-vn-wn-ml") }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(cancelledByPrisonerVisit, VisitEventType.CANCELLED) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendEmail(
+        templateId,
+        cancelledByPrisonerVisit.visitContact.email,
+        templateVars,
+        cancelledByPrisonerVisit.reference,
+      )
+    }
+  }
+
+  @Test
+  fun `when visit cancelled by un-supported reason then default cancelled email template is sent`() {
+    // Given
+    val bookingReference = unsupportedCancelledTypeVisit.reference
+
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(bookingReference))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
+    val visitDate = unsupportedCancelledTypeVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateVars = mutableMapOf<String, Any>(
+      "ref number" to bookingReference,
+      "prison" to prison.prisonName,
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "main contact name" to "Contact One",
+      "opening sentence" to "Your visit to see Prisoner One",
+      "prisoner" to "Prisoner One",
+      "phone" to prisonContactDetailsDto.phoneNumber!!,
+      "website" to prisonContactDetailsDto.webAddress!!,
+    )
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, unsupportedCancelledTypeVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(unsupportedCancelledTypeVisit.prisonerId, prisonerSearchResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "bi-vn-wn-ml") }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(unsupportedCancelledTypeVisit, VisitEventType.CANCELLED) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendEmail(
+        templateId,
+        unsupportedCancelledTypeVisit.visitContact.email,
+        templateVars,
+        unsupportedCancelledTypeVisit.reference,
+      )
+    }
+  }
+
+  @Test
   fun `when visit cancelled message is received and prisoner-search returns an error, cancelled email is still sent`() {
     // Given
     val bookingReference = visit.reference
@@ -189,6 +359,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "main contact name" to "Contact One",
       "opening sentence" to "Your visit to the prison",
+      "prisoner" to "the prisoner",
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
