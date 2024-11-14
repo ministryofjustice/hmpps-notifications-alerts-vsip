@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service
 
+import jakarta.validation.ValidationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -32,7 +33,7 @@ class EmailSenderService(
   val templatesConfig: TemplatesConfig,
   val dateUtils: DateUtils,
 ) {
-  private companion object {
+  companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
     const val GOV_UK_PRISON_PAGE = "https://www.gov.uk/government/collections/prisons-in-england-and-wales"
   }
@@ -113,9 +114,8 @@ class EmailSenderService(
       }
 
       else -> {
-        // TODO: Confirm what we want to happen if another cancellation reason comes in? No template? Default template?
-        LOG.error("visit cancellation type $visitOutcome is unsupported, defaulting to standard cancellation template ${EmailTemplateNames.VISIT_CANCELLED}")
-        EmailTemplateNames.VISIT_CANCELLED
+        LOG.error("visit cancellation type $visitOutcome is unsupported")
+        throw ValidationException("visit cancellation type $visitOutcome is unsupported")
       }
     }
   }
@@ -137,12 +137,12 @@ class EmailSenderService(
   private fun getPrisoner(visit: VisitDto): Map<String, Any> {
     return prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
       return mutableMapOf(
-        Pair<String, Any>("opening sentence", "Your visit to see $prisoner"),
-        Pair<String, Any>("prisoner", "$prisoner"),
+        "opening sentence" to "Your visit to see $prisoner",
+        "prisoner" to "$prisoner",
       )
     } ?: mutableMapOf(
-      Pair<String, Any>("opening sentence", "Your visit to the prison"),
-      Pair<String, Any>("prisoner", "the prisoner"),
+      "opening sentence" to "Your visit to the prison",
+      "prisoner" to "the prisoner",
     )
   }
 
