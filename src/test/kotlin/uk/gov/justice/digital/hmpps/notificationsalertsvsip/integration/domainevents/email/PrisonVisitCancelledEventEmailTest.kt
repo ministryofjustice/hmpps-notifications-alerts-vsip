@@ -157,7 +157,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit cancelled by un-supported reason then illegal argument exception is thrown`() {
+  fun `when visit cancelled by un-supported reason then validation exception is thrown`() {
     // Given
     val unsupportedCancelledTypeVisit = createVisitDto(
       bookingReference = "bi-vn-wn-ml",
@@ -176,7 +176,10 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(unsupportedCancelledTypeVisit.reference, unsupportedCancelledTypeVisit)
 
     // Then
-    verifyEmailNotSent(unsupportedCancelledTypeVisit.reference)
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, unsupportedCancelledTypeVisit.reference) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(any(), any()) }
+    await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
   }
 
   @Test
@@ -296,5 +299,6 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitReference) }
     await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any()) }
+    await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
   }
 }
