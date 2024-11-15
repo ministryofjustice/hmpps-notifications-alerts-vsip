@@ -16,7 +16,6 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.OutcomeStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService.Companion.GOV_UK_PRISON_PAGE
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_CANCELLED
@@ -41,7 +40,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-      outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
+      outcomeStatus = "VISITOR_CANCELLED",
     )
 
     prison = PrisonDto("HEI", "Hewell", true)
@@ -79,7 +78,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-      outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
+      outcomeStatus = "VISITOR_CANCELLED",
     )
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(singleDigitDateVisit.reference))
     val jsonSqsMessage = createSQSMessage(domainEvent)
@@ -108,7 +107,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-      outcomeStatus = OutcomeStatus.ESTABLISHMENT_CANCELLED,
+      outcomeStatus = "ESTABLISHMENT_CANCELLED",
     )
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(cancelledByPrisonVisit.reference))
     val jsonSqsMessage = createSQSMessage(domainEvent)
@@ -137,7 +136,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-      outcomeStatus = OutcomeStatus.PRISONER_CANCELLED,
+      outcomeStatus = "PRISONER_CANCELLED",
     )
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(cancelledByPrisonerVisit.reference))
     val jsonSqsMessage = createSQSMessage(domainEvent)
@@ -166,7 +165,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-      outcomeStatus = OutcomeStatus.NOT_RECORDED,
+      outcomeStatus = "NOT_RECORDED",
     )
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(unsupportedCancelledTypeVisit.reference))
     val jsonSqsMessage = createSQSMessage(domainEvent)
@@ -227,7 +226,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-      outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
+      outcomeStatus = "VISITOR_CANCELLED",
     )
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(pastDatedVisit.reference))
     val jsonSqsMessage = createSQSMessage(domainEvent)
@@ -250,7 +249,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", null, null),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-      outcomeStatus = OutcomeStatus.VISITOR_CANCELLED,
+      outcomeStatus = "VISITOR_CANCELLED",
     )
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(noContactVisit.reference))
     val jsonSqsMessage = createSQSMessage(domainEvent)

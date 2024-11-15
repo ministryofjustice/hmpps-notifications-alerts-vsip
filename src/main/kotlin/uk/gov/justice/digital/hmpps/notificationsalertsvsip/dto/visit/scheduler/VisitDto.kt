@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.OutcomeStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import java.time.LocalDateTime
 
@@ -30,5 +29,5 @@ data class VisitDto(
   @Schema(description = "List of visitors associated with the visit", required = true)
   val visitors: List<VisitorDto> = listOf(),
   @Schema(description = "Outcome Status", example = "VISITOR_CANCELLED", required = false)
-  val outcomeStatus: OutcomeStatus? = null,
+  val outcomeStatus: String? = null,
 )

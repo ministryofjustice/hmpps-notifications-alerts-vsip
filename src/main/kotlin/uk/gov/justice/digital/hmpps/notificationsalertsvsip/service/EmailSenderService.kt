@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.BOOKED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.CANCELLED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.UPDATED
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.OutcomeStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils
 import uk.gov.service.notify.NotificationClient
@@ -99,17 +98,17 @@ class EmailSenderService(
     )
   }
 
-  private fun getCancelledEmailTemplateName(visitOutcome: OutcomeStatus): EmailTemplateNames {
+  private fun getCancelledEmailTemplateName(visitOutcome: String): EmailTemplateNames {
     return when (visitOutcome) {
-      OutcomeStatus.PRISONER_CANCELLED -> {
+      "PRISONER_CANCELLED" -> {
         EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER
       }
 
-      OutcomeStatus.ESTABLISHMENT_CANCELLED, OutcomeStatus.DETAILS_CHANGED_AFTER_BOOKING, OutcomeStatus.ADMINISTRATIVE_ERROR -> {
+      "ESTABLISHMENT_CANCELLED", "DETAILS_CHANGED_AFTER_BOOKING", "ADMINISTRATIVE_ERROR" -> {
         EmailTemplateNames.VISIT_CANCELLED_BY_PRISON
       }
 
-      OutcomeStatus.VISITOR_CANCELLED -> {
+      "VISITOR_CANCELLED" -> {
         EmailTemplateNames.VISIT_CANCELLED
       }
 
