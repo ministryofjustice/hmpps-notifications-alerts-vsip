@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service
 
+import jakarta.validation.ValidationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -11,6 +12,9 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.BOOKED
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.CANCELLED
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.UPDATED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils
 import uk.gov.service.notify.NotificationClient
@@ -28,7 +32,7 @@ class EmailSenderService(
   val templatesConfig: TemplatesConfig,
   val dateUtils: DateUtils,
 ) {
-  private companion object {
+  companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
     const val GOV_UK_PRISON_PAGE = "https://www.gov.uk/government/collections/prisons-in-england-and-wales"
   }
@@ -36,12 +40,16 @@ class EmailSenderService(
   fun sendEmail(visit: VisitDto, visitEventType: VisitEventType) {
     if (enabled) {
       val sendEmailNotificationDto = when (visitEventType) {
-        VisitEventType.BOOKED -> {
+        BOOKED -> {
           handleBookedEvent(visit)
         }
 
-        else -> {
-          LOG.error("visit event type $visitEventType is unsupported")
+        CANCELLED -> {
+          handleCancelledEvent(visit)
+        }
+
+        UPDATED -> {
+          LOG.info("No email template for UPDATED event, skipping email notification for visit ${visit.reference}")
           return Unit
         }
       }
@@ -64,31 +72,77 @@ class EmailSenderService(
   }
 
   private fun handleBookedEvent(visit: VisitDto): SendEmailNotificationDto {
-    val templateVars = mutableMapOf(
+    LOG.info("handleBookedEvent (email) - Entered")
+
+    val templateVars = getCommonTemplateVars(visit)
+
+    templateVars.putAll(
+      mutableMapOf(
+        "time" to dateUtils.getFormattedTime(visit.startTimestamp.toLocalTime()),
+        "end time" to dateUtils.getFormattedTime(visit.endTimestamp.toLocalTime()),
+        "arrival time" to "45",
+        "closed visit" to (visit.visitRestriction == VisitRestriction.CLOSED).toString(),
+        "visitors" to getVisitors(visit),
+      ),
+    )
+
+    return SendEmailNotificationDto(templateName = EmailTemplateNames.VISIT_BOOKING, templateVars = templateVars)
+  }
+
+  private fun handleCancelledEvent(visit: VisitDto): SendEmailNotificationDto {
+    LOG.info("handleCancelledEvent (email) - Entered")
+
+    return SendEmailNotificationDto(
+      templateName = getCancelledEmailTemplateName(visit.outcomeStatus!!),
+      templateVars = getCommonTemplateVars(visit),
+    )
+  }
+
+  private fun getCancelledEmailTemplateName(visitOutcome: String): EmailTemplateNames {
+    return when (visitOutcome) {
+      "PRISONER_CANCELLED" -> {
+        EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER
+      }
+
+      "ESTABLISHMENT_CANCELLED", "DETAILS_CHANGED_AFTER_BOOKING", "ADMINISTRATIVE_ERROR" -> {
+        EmailTemplateNames.VISIT_CANCELLED_BY_PRISON
+      }
+
+      "VISITOR_CANCELLED" -> {
+        EmailTemplateNames.VISIT_CANCELLED
+      }
+
+      else -> {
+        LOG.error("visit cancellation type $visitOutcome is unsupported")
+        throw ValidationException("visit cancellation type $visitOutcome is unsupported")
+      }
+    }
+  }
+
+  private fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, Any> {
+    val templateVars: MutableMap<String, Any> = mutableMapOf(
       "ref number" to visit.reference,
       "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
-      "time" to dateUtils.getFormattedTime(visit.startTimestamp.toLocalTime()),
-      "end time" to dateUtils.getFormattedTime(visit.endTimestamp.toLocalTime()),
-      "arrival time" to "45",
       "dayofweek" to dateUtils.getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
       "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
       "main contact name" to visit.visitContact.name,
-      "closed visit" to (visit.visitRestriction == VisitRestriction.CLOSED).toString(),
-      "opening sentence" to getPrisoner(visit),
-      "visitors" to getVisitors(visit),
     )
+    templateVars.putAll(getPrisoner(visit))
     templateVars.putAll(getPrisonContactDetails(visit))
 
-    val templateName = EmailTemplateNames.VISIT_BOOKING
-
-    LOG.info("Sending Email template: $templateName")
-    return SendEmailNotificationDto(templateName = templateName, templateVars = templateVars)
+    return templateVars
   }
 
-  private fun getPrisoner(visit: VisitDto): String {
+  private fun getPrisoner(visit: VisitDto): Map<String, Any> {
     return prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
-      return "Your visit to see $prisoner"
-    } ?: "Your visit to the prison"
+      return mutableMapOf(
+        "opening sentence" to "Your visit to see $prisoner",
+        "prisoner" to "$prisoner",
+      )
+    } ?: mutableMapOf(
+      "opening sentence" to "Your visit to the prison",
+      "prisoner" to "the prisoner",
+    )
   }
 
   private fun getVisitors(visit: VisitDto): List<String> {

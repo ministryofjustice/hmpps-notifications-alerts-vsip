@@ -190,7 +190,7 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>): VisitDto {
+  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>, outcomeStatus: String? = null): VisitDto {
     return VisitDto(
       reference = bookingReference,
       prisonCode = prisonCode,
@@ -200,6 +200,7 @@ abstract class EventsIntegrationTestBase {
       prisonerId = prisonerId,
       visitRestriction = visitRestriction,
       visitors = visitors,
+      outcomeStatus = outcomeStatus,
     )
   }
 }

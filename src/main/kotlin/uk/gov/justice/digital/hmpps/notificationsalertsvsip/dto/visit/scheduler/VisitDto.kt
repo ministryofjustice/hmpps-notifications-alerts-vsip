@@ -28,4 +28,6 @@ data class VisitDto(
   val visitRestriction: VisitRestriction,
   @Schema(description = "List of visitors associated with the visit", required = true)
   val visitors: List<VisitorDto> = listOf(),
+  @Schema(description = "Outcome Status", example = "VISITOR_CANCELLED", required = false)
+  val outcomeStatus: String? = null,
 )
