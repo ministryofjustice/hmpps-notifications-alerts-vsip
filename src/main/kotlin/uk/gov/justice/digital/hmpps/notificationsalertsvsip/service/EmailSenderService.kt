@@ -108,7 +108,7 @@ class EmailSenderService(
         EmailTemplateNames.VISIT_CANCELLED_BY_PRISON
       }
 
-      "VISITOR_CANCELLED" -> {
+      "VISITOR_CANCELLED", "BOOKER_CANCELLED" -> {
         EmailTemplateNames.VISIT_CANCELLED
       }
 
