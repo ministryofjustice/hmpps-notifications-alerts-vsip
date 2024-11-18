@@ -40,7 +40,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
-      outcomeStatus = "VISITOR_CANCELLED",
+      outcomeStatus = "BOOKER_CANCELLED",
     )
 
     prison = PrisonDto("HEI", "Hewell", true)
