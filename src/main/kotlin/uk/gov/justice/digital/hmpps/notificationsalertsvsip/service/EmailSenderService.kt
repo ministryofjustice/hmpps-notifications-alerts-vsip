@@ -136,11 +136,11 @@ class EmailSenderService(
   private fun getPrisoner(visit: VisitDto): Map<String, Any> {
     return prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
       return mutableMapOf(
-        "opening sentence" to "Your visit to see $prisoner",
+        "opening sentence" to "visit to see $prisoner",
         "prisoner" to "$prisoner",
       )
     } ?: mutableMapOf(
-      "opening sentence" to "Your visit to the prison",
+      "opening sentence" to "visit to the prison",
       "prisoner" to "the prisoner",
     )
   }
