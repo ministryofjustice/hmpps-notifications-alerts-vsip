@@ -188,7 +188,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
-    val templateVars = createTemplateVars(visit, openingSentence = "Your visit to the prison", prisoner = "the prisoner")
+    val templateVars = createTemplateVars(visit, openingSentence = "visit to the prison", prisoner = "the prisoner")
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
@@ -262,7 +262,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     verifyEmailNotSent(noContactVisit.reference)
   }
 
-  private fun createTemplateVars(visit: VisitDto, openingSentence: String? = "Your visit to see $prisonerSearchResult", prisoner: String? = prisonerSearchResult.toString(), phone: String? = prisonContactDetailsDto.phoneNumber, webAddress: String? = prisonContactDetailsDto.webAddress): Map<String, Any> {
+  private fun createTemplateVars(visit: VisitDto, openingSentence: String? = "visit to see $prisonerSearchResult", prisoner: String? = prisonerSearchResult.toString(), phone: String? = prisonContactDetailsDto.phoneNumber, webAddress: String? = prisonContactDetailsDto.webAddress): Map<String, Any> {
     val visitDate = visit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
