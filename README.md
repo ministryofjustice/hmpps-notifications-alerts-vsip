@@ -42,3 +42,4 @@ The `rename-project.bash` script takes a single argument - the name of the proje
 * The main package name (project name with hyphens removed)
 
 It then performs a search and replace and directory renames so the project is ready to be used.
+
