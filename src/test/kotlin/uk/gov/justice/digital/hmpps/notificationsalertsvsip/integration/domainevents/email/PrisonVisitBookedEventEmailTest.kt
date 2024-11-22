@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_BOOKED
 import java.time.Duration
 import java.time.LocalDate
@@ -125,8 +126,9 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visit booked message is received then booking email is sent`() {
     // Given
     val bookingReference = visit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
 
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
@@ -160,14 +162,14 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.BOOKED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit.visitContact.email,
         templateVars,
-        visit.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
@@ -176,7 +178,8 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visit booked message is received then booking email is sent in the right time format when start time minutes is 01`() {
     // Given
     val bookingReference = visit3.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit3.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -210,14 +213,14 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "qq-yy-xx-kk") }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit3, VisitEventType.BOOKED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit3, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit3.visitContact.email,
         templateVars,
-        visit3.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
@@ -226,7 +229,8 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visit booked message is received then booking email is sent in the right time format when start time minutes is 00`() {
     // Given
     val bookingReference = visit2.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit2.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -260,14 +264,14 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "zz-yy-xx-kk") }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit2, VisitEventType.BOOKED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit2, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit2.visitContact.email,
         templateVars,
-        visit2.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
@@ -276,7 +280,8 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visit booked message is received but the visit could not be found then booking email is not sent`() {
     // Given
     val bookingReference = visit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -286,15 +291,16 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
   }
 
   @Test
   fun `when visit booked message is received but the visit is in the past then booking email is not sent`() {
     // Given
     val bookingReference = pastDatedVisit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(pastDatedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -304,15 +310,16 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "aa-bb-cc-dd") }
-    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
   }
 
   @Test
   fun `when visit booked message is received but no visit contact found then booking email is not sent`() {
     // Given
     val bookingReference = noContactVisit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(noContactVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -322,15 +329,16 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bb-cc-dd-zz") }
-    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
   }
 
   @Test
   fun `when single digit visit date booked then message is sent out with the right visit date format`() {
     // Given
     val bookingReference = singleDigitDateVisit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(singleDigitDateVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // expected visit date should not be 2 digits
@@ -365,14 +373,14 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bb-cc-dd-xd") }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(singleDigitDateVisit, VisitEventType.BOOKED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(singleDigitDateVisit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         singleDigitDateVisit.visitContact.email,
         templateVars,
-        singleDigitDateVisit.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
@@ -381,9 +389,11 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visit booked message is received but and only matching visitors are on the booking email`() {
     // Given
     val bookingReference = visitWithOneVisitor.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(visitWithOneVisitor.reference, "123456")
+
     prisonVisitors = listOf("Visitor One (29 years old)")
 
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
@@ -417,14 +427,14 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visitWithOneVisitor, VisitEventType.BOOKED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visitWithOneVisitor, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visitWithOneVisitor.visitContact.email,
         templateVars,
-        visitWithOneVisitor.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
@@ -433,8 +443,8 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visit booked message is received and prisoner-contact-registry returns an error, booking email is still sent`() {
     // Given
     val bookingReference = visit.reference
-
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
@@ -468,14 +478,14 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.BOOKED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit.visitContact.email,
         templateVars,
-        visit.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
@@ -484,8 +494,9 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visit booked message is received and prisoner-search returns an error, booking email is still sent`() {
     // Given
     val bookingReference = visit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
 
-    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(bookingReference))
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
@@ -519,14 +530,14 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.BOOKED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit.visitContact.email,
         templateVars,
-        visit.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }

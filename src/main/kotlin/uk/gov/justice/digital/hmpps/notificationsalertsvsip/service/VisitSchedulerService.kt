@@ -4,6 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.client.VisitSchedulerClient
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.NotifyCreateNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 
 @Service
@@ -17,5 +18,9 @@ class VisitSchedulerService(
   fun getVisit(bookingReference: String): VisitDto? {
     LOG.info("VisitSchedulerService getVisit entered, booking reference - $bookingReference")
     return visitSchedulerClient.getVisitByReference(bookingReference)
+  }
+
+  fun createNotifyNotification(notifyCreateNotificationDto: NotifyCreateNotificationDto) {
+    visitSchedulerClient.createNotifyNotification(notifyCreateNotificationDto)
   }
 }

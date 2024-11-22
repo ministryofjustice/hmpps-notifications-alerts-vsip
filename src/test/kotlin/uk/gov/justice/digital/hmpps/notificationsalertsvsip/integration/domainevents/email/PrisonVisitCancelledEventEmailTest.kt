@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateN
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService.Companion.GOV_UK_PRISON_PAGE
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_CANCELLED
 import java.time.Duration
 import java.time.LocalDate
@@ -51,7 +52,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   @Test
   fun `when visit cancelled message is received then cancelled email is sent`() {
     // Given
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visit.reference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
@@ -65,7 +67,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
-    verifyEmailSent(templateId!!, visit, templateVars)
+    verifyEmailSent(templateId!!, visit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -80,7 +82,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "VISITOR_CANCELLED",
     )
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(singleDigitDateVisit.reference))
+    val visitAdditionalInfo = VisitAdditionalInfo(singleDigitDateVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
@@ -94,7 +97,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
-    verifyEmailSent(templateId!!, singleDigitDateVisit, templateVars)
+    verifyEmailSent(templateId!!, singleDigitDateVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -109,7 +112,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "ESTABLISHMENT_CANCELLED",
     )
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(cancelledByPrisonVisit.reference))
+    val visitAdditionalInfo = VisitAdditionalInfo(cancelledByPrisonVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISON.name]
@@ -123,7 +127,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null)
 
     // Then
-    verifyEmailSent(templateId!!, cancelledByPrisonVisit, templateVars)
+    verifyEmailSent(templateId!!, cancelledByPrisonVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -138,7 +142,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "PRISONER_CANCELLED",
     )
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(cancelledByPrisonerVisit.reference))
+    val visitAdditionalInfo = VisitAdditionalInfo(cancelledByPrisonerVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER.name]
@@ -152,7 +157,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
-    verifyEmailSent(templateId!!, cancelledByPrisonerVisit, templateVars)
+    verifyEmailSent(templateId!!, cancelledByPrisonerVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -167,7 +172,9 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "NOT_RECORDED",
     )
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(unsupportedCancelledTypeVisit.reference))
+    val visitAdditionalInfo = VisitAdditionalInfo(unsupportedCancelledTypeVisit.reference, "123456")
+
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -176,15 +183,16 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, unsupportedCancelledTypeVisit.reference) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(any(), any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
   }
 
   @Test
   fun `when visit cancelled message is received and prisoner-search returns an error, cancelled email is still sent`() {
     // Given
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visit.reference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
@@ -198,14 +206,15 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
 
     // Then
-    verifyEmailSent(templateId!!, visit, templateVars)
+    verifyEmailSent(templateId!!, visit, visitAdditionalInfo, templateVars)
   }
 
   @Test
   fun `when visit cancelled message is received but the visit could not be found then cancelled email is not sent`() {
     // Given
     val bookingReference = visit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -213,7 +222,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, null, HttpStatus.NOT_FOUND)
 
     // Then
-    verifyEmailNotSent(visit.reference)
+    verifyEmailNotSent(visitAdditionalInfo)
   }
 
   @Test
@@ -228,7 +237,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "VISITOR_CANCELLED",
     )
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(pastDatedVisit.reference))
+    val visitAdditionalInfo = VisitAdditionalInfo(pastDatedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -236,7 +246,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(pastDatedVisit.reference, null, HttpStatus.NOT_FOUND)
 
     // Then
-    verifyEmailNotSent(pastDatedVisit.reference)
+    verifyEmailNotSent(visitAdditionalInfo)
   }
 
   @Test
@@ -251,7 +261,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "VISITOR_CANCELLED",
     )
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(noContactVisit.reference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -259,7 +270,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(noContactVisit.reference, null, HttpStatus.NOT_FOUND)
 
     // Then
-    verifyEmailNotSent(noContactVisit.reference)
+    verifyEmailNotSent(visitAdditionalInfo)
   }
 
   private fun createTemplateVars(visit: VisitDto, openingSentence: String? = "visit to see $prisonerSearchResult", prisoner: String? = prisonerSearchResult.toString(), phone: String? = prisonContactDetailsDto.phoneNumber, webAddress: String? = prisonContactDetailsDto.webAddress): Map<String, Any> {
@@ -280,24 +291,24 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     )
   }
 
-  private fun verifyEmailSent(templateId: String, visit: VisitDto, templateVars: Map<String, Any>) {
+  private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visit.reference) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.CANCELLED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit.visitContact.email,
         templateVars,
-        visit.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
 
-  private fun verifyEmailNotSent(visitReference: String) {
+  private fun verifyEmailNotSent(visitAdditionalInfo: VisitAdditionalInfo) {
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitReference) }
-    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
   }
 }

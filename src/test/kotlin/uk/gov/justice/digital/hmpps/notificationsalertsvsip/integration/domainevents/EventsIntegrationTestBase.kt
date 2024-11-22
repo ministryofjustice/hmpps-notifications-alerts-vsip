@@ -37,6 +37,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.SmsSenderSer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.EventFeatureSwitch
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.SQSMessage
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitBookedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitCancelledEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitChangedEventNotifier
@@ -182,12 +183,13 @@ abstract class EventsIntegrationTestBase {
     return "{\"eventType\":\"$eventType\",\"additionalInformation\":$additionalInformation}"
   }
 
-  fun createAdditionalInformationJson(bookingReference: String): String {
+  fun createAdditionalInformationJson(visitAdditionalInfo: VisitAdditionalInfo): String {
     val builder = StringBuilder()
     builder.append("{")
-    builder.append("\"reference\":\"$bookingReference\"")
+    builder.append("\"reference\":\"${visitAdditionalInfo.bookingReference}\",")
+    builder.append("\"eventAuditId\":\"${visitAdditionalInfo.eventAuditId}\"")
     builder.append("}")
-    return builder.toString()
+    return builder.toString();
   }
 
   fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>, outcomeStatus: String? = null): VisitDto {

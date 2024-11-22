@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.NotifyCreateNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.personalisations.PrisonerVisitorPersonalisationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
@@ -37,7 +38,7 @@ class EmailSenderService(
     const val GOV_UK_PRISON_PAGE = "https://www.gov.uk/government/collections/prisons-in-england-and-wales"
   }
 
-  fun sendEmail(visit: VisitDto, visitEventType: VisitEventType) {
+  fun sendEmail(visit: VisitDto, visitEventType: VisitEventType, eventAuditId: String): NotifyCreateNotificationDto? {
     if (enabled) {
       val sendEmailNotificationDto = when (visitEventType) {
         BOOKED -> {
@@ -50,7 +51,7 @@ class EmailSenderService(
 
         UPDATED -> {
           LOG.info("No email template for UPDATED event, skipping email notification for visit ${visit.reference}")
-          return Unit
+          return null
         }
       }
 
@@ -60,14 +61,18 @@ class EmailSenderService(
           templatesConfig.emailTemplates[sendEmailNotificationDto.templateName.name],
           visit.visitContact.email,
           sendEmailNotificationDto.templateVars,
-          visit.reference,
+          eventAuditId,
         )
         LOG.info("Calling notification client finished with response ${response.notificationId}")
+
+        return NotifyCreateNotificationDto(response)
       } catch (e: NotificationClientException) {
         LOG.error("Error sending email with exception: $e")
+        return null
       }
     } else {
       LOG.info("Sending Email has been disabled.")
+      return null
     }
   }
 

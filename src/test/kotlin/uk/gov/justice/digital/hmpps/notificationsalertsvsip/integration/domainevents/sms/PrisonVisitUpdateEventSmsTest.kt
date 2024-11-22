@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_CHANGED
 import java.time.Duration
 import java.time.LocalDate
@@ -101,7 +102,8 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit updated message is received then update message is sent`() {
     // Given
     val bookingReference = visit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitDate = visit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
@@ -122,7 +124,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "bi-vn-wn-ml") }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.UPDATED) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -138,7 +140,8 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit updated message is received then update message is sent with th right time format when start time minutes is 00`() {
     // Given
     val bookingReference = visit2.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit2.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitDate = visit2.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
@@ -159,7 +162,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "zz-yy-xx-kk") }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit2, VisitEventType.UPDATED) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -175,7 +178,8 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit updated message is received then update message is sent with th right time format when start time minutes is 01`() {
     // Given
     val bookingReference = visit3.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit3.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitDate = visit3.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
@@ -196,7 +200,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "qq-yy-xx-kk") }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit3, VisitEventType.UPDATED) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -212,7 +216,8 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit updated message is received but the visit could not be found then update message is not sent`() {
     // Given
     val bookingReference = visit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -222,7 +227,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "bi-vn-wn-ml") }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any()) }
   }
 
@@ -230,7 +235,8 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit updated message is received but the visit is in the past then update message is not sent`() {
     // Given
     val bookingReference = pastDatedVisit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(pastDatedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -240,7 +246,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "aa-bb-cc-dd") }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any()) }
   }
 
@@ -248,7 +254,8 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit updated message is received but no visit contact then update message is not sent`() {
     // Given
     val bookingReference = noContactVisit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(noContactVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -258,7 +265,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "bb-cc-dd-zz") }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any()) }
   }
 
@@ -266,7 +273,8 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit date updated to a single digit date then message is sent out with the right visit date format`() {
     // Given
     val bookingReference = singleDigitDateVisit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(singleDigitDateVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitYear = singleDigitDateVisit.startTimestamp.toLocalDate().year
     // expected visit date should not be 2 digits
@@ -288,7 +296,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, "bb-cc-dd-xd") }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(singleDigitDateVisit, VisitEventType.UPDATED) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(

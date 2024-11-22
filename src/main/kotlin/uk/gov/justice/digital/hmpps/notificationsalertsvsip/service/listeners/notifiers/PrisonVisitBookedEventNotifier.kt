@@ -18,6 +18,6 @@ class PrisonVisitBookedEventNotifier(
   override fun processEvent(domainEvent: DomainEvent) {
     val visitAdditionalInfo: VisitAdditionalInfo = objectMapper.readValue(domainEvent.additionalInformation)
     LOG.debug("Enter booking event with info : {}", visitAdditionalInfo)
-    notificationService.sendMessage(VisitEventType.BOOKED, visitAdditionalInfo.bookingReference)
+    notificationService.sendMessage(VisitEventType.BOOKED, visitAdditionalInfo)
   }
 }
