@@ -189,7 +189,7 @@ abstract class EventsIntegrationTestBase {
     builder.append("\"reference\":\"${visitAdditionalInfo.bookingReference}\",")
     builder.append("\"eventAuditId\":\"${visitAdditionalInfo.eventAuditId}\"")
     builder.append("}")
-    return builder.toString();
+    return builder.toString()
   }
 
   fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>, outcomeStatus: String? = null): VisitDto {
