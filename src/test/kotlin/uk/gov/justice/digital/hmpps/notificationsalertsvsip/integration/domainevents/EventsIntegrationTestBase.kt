@@ -9,12 +9,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
@@ -96,34 +96,34 @@ abstract class EventsIntegrationTestBase {
   @Autowired
   lateinit var domainEventListenerService: DomainEventListenerService
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var eventFeatureSwitch: EventFeatureSwitch
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var notificationService: NotificationService
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var smsSenderService: SmsSenderService
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var emailSenderService: EmailSenderService
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var visitSchedulerService: VisitSchedulerService
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var templatesConfig: TemplatesConfig
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var prisonVisitBookedEventNotifierSpy: PrisonVisitBookedEventNotifier
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var prisonVisitChangedEventNotifierSpy: PrisonVisitChangedEventNotifier
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var prisonVisitCancelledEventNotifierSpy: PrisonVisitCancelledEventNotifier
 
-  @MockBean
+  @MockitoBean
   lateinit var notificationClient: NotificationClient
 
   @Autowired
