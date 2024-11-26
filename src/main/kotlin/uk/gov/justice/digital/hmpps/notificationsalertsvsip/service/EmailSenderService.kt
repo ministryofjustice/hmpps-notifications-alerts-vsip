@@ -55,8 +55,8 @@ class EmailSenderService(
         }
       }
 
-      LOG.info("Calling notification client")
       try {
+        LOG.info("Calling notification client")
         val response = notificationClient.sendEmail(
           templatesConfig.emailTemplates[sendEmailNotificationDto.templateName.name],
           visit.visitContact.email,

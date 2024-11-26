@@ -48,6 +48,7 @@ import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
 import uk.gov.service.notify.NotificationClient
 import uk.gov.service.notify.SendEmailResponse
+import uk.gov.service.notify.SendSmsResponse
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
@@ -249,5 +250,38 @@ abstract class EventsIntegrationTestBase {
     }.toString()
 
     return SendEmailResponse(jsonResponse)
+  }
+
+  fun buildSendSmsResponse(
+    id: UUID = UUID.randomUUID(),
+    reference: String?,
+    body: String = "Hello, {{name}}!",
+    fromNumber: String? = "no-reply@example.com",
+    templateId: UUID = UUID.randomUUID(),
+    templateVersion: Int = 1,
+    templateUri: String = "https://example.com/template/template-id",
+  ): SendSmsResponse {
+    val jsonResponse = JSONObject().apply {
+      put("id", id.toString())
+      put("reference", reference)
+      put(
+        "content",
+        JSONObject().apply {
+          put("body", body)
+          put("from_number", fromNumber)
+        },
+      )
+
+      put(
+        "template",
+        JSONObject().apply {
+          put("id", templateId.toString())
+          put("version", templateVersion)
+          put("uri", templateUri)
+        },
+      )
+    }.toString()
+
+    return SendSmsResponse(jsonResponse)
   }
 }

@@ -120,12 +120,12 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visit booked message is received then booking email is sent in the right time format when start time minutes is 01`() {
     // Given
     val visit3 = createVisitDto(
-    bookingReference = "qq-yy-xx-kk",
-    visitDate = LocalDate.now().plusDays(1),
-    visitTime = LocalTime.of(0, 1),
-    duration = Duration.of(30, ChronoUnit.MINUTES),
-    visitContact = ContactDto("Contact One", email = "example@email.com"),
-    visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      bookingReference = "qq-yy-xx-kk",
+      visitDate = LocalDate.now().plusDays(1),
+      visitTime = LocalTime.of(0, 1),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("Contact One", email = "example@email.com"),
+      visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
     )
     val bookingReference = visit3.reference
     val visitAdditionalInfo = VisitAdditionalInfo(visit3.reference, "123456")
@@ -521,7 +521,8 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, visit, visitAdditionalInfo, templateVars) }
+    verifyEmailSent(templateId!!, visit, visitAdditionalInfo, templateVars)
+  }
 
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
