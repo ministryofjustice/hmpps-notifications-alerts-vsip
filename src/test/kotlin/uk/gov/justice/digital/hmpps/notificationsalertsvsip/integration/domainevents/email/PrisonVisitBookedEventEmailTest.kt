@@ -4,6 +4,7 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -151,6 +152,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
@@ -159,6 +161,15 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, prisonerSearchResult)
     prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit.prisonerId, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
@@ -172,6 +183,9 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visitAdditionalInfo.eventAuditId,
       )
     }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
+    }
   }
 
   @Test
@@ -181,15 +195,6 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     val visitAdditionalInfo = VisitAdditionalInfo(visit3.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
-
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    visitSchedulerMockServer.stubGetVisit(bookingReference, visit3)
-    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
-    prisonerOffenderSearchMockServer.stubGetPrisoner(visit3.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit3.prisonerId, prisonerContactsResult)
-    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
-
     val visitDate = visit3.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
@@ -210,6 +215,24 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, visit3)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(visit3.prisonerId, prisonerSearchResult)
+    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit3.prisonerId, prisonerContactsResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
@@ -223,6 +246,9 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visitAdditionalInfo.eventAuditId,
       )
     }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
+    }
   }
 
   @Test
@@ -232,15 +258,6 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     val visitAdditionalInfo = VisitAdditionalInfo(visit2.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
-
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    visitSchedulerMockServer.stubGetVisit(bookingReference, visit2)
-    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
-    prisonerOffenderSearchMockServer.stubGetPrisoner(visit2.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit2.prisonerId, prisonerContactsResult)
-    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
-
     val visitDate = visit2.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
@@ -261,6 +278,24 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, visit2)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(visit2.prisonerId, prisonerSearchResult)
+    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit2.prisonerId, prisonerContactsResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
@@ -273,6 +308,9 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         templateVars,
         visitAdditionalInfo.eventAuditId,
       )
+    }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
     }
   }
 
@@ -293,6 +331,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
     await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
+    await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }
 
   @Test
@@ -312,6 +351,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
     await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
+    await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }
 
   @Test
@@ -331,6 +371,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
     await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
+    await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }
 
   @Test
@@ -362,6 +403,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
@@ -370,6 +412,15 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     prisonerOffenderSearchMockServer.stubGetPrisoner(singleDigitDateVisit.prisonerId, prisonerSearchResult)
     prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(singleDigitDateVisit.prisonerId, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
@@ -382,6 +433,9 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         templateVars,
         visitAdditionalInfo.eventAuditId,
       )
+    }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
     }
   }
 
@@ -416,6 +470,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
@@ -424,6 +479,15 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     prisonerOffenderSearchMockServer.stubGetPrisoner(visitWithOneVisitor.prisonerId, prisonerSearchResult)
     prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visitWithOneVisitor.prisonerId, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
@@ -436,6 +500,9 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         templateVars,
         visitAdditionalInfo.eventAuditId,
       )
+    }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
     }
   }
 
@@ -467,6 +534,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
@@ -475,6 +543,15 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, prisonerSearchResult)
     prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit.prisonerId, null)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
@@ -487,6 +564,9 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         templateVars,
         visitAdditionalInfo.eventAuditId,
       )
+    }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
     }
   }
 
@@ -519,6 +599,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
@@ -527,6 +608,15 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, null)
     prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit.prisonerId, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
@@ -539,6 +629,9 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         templateVars,
         visitAdditionalInfo.eventAuditId,
       )
+    }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
     }
   }
 }

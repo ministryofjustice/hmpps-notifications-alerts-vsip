@@ -4,6 +4,7 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -58,6 +59,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
     val templateVars = createTemplateVars(visit)
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
@@ -65,6 +67,15 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, prisonerSearchResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     verifyEmailSent(templateId!!, visit, visitAdditionalInfo, templateVars)
@@ -89,12 +100,23 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
     val templateVars = createTemplateVars(singleDigitDateVisit)
 
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(singleDigitDateVisit.reference, singleDigitDateVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(singleDigitDateVisit.prisonerId, prisonerSearchResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     verifyEmailSent(templateId!!, singleDigitDateVisit, visitAdditionalInfo, templateVars)
@@ -119,12 +141,23 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISON.name]
     val templateVars = createTemplateVars(cancelledByPrisonVisit, phone = GOV_UK_PRISON_PAGE, webAddress = GOV_UK_PRISON_PAGE)
 
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(cancelledByPrisonVisit.reference, cancelledByPrisonVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(cancelledByPrisonVisit.prisonerId, prisonerSearchResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     verifyEmailSent(templateId!!, cancelledByPrisonVisit, visitAdditionalInfo, templateVars)
@@ -149,12 +182,23 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER.name]
     val templateVars = createTemplateVars(cancelledByPrisonerVisit)
 
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(cancelledByPrisonerVisit.reference, cancelledByPrisonerVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(cancelledByPrisonerVisit.prisonerId, prisonerSearchResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     verifyEmailSent(templateId!!, cancelledByPrisonerVisit, visitAdditionalInfo, templateVars)
@@ -186,6 +230,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(emailSenderService, times(1)).sendEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
+    await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }
 
   @Test
@@ -198,12 +243,23 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
     val templateVars = createTemplateVars(visit, openingSentence = "visit to the prison", prisoner = "the prisoner")
 
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(visit.reference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, null)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     verifyEmailSent(templateId!!, visit, visitAdditionalInfo, templateVars)
@@ -303,6 +359,9 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
         visitAdditionalInfo.eventAuditId,
       )
     }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
+    }
   }
 
   private fun verifyEmailNotSent(visitAdditionalInfo: VisitAdditionalInfo) {
@@ -310,5 +369,6 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
+    await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }
 }

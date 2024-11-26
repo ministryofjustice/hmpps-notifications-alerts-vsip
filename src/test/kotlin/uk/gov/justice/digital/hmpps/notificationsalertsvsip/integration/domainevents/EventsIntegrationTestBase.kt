@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domaine
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import org.json.JSONObject
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -34,6 +35,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderS
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PRISON_VISITS_NOTIFICATION_ALERTS_QUEUE_CONFIG_KEY
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.SmsSenderService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitSchedulerService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.EventFeatureSwitch
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.SQSMessage
@@ -45,9 +47,11 @@ import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
 import uk.gov.service.notify.NotificationClient
+import uk.gov.service.notify.SendEmailResponse
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -102,6 +106,9 @@ abstract class EventsIntegrationTestBase {
 
   @SpyBean
   lateinit var emailSenderService: EmailSenderService
+
+  @SpyBean
+  lateinit var visitSchedulerService: VisitSchedulerService
 
   @SpyBean
   lateinit var templatesConfig: TemplatesConfig
@@ -204,5 +211,43 @@ abstract class EventsIntegrationTestBase {
       visitors = visitors,
       outcomeStatus = outcomeStatus,
     )
+  }
+
+  fun buildSendEmailResponse(
+    id: UUID = UUID.randomUUID(),
+    reference: String?,
+    body: String = "Hello, {{name}}!",
+    subject: String = "Test Subject",
+    fromEmail: String? = "no-reply@example.com",
+    templateId: UUID = UUID.randomUUID(),
+    templateVersion: Int = 1,
+    templateUri: String = "https://example.com/template/template-id",
+    oneClickUnsubscribeURL: String? = "https://example.com/unsubscribe",
+  ): SendEmailResponse {
+    val jsonResponse = JSONObject().apply {
+      put("id", id.toString())
+      put("reference", reference)
+      put(
+        "content",
+        JSONObject().apply {
+          put("body", body)
+          put("subject", subject)
+          put("from_email", fromEmail)
+        },
+      )
+
+      put(
+        "template",
+        JSONObject().apply {
+          put("id", templateId.toString())
+          put("version", templateVersion)
+          put("uri", templateUri)
+        },
+      )
+
+      put("one_click_unsubscribe_url", oneClickUnsubscribeURL)
+    }.toString()
+
+    return SendEmailResponse(jsonResponse)
   }
 }
