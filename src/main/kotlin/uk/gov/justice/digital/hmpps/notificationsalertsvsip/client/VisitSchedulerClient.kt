@@ -58,7 +58,7 @@ class VisitSchedulerClient(
 
   fun processNotifyCallbackNotification(notifyCallbackNotificationDto: NotifyCallbackNotificationDto) {
     webClient.post()
-      .uri("/visits/notify/create")
+      .uri("/visits/notify/callback")
       .body(BodyInserters.fromValue(notifyCallbackNotificationDto))
       .accept(MediaType.APPLICATION_JSON)
       .retrieve()

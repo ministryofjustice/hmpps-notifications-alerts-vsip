@@ -15,6 +15,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+import org.springframework.test.web.reactive.server.WebTestClient
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
@@ -92,6 +93,9 @@ abstract class EventsIntegrationTestBase {
       prisonerOffenderSearchMockServer.stop()
     }
   }
+
+  @Autowired
+  lateinit var webTestClient: WebTestClient
 
   @Autowired
   lateinit var domainEventListenerService: DomainEventListenerService
