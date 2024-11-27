@@ -36,6 +36,7 @@ generic-service:
       SYSTEM_CLIENT_ID: "SYSTEM_CLIENT_ID"
       SYSTEM_CLIENT_SECRET: "SYSTEM_CLIENT_SECRET"
       NOTIFY_API_KEY: "NOTIFY_API_KEY"
+      NOTIFY_CALLBACK_TOKEN: "NOTIFY_CALLBACK_TOKEN"
     hmpps-domain-events-topic:
       HMPPS_SQS_TOPICS_DOMAINEVENTS_ARN: "topic_arn"
     sqs-prison-visits-notification-alerts-secret:

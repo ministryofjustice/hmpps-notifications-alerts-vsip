@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.client.HttpClientErrorException.Unauthorized
+import software.amazon.awssdk.http.HttpStatusCode.UNAUTHORIZED
 
 @RestControllerAdvice
 class HmppsNotificationsAlertsVsipExceptionHandler {
@@ -20,6 +22,20 @@ class HmppsNotificationsAlertsVsipExceptionHandler {
         ErrorResponse(
           status = BAD_REQUEST,
           userMessage = "Validation failure: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
+
+  @ExceptionHandler(Unauthorized::class)
+  fun handleUnauthorizedException(e: Exception): ResponseEntity<ErrorResponse> {
+    log.info("Unauthorised request made: {}", e.message)
+    return ResponseEntity
+      .status(UNAUTHORIZED)
+      .body(
+        ErrorResponse(
+          status = UNAUTHORIZED,
+          userMessage = "Unauthorised request made: ${e.message}",
           developerMessage = e.message,
         ),
       )
