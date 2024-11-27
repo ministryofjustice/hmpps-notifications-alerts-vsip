@@ -4,6 +4,7 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -15,6 +16,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_CANCELLED
 import java.time.Duration
 import java.time.LocalDate
@@ -111,7 +113,8 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit cancelled message is received then cancel message is sent`() {
     // Given
     val bookingReference = visit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson("bi-vn-wn-ml"))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitDate = visit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
@@ -125,24 +128,37 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "reference" to bookingReference,
       "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
     )
+    val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendSms(
+        templateId,
+        visit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.CANCELLED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
         visit.visitContact.telephone,
         templateVars,
-        visit.reference,
+        visitAdditionalInfo.eventAuditId,
       )
+    }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
     }
   }
 
@@ -150,7 +166,8 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit cancelled message is received then cancel message is sent with the right time format  when start time minutes is 00`() {
     // Given
     val bookingReference = visit3.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson("zz-yy-xx-kk"))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit3.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitDate = visit3.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
@@ -173,14 +190,14 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "zz-yy-xx-kk") }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit3, VisitEventType.CANCELLED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit3, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
         visit3.visitContact.telephone,
         templateVars,
-        visit3.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
@@ -189,7 +206,8 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit cancelled message is received then cancel message is sent with the right time format  when start time minutes is 01`() {
     // Given
     val bookingReference = visit4.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson("qq-yy-xx-kk"))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit4.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitDate = visit4.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
@@ -212,14 +230,14 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "qq-yy-xx-kk") }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit4, VisitEventType.CANCELLED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit4, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
         visit4.visitContact.telephone,
         templateVars,
-        visit4.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
@@ -228,7 +246,8 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit cancelled message is received but no prison contact number then cancel message is sent`() {
     // Given
     val bookingReference = visit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson("bi-vn-wn-ml"))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitDate = visit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
@@ -250,14 +269,14 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "bi-vn-wn-ml") }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.CANCELLED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
         visit.visitContact.telephone,
         templateVars,
-        visit.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }
@@ -266,7 +285,8 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
   fun `when visit cancelled message is received but the visit could not be found then cancel message is not sent`() {
     // Given
     val bookingReference = visit2.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(visit2.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -276,15 +296,16 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "aa-xx-wn-ml") }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
   }
 
   @Test
   fun `when visit cancelled message is received but the visit is in the past then cancel message is not sent`() {
     // Given
     val bookingReference = pastDatedVisit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(pastDatedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -294,15 +315,16 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "aa-bb-cc-dd") }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
   }
 
   @Test
   fun `when visit cancelled message is received but no visit contact then cancel message is not sent`() {
     // Given
     val bookingReference = noContactVisit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(noContactVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -312,15 +334,16 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "bb-cc-dd-zz") }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
   }
 
   @Test
   fun `when single digit visit date cancelled then message is sent out with the right visit date format`() {
     // Given
     val bookingReference = singleDigitDateVisit.reference
-    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(bookingReference))
+    val visitAdditionalInfo = VisitAdditionalInfo(singleDigitDateVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitYear = singleDigitDateVisit.startTimestamp.toLocalDate().year
     // expected visit date should not be 2 digits
@@ -343,14 +366,14 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, "bb-cc-dd-xd") }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(singleDigitDateVisit, VisitEventType.CANCELLED) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(singleDigitDateVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
         singleDigitDateVisit.visitContact.telephone,
         templateVars,
-        singleDigitDateVisit.reference,
+        visitAdditionalInfo.eventAuditId,
       )
     }
   }

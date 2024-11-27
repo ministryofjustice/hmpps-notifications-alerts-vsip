@@ -18,6 +18,6 @@ class PrisonVisitCancelledEventNotifier(
   override fun processEvent(domainEvent: DomainEvent) {
     val visitAdditionalInfo: VisitAdditionalInfo = objectMapper.readValue(domainEvent.additionalInformation)
     LOG.debug("Enter cancel event with info {}", visitAdditionalInfo)
-    notificationService.sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo.bookingReference)
+    notificationService.sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo)
   }
 }
