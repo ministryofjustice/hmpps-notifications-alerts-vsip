@@ -27,7 +27,7 @@ class NotificationService(
       return
     }
 
-    if (visit.startTimestamp <= LocalDateTime.now()) {
+    if (visit.startTimestamp < LocalDateTime.now()) {
       LOG.info("Visit in the past - ${visit.reference}")
       return
     }
