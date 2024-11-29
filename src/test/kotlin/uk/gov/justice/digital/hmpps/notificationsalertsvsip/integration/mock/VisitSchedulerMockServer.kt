@@ -35,6 +35,14 @@ class VisitSchedulerMockServer(@Autowired private val objectMapper: ObjectMapper
     )
   }
 
+  fun stubProcessNotifyCallbackNotification(httpStatus: HttpStatus) {
+    val responseBuilder = createJsonResponseBuilder()
+    stubFor(
+      post("/visits/notify/callback")
+        .willReturn(responseBuilder.withStatus(httpStatus.value())),
+    )
+  }
+
   private fun getJsonString(obj: VisitDto): String {
     return objectMapper.writer().writeValueAsString(obj)
   }

@@ -18,11 +18,11 @@ data class NotifyCreateNotificationDto(
   val eventAuditId: String,
   @Schema(description = "The timestamp for when the vsip notification service sent the notification to gov notify", required = true)
   val createdAt: LocalDateTime,
-  @Schema(description = "The type of the notification", example = "email", required = true)
+  @Schema(description = "The type of the notification", required = true)
   val notificationType: String,
-  @Schema(description = "The id the template used for the notification", example = "email", required = true)
+  @Schema(description = "The id the template used for the notification", required = true)
   val templateId: UUID,
-  @Schema(description = "The version of the template used for the notification", example = "email", required = true)
+  @Schema(description = "The version of the template used for the notification", required = true)
   val templateVersion: Int,
 ) {
   constructor(sendEmailResponse: SendEmailResponse) : this(
