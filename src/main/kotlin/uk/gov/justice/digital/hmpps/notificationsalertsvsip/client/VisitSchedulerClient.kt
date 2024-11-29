@@ -46,7 +46,7 @@ class VisitSchedulerClient(
   }
 
   fun createNotifyNotification(notifyCreateNotificationDto: NotifyCreateNotificationDto) {
-    webClient.post()
+    webClient.put()
       .uri("/visits/notify/create")
       .body(BodyInserters.fromValue(notifyCreateNotificationDto))
       .accept(MediaType.APPLICATION_JSON)
@@ -57,7 +57,7 @@ class VisitSchedulerClient(
   }
 
   fun processNotifyCallbackNotification(notifyCallbackNotificationDto: NotifyCallbackNotificationDto) {
-    webClient.post()
+    webClient.put()
       .uri("/visits/notify/callback")
       .body(BodyInserters.fromValue(notifyCallbackNotificationDto))
       .accept(MediaType.APPLICATION_JSON)
