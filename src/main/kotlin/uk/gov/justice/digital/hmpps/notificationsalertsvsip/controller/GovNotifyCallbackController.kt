@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
@@ -21,6 +21,12 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.NotifyCallbackNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitSchedulerService
 import java.security.MessageDigest
+
+/**
+ * TODO: VB-1736 - Gov notify callback configs
+ * URL: https://https://hmpps-notifi-alerts-vsip-preprod.prison.service.justice.gov.uk/visits/notify/callback
+ * Token: eyJhbGciOiAiSFMyNTYiLCJ0eXAiOiAiSldUIn0.eyJzdWIiOiAiZ292LW5vdGlmeSIsImp0aSI6ICJlZGZlOTJhMjUtZTg3Mi00YzdkLWE4ZmMtMGI5NzFlMzg1YTgwIn0.
+ */
 
 const val GOV_NOTIFY_CALLBACK: String = "/visits/notify/callback"
 
@@ -36,7 +42,7 @@ class GovNotifyCallbackController(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  @PostMapping(GOV_NOTIFY_CALLBACK)
+  @PutMapping(GOV_NOTIFY_CALLBACK)
   @Operation(
     summary = "Process gov notify callback",
     description = "Accept and process the gov notify callback for notifications",
