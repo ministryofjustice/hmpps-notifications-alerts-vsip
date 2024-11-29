@@ -22,12 +22,6 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.NotifyCallbackNo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitSchedulerService
 import java.security.MessageDigest
 
-/**
- * TODO: VB-1736 - Gov notify callback configs
- * URL: https://https://hmpps-notifi-alerts-vsip-preprod.prison.service.justice.gov.uk/visits/notify/callback
- * Token: eyJhbGciOiAiSFMyNTYiLCJ0eXAiOiAiSldUIn0.eyJzdWIiOiAiZ292LW5vdGlmeSIsImp0aSI6ICJlZGZlOTJhMjUtZTg3Mi00YzdkLWE4ZmMtMGI5NzFlMzg1YTgwIn0.
- */
-
 const val GOV_NOTIFY_CALLBACK: String = "/visits/notify/callback"
 
 @RestController
