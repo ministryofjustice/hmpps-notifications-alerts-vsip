@@ -45,6 +45,9 @@ generic-service:
       HMPPS_SQS_QUEUES_PRISONVISITSNOTIFICATIONALERTS_DLQ_NAME: "sqs_queue_name"
 
   allowlist:
+    gov-notify-1: 52.17.149.153
+    gov-notify-2: 63.33.132.231
+    gov-notify-3: 54.216.159.202
     groups:
       - internal
 
