@@ -12,7 +12,7 @@ import java.util.*
 @Schema(description = "Gov Notify Create Notification")
 data class NotifyCreateNotificationDto(
   @Schema(description = "The UUID of the notification", required = true)
-  val id: UUID,
+  val notificationId: UUID,
   @Schema(description = "The id of the event audit which the notification is linked to", example = "123456", required = true)
   @JsonProperty("reference")
   val eventAuditId: String,
@@ -26,7 +26,7 @@ data class NotifyCreateNotificationDto(
   val templateVersion: Int,
 ) {
   constructor(sendEmailResponse: SendEmailResponse) : this(
-    id = sendEmailResponse.notificationId,
+    notificationId = sendEmailResponse.notificationId,
     eventAuditId = sendEmailResponse.reference.toString(),
     createdAt = LocalDateTime.now(),
     notificationType = "email",
@@ -35,7 +35,7 @@ data class NotifyCreateNotificationDto(
   )
 
   constructor(sendSmsResponse: SendSmsResponse) : this(
-    id = sendSmsResponse.notificationId,
+    notificationId = sendSmsResponse.notificationId,
     eventAuditId = sendSmsResponse.reference.toString(),
     createdAt = LocalDateTime.now(),
     notificationType = "sms",
