@@ -27,7 +27,7 @@ data class NotifyCreateNotificationDto(
 ) {
   constructor(sendEmailResponse: SendEmailResponse) : this(
     notificationId = sendEmailResponse.notificationId,
-    eventAuditId = sendEmailResponse.reference.toString(),
+    eventAuditId = sendEmailResponse.reference.get(),
     createdAt = LocalDateTime.now(),
     notificationType = "email",
     templateId = sendEmailResponse.templateId,
@@ -36,7 +36,7 @@ data class NotifyCreateNotificationDto(
 
   constructor(sendSmsResponse: SendSmsResponse) : this(
     notificationId = sendSmsResponse.notificationId,
-    eventAuditId = sendSmsResponse.reference.toString(),
+    eventAuditId = sendSmsResponse.reference.get(),
     createdAt = LocalDateTime.now(),
     notificationType = "sms",
     templateId = sendSmsResponse.templateId,
