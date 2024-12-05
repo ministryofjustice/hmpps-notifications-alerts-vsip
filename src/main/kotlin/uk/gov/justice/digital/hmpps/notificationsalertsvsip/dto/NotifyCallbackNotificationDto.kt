@@ -9,7 +9,7 @@ import java.util.*
 @Schema(description = "Gov Notify Callback Notification")
 data class NotifyCallbackNotificationDto(
   @Schema(description = "The UUID of the notification", required = true)
-  val id: UUID,
+  val id: UUID?,
   @Schema(description = "The id of the event audit which the notification is linked to", required = true)
   @JsonProperty("reference")
   val eventAuditId: String,
@@ -24,7 +24,7 @@ data class NotifyCallbackNotificationDto(
   @Schema(description = "The type of the notification", required = true)
   val notificationType: String?,
   @Schema(description = "The id the template used for the notification", required = true)
-  val templateId: UUID,
+  val templateId: UUID?,
   @Schema(description = "The version of the template used for the notification", required = true)
-  val templateVersion: Int,
+  val templateVersion: Int?,
 )
