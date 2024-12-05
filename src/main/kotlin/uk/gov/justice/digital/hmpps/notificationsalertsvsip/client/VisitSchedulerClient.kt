@@ -57,11 +57,9 @@ class VisitSchedulerClient(
   }
 
   fun processNotifyCallbackNotification(notifyCallbackNotificationDto: NotifyCallbackNotificationDto) {
-    val body = BodyInserters.fromValue(notifyCallbackNotificationDto)
-    LOG.info("sending to visit-scheduler {}", body)
     webClient.put()
       .uri("/visits/notify/callback")
-      .body(body)
+      .body(BodyInserters.fromValue(notifyCallbackNotificationDto))
       .accept(MediaType.APPLICATION_JSON)
       .retrieve()
       .toBodilessEntity()
