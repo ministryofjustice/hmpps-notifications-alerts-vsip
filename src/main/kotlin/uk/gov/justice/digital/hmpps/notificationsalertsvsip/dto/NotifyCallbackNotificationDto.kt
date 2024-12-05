@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
-import java.time.LocalDateTime
 import java.util.*
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -17,11 +16,11 @@ data class NotifyCallbackNotificationDto(
   @Schema(description = "The final status of the notification", required = true)
   val status: String,
   @Schema(description = "The timestamp for when the vsip notification service sent the notification to gov notify", required = true)
-  val createdAt: LocalDateTime,
+  val createdAt: String,
   @Schema(description = "The timestamp for the final update of the notification (when delivered or ultimately failed) ", required = false)
-  val completedAt: LocalDateTime?,
+  val completedAt: String?,
   @Schema(description = "The timestamp for when gov notify sent the notification", required = false)
-  val sentAt: LocalDateTime?,
+  val sentAt: String?,
   @Schema(description = "The type of the notification", required = true)
   val notificationType: String,
   @Schema(description = "The id the template used for the notification", required = true)
