@@ -66,7 +66,7 @@ class GovNotifyCallbackController(
     }
 
     LOG.info("Gov notify callback body - {}", govNotifyCallbackNotificationDto)
-    LOG.info("Received callback with valid token, processing request for event - ${govNotifyCallbackNotificationDto.eventAuditId}")
+    LOG.info("Received callback with valid token, processing request for event - ${govNotifyCallbackNotificationDto.eventAuditReference}")
     visitSchedulerService.processNotifyCallback(govNotifyCallbackNotificationDto)
   }
 

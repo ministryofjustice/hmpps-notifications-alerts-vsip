@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto
 
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import io.swagger.v3.oas.annotations.media.Schema
@@ -13,10 +13,11 @@ import java.util.*
 @Schema(description = "Gov Notify Callback Notification")
 data class NotifyCallbackNotificationDto(
   @Schema(description = "The UUID of the notification", required = true)
-  val id: UUID,
+  @JsonAlias("id")
+  val notificationId: UUID,
   @Schema(description = "The id of the event audit which the notification is linked to", required = true)
-  @JsonProperty("reference")
-  val eventAuditId: String,
+  @JsonAlias("reference")
+  val eventAuditReference: String,
   @Schema(description = "The final status of the notification", required = true)
   val status: String,
   @Schema(description = "The timestamp for when the vsip notification service sent the notification to gov notify", required = true)
