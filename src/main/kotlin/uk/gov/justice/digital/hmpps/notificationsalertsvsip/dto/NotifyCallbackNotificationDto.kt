@@ -2,29 +2,33 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.LocalDateTime
 import java.util.*
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 @Schema(description = "Gov Notify Callback Notification")
 data class NotifyCallbackNotificationDto(
   @Schema(description = "The UUID of the notification", required = true)
-  val id: UUID?,
+  val id: UUID,
   @Schema(description = "The id of the event audit which the notification is linked to", required = true)
   @JsonProperty("reference")
-  val eventAuditId: String?,
+  val eventAuditId: String,
   @Schema(description = "The final status of the notification", required = true)
-  val status: String?,
+  val status: String,
   @Schema(description = "The timestamp for when the vsip notification service sent the notification to gov notify", required = true)
-  val createdAt: String?,
+  val createdAt: LocalDateTime,
   @Schema(description = "The timestamp for the final update of the notification (when delivered or ultimately failed) ", required = false)
-  val completedAt: String?,
+  val completedAt: LocalDateTime?,
   @Schema(description = "The timestamp for when gov notify sent the notification", required = false)
-  val sentAt: String?,
+  val sentAt: LocalDateTime?,
   @Schema(description = "The type of the notification", required = true)
-  val notificationType: String?,
+  val notificationType: String,
   @Schema(description = "The id the template used for the notification", required = true)
-  val templateId: UUID?,
+  val templateId: UUID,
   @Schema(description = "The version of the template used for the notification", required = true)
-  val templateVersion: Int?,
+  val templateVersion: Int,
 )
