@@ -65,7 +65,7 @@ class GovNotifyCallbackController(
       throw HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized access")
     }
 
-    LOG.trace("Gov notify callback body - {}", govNotifyCallbackNotificationDto)
+    LOG.info("Gov notify callback body - {}", govNotifyCallbackNotificationDto)
     LOG.info("Received callback with valid token, processing request for event - ${govNotifyCallbackNotificationDto.eventAuditId}")
     visitSchedulerService.processNotifyCallback(govNotifyCallbackNotificationDto)
   }
