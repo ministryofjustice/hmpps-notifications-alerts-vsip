@@ -28,7 +28,7 @@ class NotifyCallbackTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubProcessNotifyCallbackNotification(HttpStatus.OK)
 
     // Then
-    webTestClient.put()
+    webTestClient.post()
       .uri("/visits/notify/callback")
       .header("Authorization", "Bearer $validToken")
       .contentType(APPLICATION_JSON)
@@ -51,7 +51,7 @@ class NotifyCallbackTest : EventsIntegrationTestBase() {
       templateVersion = 1,
     )
 
-    webTestClient.put()
+    webTestClient.post()
       .uri("/visits/notify/callback")
       .contentType(APPLICATION_JSON)
       .bodyValue(dto)
@@ -74,7 +74,7 @@ class NotifyCallbackTest : EventsIntegrationTestBase() {
       templateVersion = 1,
     )
 
-    webTestClient.put()
+    webTestClient.post()
       .uri("/visits/notify/callback")
       .header("Authorization", "Bearer $invalidToken")
       .contentType(APPLICATION_JSON)
