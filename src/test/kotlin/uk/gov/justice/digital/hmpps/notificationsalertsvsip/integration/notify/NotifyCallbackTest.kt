@@ -15,7 +15,7 @@ class NotifyCallbackTest : EventsIntegrationTestBase() {
     val validToken = "test-valid-token"
     val dto = NotifyCallbackNotificationDto(
       id = UUID.randomUUID(),
-      eventAuditId = 123456L,
+      eventAuditId = "123456",
       status = "delivered",
       createdAt = LocalDateTime.now().minusDays(2),
       completedAt = LocalDateTime.now().minusDays(1),
@@ -41,7 +41,7 @@ class NotifyCallbackTest : EventsIntegrationTestBase() {
   fun `should return unauthorized when token is null`() {
     val dto = NotifyCallbackNotificationDto(
       id = UUID.randomUUID(),
-      eventAuditId = 123456L,
+      eventAuditId = "123456",
       status = "delivered",
       createdAt = LocalDateTime.now().minusDays(2),
       completedAt = LocalDateTime.now().minusDays(1),
@@ -64,7 +64,7 @@ class NotifyCallbackTest : EventsIntegrationTestBase() {
     val invalidToken = "Bearer invalid-token"
     val dto = NotifyCallbackNotificationDto(
       id = UUID.randomUUID(),
-      eventAuditId = 123456L,
+      eventAuditId = "123456",
       status = "delivered",
       createdAt = LocalDateTime.now().minusDays(2),
       completedAt = LocalDateTime.now().minusDays(1),
