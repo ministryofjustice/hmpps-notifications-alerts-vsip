@@ -2,18 +2,20 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domaine
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import org.json.JSONObject
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+import org.springframework.test.web.reactive.server.WebTestClient
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
@@ -34,9 +36,11 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderS
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PRISON_VISITS_NOTIFICATION_ALERTS_QUEUE_CONFIG_KEY
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.SmsSenderService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitSchedulerService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.EventFeatureSwitch
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.SQSMessage
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitBookedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitCancelledEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitChangedEventNotifier
@@ -44,9 +48,12 @@ import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
 import uk.gov.service.notify.NotificationClient
+import uk.gov.service.notify.SendEmailResponse
+import uk.gov.service.notify.SendSmsResponse
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -88,33 +95,39 @@ abstract class EventsIntegrationTestBase {
   }
 
   @Autowired
+  lateinit var webTestClient: WebTestClient
+
+  @Autowired
   lateinit var domainEventListenerService: DomainEventListenerService
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var eventFeatureSwitch: EventFeatureSwitch
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var notificationService: NotificationService
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var smsSenderService: SmsSenderService
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var emailSenderService: EmailSenderService
 
-  @SpyBean
+  @MockitoSpyBean
+  lateinit var visitSchedulerService: VisitSchedulerService
+
+  @MockitoSpyBean
   lateinit var templatesConfig: TemplatesConfig
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var prisonVisitBookedEventNotifierSpy: PrisonVisitBookedEventNotifier
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var prisonVisitChangedEventNotifierSpy: PrisonVisitChangedEventNotifier
 
-  @SpyBean
+  @MockitoSpyBean
   lateinit var prisonVisitCancelledEventNotifierSpy: PrisonVisitCancelledEventNotifier
 
-  @MockBean
+  @MockitoBean
   lateinit var notificationClient: NotificationClient
 
   @Autowired
@@ -182,10 +195,11 @@ abstract class EventsIntegrationTestBase {
     return "{\"eventType\":\"$eventType\",\"additionalInformation\":$additionalInformation}"
   }
 
-  fun createAdditionalInformationJson(bookingReference: String): String {
+  fun createAdditionalInformationJson(visitAdditionalInfo: VisitAdditionalInfo): String {
     val builder = StringBuilder()
     builder.append("{")
-    builder.append("\"reference\":\"$bookingReference\"")
+    builder.append("\"reference\":\"${visitAdditionalInfo.bookingReference}\",")
+    builder.append("\"eventAuditId\":\"${visitAdditionalInfo.eventAuditId}\"")
     builder.append("}")
     return builder.toString()
   }
@@ -202,5 +216,76 @@ abstract class EventsIntegrationTestBase {
       visitors = visitors,
       outcomeStatus = outcomeStatus,
     )
+  }
+
+  fun buildSendEmailResponse(
+    id: UUID = UUID.randomUUID(),
+    reference: String?,
+    body: String = "Hello, {{name}}!",
+    subject: String = "Test Subject",
+    fromEmail: String? = "no-reply@example.com",
+    templateId: UUID = UUID.randomUUID(),
+    templateVersion: Int = 1,
+    templateUri: String = "https://example.com/template/template-id",
+    oneClickUnsubscribeURL: String? = "https://example.com/unsubscribe",
+  ): SendEmailResponse {
+    val jsonResponse = JSONObject().apply {
+      put("id", id.toString())
+      put("reference", reference)
+      put(
+        "content",
+        JSONObject().apply {
+          put("body", body)
+          put("subject", subject)
+          put("from_email", fromEmail)
+        },
+      )
+
+      put(
+        "template",
+        JSONObject().apply {
+          put("id", templateId.toString())
+          put("version", templateVersion)
+          put("uri", templateUri)
+        },
+      )
+
+      put("one_click_unsubscribe_url", oneClickUnsubscribeURL)
+    }.toString()
+
+    return SendEmailResponse(jsonResponse)
+  }
+
+  fun buildSendSmsResponse(
+    id: UUID = UUID.randomUUID(),
+    reference: String?,
+    body: String = "Hello, {{name}}!",
+    fromNumber: String? = "no-reply@example.com",
+    templateId: UUID = UUID.randomUUID(),
+    templateVersion: Int = 1,
+    templateUri: String = "https://example.com/template/template-id",
+  ): SendSmsResponse {
+    val jsonResponse = JSONObject().apply {
+      put("id", id.toString())
+      put("reference", reference)
+      put(
+        "content",
+        JSONObject().apply {
+          put("body", body)
+          put("from_number", fromNumber)
+        },
+      )
+
+      put(
+        "template",
+        JSONObject().apply {
+          put("id", templateId.toString())
+          put("version", templateVersion)
+          put("uri", templateUri)
+        },
+      )
+    }.toString()
+
+    return SendSmsResponse(jsonResponse)
   }
 }

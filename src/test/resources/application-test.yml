@@ -55,3 +55,6 @@ notify:
     enabled: true
   api:
     key: "test"
+  callback:
+    token: "test-valid-token"
+

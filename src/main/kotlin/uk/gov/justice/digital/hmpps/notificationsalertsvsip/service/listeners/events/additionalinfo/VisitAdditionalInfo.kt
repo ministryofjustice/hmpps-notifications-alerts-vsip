@@ -7,4 +7,6 @@ data class VisitAdditionalInfo(
   @JsonProperty("reference")
   @NotBlank
   val bookingReference: String,
+  @NotBlank
+  val eventAuditId: String,
 )

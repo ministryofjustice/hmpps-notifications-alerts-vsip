@@ -3,7 +3,9 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import java.time.LocalDateTime
 
 @Service
@@ -16,26 +18,43 @@ class NotificationService(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun sendMessage(visitEventType: VisitEventType, bookingReference: String) {
-    LOG.info("Received call to send notification for event type $visitEventType, visit - $bookingReference")
+  fun sendMessage(visitEventType: VisitEventType, additionalInfo: VisitAdditionalInfo) {
+    LOG.info("Received call to send notification for event type $visitEventType, visit - ${additionalInfo.bookingReference}")
 
-    val visit = visitSchedulerService.getVisit(bookingReference)
-    visit?.let {
-      if (visit.startTimestamp > LocalDateTime.now()) {
-        if (!visit.visitContact.telephone.isNullOrEmpty()) {
-          smsSenderService.sendSms(visit, visitEventType)
-        } else {
-          LOG.info("No telephone number exists for contact on visit reference - ${visit.reference}")
-        }
-
-        if (!visit.visitContact.email.isNullOrEmpty()) {
-          emailSenderService.sendEmail(visit, visitEventType)
-        } else {
-          LOG.info("No email exists for contact on visit reference - ${visit.reference}")
-        }
-      } else {
-        LOG.info("Visit in past - ${visit.reference}")
-      }
+    val visit = visitSchedulerService.getVisit(additionalInfo.bookingReference)
+    if (visit == null) {
+      LOG.warn("No visit found for booking reference ${additionalInfo.bookingReference}")
+      return
     }
+
+    if (visit.startTimestamp < LocalDateTime.now()) {
+      LOG.info("Visit in the past - ${visit.reference}")
+      return
+    }
+
+    sendSmsNotificationIfAvailable(visit, visitEventType, additionalInfo)
+    sendEmailNotificationIfAvailable(visit, visitEventType, additionalInfo)
+  }
+
+  private fun sendSmsNotificationIfAvailable(visit: VisitDto, visitEventType: VisitEventType, additionalInfo: VisitAdditionalInfo) {
+    val telephone = visit.visitContact.telephone
+    if (telephone.isNullOrEmpty()) {
+      LOG.info("No telephone number exists for contact on visit reference - ${visit.reference}")
+      return
+    }
+
+    val notification = smsSenderService.sendSms(visit, visitEventType, additionalInfo.eventAuditId)
+    notification?.let { visitSchedulerService.createNotifyNotification(it) }
+  }
+
+  private fun sendEmailNotificationIfAvailable(visit: VisitDto, visitEventType: VisitEventType, additionalInfo: VisitAdditionalInfo) {
+    val email = visit.visitContact.email
+    if (email.isNullOrEmpty()) {
+      LOG.info("No email exists for contact on visit reference - ${visit.reference}")
+      return
+    }
+
+    val notification = emailSenderService.sendEmail(visit, visitEventType, additionalInfo.eventAuditId)
+    notification?.let { visitSchedulerService.createNotifyNotification(it) }
   }
 }

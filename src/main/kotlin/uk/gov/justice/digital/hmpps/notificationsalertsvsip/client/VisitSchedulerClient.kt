@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.NotifyCallbackNotificationDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.NotifyCreateNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.ClientUtils.Companion.isNotFoundError
 import java.time.Duration
@@ -39,6 +42,28 @@ class VisitSchedulerClient(
           return@onErrorResume Mono.empty()
         }
       }
+      .block(apiTimeout)
+  }
+
+  fun createNotifyNotification(notifyCreateNotificationDto: NotifyCreateNotificationDto) {
+    webClient.put()
+      .uri("/visits/notify/create")
+      .body(BodyInserters.fromValue(notifyCreateNotificationDto))
+      .accept(MediaType.APPLICATION_JSON)
+      .retrieve()
+      .toBodilessEntity()
+      .doOnError { e -> LOG.error("Could not createNotifyNotification :", e) }
+      .block(apiTimeout)
+  }
+
+  fun processNotifyCallbackNotification(notifyCallbackNotificationDto: NotifyCallbackNotificationDto) {
+    webClient.put()
+      .uri("/visits/notify/callback")
+      .body(BodyInserters.fromValue(notifyCallbackNotificationDto))
+      .accept(MediaType.APPLICATION_JSON)
+      .retrieve()
+      .toBodilessEntity()
+      .doOnError { e -> LOG.error("Could not processNotifyCallbackNotification :", e) }
       .block(apiTimeout)
   }
 }

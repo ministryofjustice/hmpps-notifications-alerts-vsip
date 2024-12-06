@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.put
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -23,6 +24,22 @@ class VisitSchedulerMockServer(@Autowired private val objectMapper: ObjectMapper
               .withBody(getJsonString(visitDto))
           },
         ),
+    )
+  }
+
+  fun stubCreateNotifyNotification(httpStatus: HttpStatus) {
+    val responseBuilder = createJsonResponseBuilder()
+    stubFor(
+      put("/visits/notify/create")
+        .willReturn(responseBuilder.withStatus(httpStatus.value())),
+    )
+  }
+
+  fun stubProcessNotifyCallbackNotification(httpStatus: HttpStatus) {
+    val responseBuilder = createJsonResponseBuilder()
+    stubFor(
+      put("/visits/notify/callback")
+        .willReturn(responseBuilder.withStatus(httpStatus.value())),
     )
   }
 

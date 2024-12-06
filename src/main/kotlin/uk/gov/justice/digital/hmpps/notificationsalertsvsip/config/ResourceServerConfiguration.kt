@@ -20,6 +20,21 @@ import org.springframework.security.web.SecurityFilterChain
 @EnableCaching
 class ResourceServerConfiguration {
 
+  @Bean
+  fun visitNotifyCallbackSecurityFilter(http: HttpSecurity): SecurityFilterChain {
+    http {
+      sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
+      // Can't have CSRF protection as requires session
+      csrf { disable() }
+
+      securityMatcher("/visits/notify/callback")
+      authorizeHttpRequests {
+        authorize("/visits/notify/callback", permitAll)
+      }
+    }
+    return http.build()
+  }
+
   @Throws(Exception::class)
   @Bean
   fun filterChain(http: HttpSecurity): SecurityFilterChain {

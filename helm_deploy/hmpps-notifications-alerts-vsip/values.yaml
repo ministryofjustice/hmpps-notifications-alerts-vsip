@@ -36,6 +36,7 @@ generic-service:
       SYSTEM_CLIENT_ID: "SYSTEM_CLIENT_ID"
       SYSTEM_CLIENT_SECRET: "SYSTEM_CLIENT_SECRET"
       NOTIFY_API_KEY: "NOTIFY_API_KEY"
+      NOTIFY_CALLBACK_TOKEN: "NOTIFY_CALLBACK_TOKEN"
     hmpps-domain-events-topic:
       HMPPS_SQS_TOPICS_DOMAINEVENTS_ARN: "topic_arn"
     sqs-prison-visits-notification-alerts-secret:
@@ -44,6 +45,9 @@ generic-service:
       HMPPS_SQS_QUEUES_PRISONVISITSNOTIFICATIONALERTS_DLQ_NAME: "sqs_queue_name"
 
   allowlist:
+    gov-notify-1: 52.17.149.153
+    gov-notify-2: 63.33.132.231
+    gov-notify-3: 54.216.159.202
     groups:
       - internal
 
