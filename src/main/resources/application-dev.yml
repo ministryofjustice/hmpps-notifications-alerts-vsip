@@ -32,6 +32,10 @@ prisoner:
       timeout: 10s
 
 notify:
+  api:
+    key: dummy-key
+  callback:
+    token: dummy-token
   sms:
     enabled: true
   email:
