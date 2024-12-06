@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.config
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
@@ -21,7 +22,10 @@ import org.springframework.security.web.SecurityFilterChain
 class ResourceServerConfiguration {
 
   @Bean
-  fun visitNotifyCallbackSecurityFilter(http: HttpSecurity): SecurityFilterChain {
+  fun visitNotifyCallbackSecurityFilter(
+    http: HttpSecurity,
+    @Autowired notifyCallbackAuthorizationManager: NotifyCallbackAuthorizationManager,
+  ): SecurityFilterChain {
     http {
       sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
       // Can't have CSRF protection as requires session
@@ -29,7 +33,7 @@ class ResourceServerConfiguration {
 
       securityMatcher("/visits/notify/callback")
       authorizeHttpRequests {
-        authorize("/visits/notify/callback", permitAll)
+        authorize("/visits/notify/callback", notifyCallbackAuthorizationManager)
       }
     }
     return http.build()
