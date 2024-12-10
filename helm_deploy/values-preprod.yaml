@@ -6,6 +6,8 @@ generic-service:
 
   ingress:
     host: hmpps-notifi-alerts-vsip-preprod.prison.service.justice.gov.uk
+    annotations:
+      nginx.ingress.kubernetes.io/server-snippet: location /visits/notify/callback { allow all; }
 
   env:
     HMPPS_AUTH_URL: https://sign-in-preprod.hmpps.service.justice.gov.uk/auth
