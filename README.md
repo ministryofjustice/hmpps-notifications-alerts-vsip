@@ -1,4 +1,4 @@
-# HMPPS Visit Scheduler API
+# hmpps-notifications-alerts-vsip
 
 [![CircleCI](https://circleci.com/gh/ministryofjustice/hmpps-notifications-alerts-vsip/tree/main.svg?style=shield)](https://app.circleci.com/pipelines/github/ministryofjustice/hmpps-notifications-alerts-vsip)
 
