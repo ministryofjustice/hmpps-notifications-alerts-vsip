@@ -1,45 +1,148 @@
-# hmpps-notifications-alerts-vsip
-[![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=flat&logo=github&label=MoJ%20Compliant&query=%24.result&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-notifications-alerts-vsip)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#hmpps-notifications-alerts-vsip "Link to report")
-[![CircleCI](https://circleci.com/gh/ministryofjustice/hmpps-notifications-alerts-vsip/tree/main.svg?style=svg)](https://circleci.com/gh/ministryofjustice/hmpps-notifications-alerts-vsip)
-[![Docker Repository on Quay](https://quay.io/repository/hmpps/hmpps-notifications-alerts-vsip/status "Docker Repository on Quay")](https://quay.io/repository/hmpps/hmpps-notifications-alerts-vsip)
-[![API docs](https://img.shields.io/badge/API_docs_-view-85EA2D.svg?logo=swagger)](https://hmpps-notifications-alerts-vsip-dev.hmpps.service.justice.gov.uk/webjars/swagger-ui/index.html?configUrl=/v3/api-docs)
+# HMPPS Visit Scheduler API
 
-This is a skeleton project from which to create new kotlin projects from.
+[![CircleCI](https://circleci.com/gh/ministryofjustice/hmpps-notifications-alerts-vsip/tree/main.svg?style=shield)](https://app.circleci.com/pipelines/github/ministryofjustice/hmpps-notifications-alerts-vsip)
 
-# Instructions
+This is a Spring Boot application, written in Kotlin, used to send notifications to users about their visits. Used by [Visits](https://developer-portal.hmpps.service.justice.gov.uk/products/v-isit-someone-in-prison-v-si-p-2).
 
-If this is a HMPPS project then the project will be created as part of bootstrapping - 
-see https://github.com/ministryofjustice/dps-project-bootstrap.
+## Building
 
-## Creating a CloudPlatform namespace
+To build the project (without tests):
+```
+./gradlew clean build -x test
+```
 
-When deploying to a new namespace, you may wish to use this template kotlin project namespace as the basis for your new namespace:
+## Testing
 
-<https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/hmpps-notifications-alerts-vsip>
+Run:
+```
+./gradlew test 
+```
 
-Copy this folder, update all the existing namespace references, and submit a PR to the CloudPlatform team. Further instructions from the CloudPlatform team can be found here: <https://user-guide.cloud-platform.service.justice.gov.uk/#cloud-platform-user-guide>
+## Running
 
-## Renaming from Hmpps Notifications Alerts Vsip - github Actions
+This service uses the deployed dev environment to connect to most of the required services,
+with an exception of the visit-scheduler and local-stack.
 
-Once the new repository is deployed. Navigate to the repository in github, and select the `Actions` tab.
-Click the link to `Enable Actions on this repository`.
+To run this service, clone and run the visit-scheduler locally (with local-stack) 
 
-Find the Action workflow named: `rename-project-create-pr` and click `Run workflow`.  This workflow will
-execute the `rename-project.bash` and create Pull Request for you to review.  Review the PR and merge.
+Then create a .env file at the project root and add 2 secrets to it
+```
+SYSTEM_CLIENT_ID="get from kubernetes secrets for dev namespace"
+SYSTEM_CLIENT_SECRET"get from kubernetes secrets for dev namespace"
+```
 
-Note: ideally this workflow would run automatically however due to a recent change github Actions are not
-enabled by default on newly created repos. There is no way to enable Actions other then to click the button in the UI.
-If this situation changes we will update this project so that the workflow is triggered during the bootstrap project.
-Further reading: <https://github.community/t/workflow-isnt-enabled-in-repos-generated-from-template/136421>
+Then create a Spring Boot run configuration with active profile of 'dev' and set an environments file to the
+`.env` file we just created. Run the service in your chosen IDE.
 
-## Manually renaming from Hmpps Notifications Alerts Vsip
+Ports
 
-Run the `rename-project.bash` and create a PR.
+| Service             | Port |  
+|---------------------|------|
+| notification-service| 8080 |
+| visit-scheduler     | 8081 |
 
-The `rename-project.bash` script takes a single argument - the name of the project and calculates from it:
-* The main class name (project name converted to pascal case) 
-* The project description (class name with spaces between the words)
-* The main package name (project name with hyphens removed)
+### Auth token retrieval
 
-It then performs a search and replace and directory renames so the project is ready to be used.
+To create a Token via curl (local):
+```
+curl --location --request POST "https://sign-in-dev.hmpps.service.justice.gov.uk/auth/oauth/token?grant_type=client_credentials" --header "Authorization: Basic $(echo -n {Client}:{ClientSecret} | base64)"
+```
 
+or via postman collection using the following authorisation urls:
+```
+Grant type: Client Credentials
+Access Token URL: https://sign-in-dev.hmpps.service.justice.gov.uk/auth/oauth/token
+Client ID: <get from kubernetes secrets for dev namespace>
+Client Secret: <get from kubernetes secrets for dev namespace>
+Client Authentication: "Send as Basic Auth Header"
+```
+
+Call info endpoint:
+```
+$ curl 'http://localhost:8080/info' -i -X GET
+```
+
+## Application Tracing
+The application sends telemetry information to Azure Application Insights which allows log queries and end-to-end request tracing across services
+
+##### Application Insights
+#### Example queries
+
+Requests
+```azure
+requests 
+| where cloud_RoleName == 'hmpps-notifications-alerts-vsip' 
+| summarize count() by name
+```
+
+Performance
+```azure
+requests
+| where cloud_RoleName == 'hmpps-notifications-alerts-vsip' 
+| summarize RequestsCount=sum(itemCount), AverageDuration=avg(duration), percentiles(duration, 50, 95, 99) by operation_Name // you can replace 'operation_Name' with another value to segment by a different property
+| order by RequestsCount desc // order from highest to lower (descending)
+```
+
+Charts
+```azure
+requests
+| where cloud_RoleName == 'hmpps-notifications-alerts-vsip' 
+| where timestamp > ago(12h) 
+| summarize avgRequestDuration=avg(duration) by bin(timestamp, 10m) // use a time grain of 10 minutes
+| render timechart
+```
+
+## Common gradle tasks
+
+To list project dependencies, run:
+
+```
+./gradlew dependencies
+``` 
+
+To check for dependency updates, run:
+```
+./gradlew dependencyUpdates --warning-mode all
+```
+
+To run an OWASP dependency check, run:
+```
+./gradlew clean dependencyCheckAnalyze --info
+```
+
+To upgrade the gradle wrapper version, run:
+```
+./gradlew wrapper --gradle-version=<VERSION>
+```
+
+To automatically update project dependencies, run:
+```
+./gradlew useLatestVersions
+```
+
+#### Ktlint Gradle Tasks
+
+To run Ktlint check:
+```
+./gradlew ktlintCheck
+```
+
+To run Ktlint format:
+```
+./gradlew ktlintFormat
+```
+
+To apply ktlint styles to intellij
+```
+./gradlew ktlintApplyToIdea
+```
+
+To register pre-commit check to run Ktlint format:
+```
+./gradlew ktlintApplyToIdea addKtlintFormatGitPreCommitHook 
+```
+
+...or to register pre-commit check to only run Ktlint check:
+```
+./gradlew ktlintApplyToIdea addKtlintCheckGitPreCommitHook
+```
