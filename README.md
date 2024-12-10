@@ -62,6 +62,33 @@ Call info endpoint:
 $ curl 'http://localhost:8080/info' -i -X GET
 ```
 
+## Gov notify callbacks
+This service is configured to accept callbacks from gov notify. See the GovNotifyCallbackController.kt class 
+and ResourceServerConfiguration.kt class for implementation details.
+
+To test this functionality locally, use postman to construct an expected request and populate the authheader 
+with the gov notify callback token found in the kubernetes secrets for this service.
+
+Example postman request:
+```
+URL: /viists/notify/callbacks
+Authorization: Bearer <token_from_secrets>
+Body:
+{
+    "id": "bb4158e3-1e85-4b66-86f1-7d84fe78804e",
+    "reference": "12345",
+    "status": "delivered",
+    "created_at": "2024-12-05T11:26:38.571735Z",
+    "completed_at": "2024-12-05T11:26:40.989392Z",
+    "sent_at": "2024-12-05T11:26:38.647725Z",
+    "notification_type": "sms",
+    "template_id": "85904166-e539-43f5-9f51-7ba106cc61bd",
+    "template_version": 8
+}
+```
+
+You'll need the visit-scheduler running to accept the downstream call this service makes to store the result.
+
 ## Application Tracing
 The application sends telemetry information to Azure Application Insights which allows log queries and end-to-end request tracing across services
 
