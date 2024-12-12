@@ -10,7 +10,9 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificat
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 import uk.gov.service.notify.NotificationClient
 import uk.gov.service.notify.NotificationClientException
 
@@ -20,7 +22,6 @@ class SmsSenderService(
   val notificationClient: NotificationClient,
   val prisonRegisterService: PrisonRegisterService,
   val templatesConfig: TemplatesConfig,
-  val dateUtils: DateUtils,
 ) {
   private companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
@@ -97,9 +98,9 @@ class SmsSenderService(
   private fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, String> {
     val templateVars = mutableMapOf(
       "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
-      "time" to dateUtils.getFormattedTime(visit.startTimestamp.toLocalTime()),
-      "dayofweek" to dateUtils.getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
-      "date" to dateUtils.getFormattedDate(visit.startTimestamp.toLocalDate()),
+      "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
+      "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
+      "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
     )
 
     return templateVars
