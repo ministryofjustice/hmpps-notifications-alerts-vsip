@@ -2,29 +2,32 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers
 
 import jakarta.validation.ValidationException
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.interfaces.EmailNotificationHandler
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService.Companion.LOG
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.EmailTemplateUtils
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonRegisterService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonerSearchService
 
 @Component
 class CancelledEventEmailHandler(
-  private val templateUtils: EmailTemplateUtils,
-) : EmailNotificationHandler {
+  prisonRegisterService: PrisonRegisterService,
+  prisonerSearchService: PrisonerSearchService,
+  templatesConfig: TemplatesConfig,
+) : BaseEmailNotificationHandler(prisonRegisterService, prisonerSearchService, templatesConfig) {
 
   override fun handle(visit: VisitDto): SendEmailNotificationDto {
     LOG.info("handleCancelledEvent (email) - Entered")
 
     return SendEmailNotificationDto(
       templateName = getCancelledEmailTemplateName(visit.outcomeStatus!!),
-      templateVars = templateUtils.getCommonTemplateVars(visit),
+      templateVars = getCommonTemplateVars(visit),
     )
   }
 
-  private fun getCancelledEmailTemplateName(visitOutcome: String): EmailTemplateNames {
-    return when (visitOutcome) {
+  private fun getCancelledEmailTemplateName(visitOutcome: String): String {
+    val template = when (visitOutcome) {
       "PRISONER_CANCELLED" -> {
         EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER
       }
@@ -42,5 +45,7 @@ class CancelledEventEmailHandler(
         throw ValidationException("visit cancellation type $visitOutcome is unsupported")
       }
     }
+
+    return getTemplateName(template)
   }
 }

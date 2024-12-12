@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.interfaces.EmailNotificationHandler
 
 @Component
 class EmailNotificationHandlerFactory(
@@ -10,7 +9,7 @@ class EmailNotificationHandlerFactory(
   private val cancelledHandler: CancelledEventEmailHandler,
 ) {
 
-  fun getHandler(eventType: VisitEventType): EmailNotificationHandler {
+  fun getHandler(eventType: VisitEventType): BaseEmailNotificationHandler {
     return when (eventType) {
       VisitEventType.BOOKED -> bookedHandler
       VisitEventType.CANCELLED -> cancelledHandler

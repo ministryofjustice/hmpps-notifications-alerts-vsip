@@ -2,24 +2,27 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.personalisations.PrisonerVisitorPersonalisationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.interfaces.EmailNotificationHandler
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonRegisterService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonerContactRegistryService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonerSearchService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.EmailTemplateUtils
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 @Component
 class BookedEventEmailHandler(
-  private val templateUtils: EmailTemplateUtils,
+  prisonRegisterService: PrisonRegisterService,
+  prisonerSearchService: PrisonerSearchService,
+  templatesConfig: TemplatesConfig,
   private val prisonerContactRegistryService: PrisonerContactRegistryService,
-) : EmailNotificationHandler {
+) : BaseEmailNotificationHandler(prisonRegisterService, prisonerSearchService, templatesConfig) {
 
   companion object {
     private val LOG = LoggerFactory.getLogger(this::class.java)
@@ -28,7 +31,7 @@ class BookedEventEmailHandler(
   override fun handle(visit: VisitDto): SendEmailNotificationDto {
     LOG.info("handleBookedEvent (email) - Entered")
 
-    val templateVars = templateUtils.getCommonTemplateVars(visit).toMutableMap()
+    val templateVars = getCommonTemplateVars(visit).toMutableMap()
 
     templateVars.putAll(
       mapOf(
@@ -41,7 +44,7 @@ class BookedEventEmailHandler(
     )
 
     return SendEmailNotificationDto(
-      templateName = EmailTemplateNames.VISIT_BOOKING,
+      templateName = getTemplateName(EmailTemplateNames.VISIT_BOOKING),
       templateVars = templateVars,
     )
   }
