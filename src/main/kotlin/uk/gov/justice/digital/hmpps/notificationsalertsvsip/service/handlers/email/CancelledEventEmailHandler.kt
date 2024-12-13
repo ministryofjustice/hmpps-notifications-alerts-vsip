@@ -2,20 +2,13 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.em
 
 import jakarta.validation.ValidationException
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService.Companion.LOG
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
 
 @Component
-class CancelledEventEmailHandler(
-  prisonRegisterService: PrisonRegisterService,
-  prisonerSearchService: PrisonerSearchService,
-  templatesConfig: TemplatesConfig,
-) : BaseEmailNotificationHandler(prisonRegisterService, prisonerSearchService, templatesConfig) {
+class CancelledEventEmailHandler : BaseEmailNotificationHandler() {
 
   override fun handle(visit: VisitDto): SendEmailNotificationDto {
     LOG.info("handleCancelledEvent (email) - Entered")

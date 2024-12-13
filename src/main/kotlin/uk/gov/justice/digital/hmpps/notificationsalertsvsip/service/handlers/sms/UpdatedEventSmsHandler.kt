@@ -2,17 +2,12 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.sm
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
 
 @Component
-class UpdatedEventSmsHandler(
-  prisonRegisterService: PrisonRegisterService,
-  templatesConfig: TemplatesConfig,
-) : BaseSmsNotificationHandler(prisonRegisterService, templatesConfig) {
+class UpdatedEventSmsHandler : BaseSmsNotificationHandler() {
 
   companion object {
     private val LOG = LoggerFactory.getLogger(this::class.java)

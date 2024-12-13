@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.sms
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificationDto
@@ -11,10 +12,13 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Comp
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
 @Component
-abstract class BaseSmsNotificationHandler(
-  val prisonRegisterService: PrisonRegisterService,
-  val templatesConfig: TemplatesConfig,
-) {
+abstract class BaseSmsNotificationHandler {
+
+  @Autowired
+  lateinit var prisonRegisterService: PrisonRegisterService
+
+  @Autowired
+  lateinit var templatesConfig: TemplatesConfig
 
   abstract fun handle(visit: VisitDto): SendSmsNotificationDto
 
