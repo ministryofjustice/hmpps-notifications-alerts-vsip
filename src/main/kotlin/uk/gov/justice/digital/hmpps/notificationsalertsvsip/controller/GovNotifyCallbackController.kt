@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.NotifyCallbackNotificationDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitSchedulerService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.VisitSchedulerService
 
 const val GOV_NOTIFY_CALLBACK: String = "/visits/notify/callback"
 

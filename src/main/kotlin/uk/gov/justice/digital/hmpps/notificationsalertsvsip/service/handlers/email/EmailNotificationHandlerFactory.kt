@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers
+package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
