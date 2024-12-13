@@ -1,13 +1,13 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email
 
 import jakarta.validation.ValidationException
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService.Companion.LOG
 
-@Component
+@Service
 class CancelledEventEmailHandler : BaseEmailNotificationHandler() {
 
   override fun handle(visit: VisitDto): SendEmailNotificationDto {

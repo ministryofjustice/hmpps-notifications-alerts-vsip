@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.personalisations.PrisonerVisitorPersonalisationDto
@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Comp
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-@Component
+@Service
 abstract class BaseEmailNotificationHandler {
   companion object {
     const val GOV_UK_PRISON_PAGE = "https://www.gov.uk/government/collections/prisons-in-england-and-wales"

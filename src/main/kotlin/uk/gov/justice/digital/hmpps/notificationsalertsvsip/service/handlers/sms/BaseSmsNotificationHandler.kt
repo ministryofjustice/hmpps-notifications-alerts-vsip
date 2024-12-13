@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.sms
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Comp
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
-@Component
+@Service
 abstract class BaseSmsNotificationHandler {
 
   @Autowired

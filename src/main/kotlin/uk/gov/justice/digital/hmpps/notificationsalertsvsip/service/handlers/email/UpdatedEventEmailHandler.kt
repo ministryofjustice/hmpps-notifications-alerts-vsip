@@ -1,14 +1,14 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email
 
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
-@Component
+@Service
 class UpdatedEventEmailHandler : BaseEmailNotificationHandler() {
 
   companion object {
