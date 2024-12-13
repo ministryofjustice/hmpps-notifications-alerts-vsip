@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.NotifyCreateNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.EmailNotificationHandlerFactory
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email.EmailNotificationHandlerFactory
 import uk.gov.service.notify.NotificationClient
 import uk.gov.service.notify.NotificationClientException
 

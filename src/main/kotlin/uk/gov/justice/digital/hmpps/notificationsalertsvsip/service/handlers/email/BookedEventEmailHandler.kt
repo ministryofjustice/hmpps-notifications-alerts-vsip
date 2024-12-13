@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers
+package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -9,9 +9,9 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonRegisterService
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonerContactRegistryService
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonerSearchService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerContactRegistryService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit

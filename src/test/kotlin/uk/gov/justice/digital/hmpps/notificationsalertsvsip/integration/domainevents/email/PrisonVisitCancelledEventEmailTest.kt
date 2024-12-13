@@ -18,7 +18,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.BaseEmailNotificationHandler.Companion.GOV_UK_PRISON_PAGE
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email.BaseEmailNotificationHandler.Companion.GOV_UK_PRISON_PAGE
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_CANCELLED
 import java.time.Duration

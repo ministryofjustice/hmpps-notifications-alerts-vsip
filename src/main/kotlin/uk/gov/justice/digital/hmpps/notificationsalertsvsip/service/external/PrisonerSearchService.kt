@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service
+package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

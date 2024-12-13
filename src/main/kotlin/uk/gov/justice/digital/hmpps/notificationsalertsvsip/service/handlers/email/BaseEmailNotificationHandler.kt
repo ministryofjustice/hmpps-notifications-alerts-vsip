@@ -1,12 +1,12 @@
-package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers
+package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonRegisterService
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonerSearchService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
 
