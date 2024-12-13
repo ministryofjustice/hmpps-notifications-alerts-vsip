@@ -1,24 +1,38 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email
 
-import org.springframework.stereotype.Component
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.personalisations.PrisonerVisitorPersonalisationDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerContactRegistryService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
-@Component
-abstract class BaseEmailNotificationHandler(
-  private val prisonRegisterService: PrisonRegisterService,
-  private val prisonerSearchService: PrisonerSearchService,
-  private val templatesConfig: TemplatesConfig,
-) {
+@Service
+abstract class BaseEmailNotificationHandler {
   companion object {
     const val GOV_UK_PRISON_PAGE = "https://www.gov.uk/government/collections/prisons-in-england-and-wales"
   }
+
+  @Autowired
+  lateinit var prisonRegisterService: PrisonRegisterService
+
+  @Autowired
+  lateinit var prisonerSearchService: PrisonerSearchService
+
+  @Autowired
+  lateinit var prisonerContactRegistryService: PrisonerContactRegistryService
+
+  @Autowired
+  lateinit var templatesConfig: TemplatesConfig
 
   abstract fun handle(visit: VisitDto): SendEmailNotificationDto
 
@@ -58,5 +72,26 @@ abstract class BaseEmailNotificationHandler(
       "phone" to (prisonContactDetails?.phoneNumber ?: GOV_UK_PRISON_PAGE),
       "website" to (prisonContactDetails?.webAddress ?: GOV_UK_PRISON_PAGE),
     )
+  }
+
+  protected fun getVisitors(visit: VisitDto): List<String> {
+    val visitors = prisonerContactRegistryService.getPrisonerContacts(visit)
+    return if (visitors.isNotEmpty()) {
+      visitors.map {
+        PrisonerVisitorPersonalisationDto(
+          firstNameText = it.firstName,
+          lastNameText = it.lastName,
+          ageText = calculateAge(it),
+        ).toString()
+      }
+    } else {
+      listOf("You can view visitor information in the bookings section of your GOV.UK One Login")
+    }
+  }
+
+  protected fun calculateAge(visitor: PrisonerContactRegistryContactDto): String {
+    return visitor.dateOfBirth?.let {
+      ChronoUnit.YEARS.between(it, LocalDate.now()).toInt().toString() + " years old"
+    } ?: "age not known"
   }
 }

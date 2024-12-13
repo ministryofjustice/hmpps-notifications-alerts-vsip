@@ -9,14 +9,14 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.schedule
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
 @Service
-class BookedEventEmailHandler : BaseEmailNotificationHandler() {
+class UpdatedEventEmailHandler : BaseEmailNotificationHandler() {
 
   companion object {
     private val LOG = LoggerFactory.getLogger(this::class.java)
   }
 
   override fun handle(visit: VisitDto): SendEmailNotificationDto {
-    LOG.info("handleBookedEvent (email) - Entered")
+    LOG.info("handleUpdatedEvent (email) - Entered")
 
     val templateVars = getCommonTemplateVars(visit).toMutableMap()
 
@@ -31,7 +31,7 @@ class BookedEventEmailHandler : BaseEmailNotificationHandler() {
     )
 
     return SendEmailNotificationDto(
-      templateName = getTemplateName(EmailTemplateNames.VISIT_BOOKING),
+      templateName = getTemplateName(EmailTemplateNames.VISIT_UPDATED),
       templateVars = templateVars,
     )
   }
