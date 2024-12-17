@@ -26,6 +26,9 @@ data class NotifyCallbackNotificationDto(
   @Schema(description = "The timestamp for when gov notify sent the notification", required = false)
   @JsonAlias("sent_at")
   val sentAt: LocalDateTime?,
+  @Schema(description = "The email or phone number the notification was sent to", required = true)
+  @JsonAlias("to")
+  val sentTo: String,
   @Schema(description = "The type of the notification", required = true)
   @JsonAlias("notification_type")
   val notificationType: String,
