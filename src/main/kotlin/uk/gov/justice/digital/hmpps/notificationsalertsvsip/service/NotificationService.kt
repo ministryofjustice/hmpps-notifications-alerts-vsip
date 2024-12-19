@@ -45,7 +45,14 @@ class NotificationService(
     }
 
     val notification = smsSenderService.sendSms(visit, visitEventType, additionalInfo.eventAuditId)
-    notification?.let { visitSchedulerService.createNotifyNotification(it) }
+    notification?.let {
+      try {
+        visitSchedulerService.createNotifyNotification(it)
+      } catch (e: Exception) {
+        // TODO: Remove try-catch and convert to publish message 'notification-sent' instead of direct API call.
+        LOG.info("Call to capture sms notification creation on visit-scheduler failed with exception: $e")
+      }
+    }
   }
 
   private fun sendEmailNotificationIfAvailable(visit: VisitDto, visitEventType: VisitEventType, additionalInfo: VisitAdditionalInfo) {
@@ -56,6 +63,13 @@ class NotificationService(
     }
 
     val notification = emailSenderService.sendEmail(visit, visitEventType, additionalInfo.eventAuditId)
-    notification?.let { visitSchedulerService.createNotifyNotification(it) }
+    notification?.let {
+      try {
+        visitSchedulerService.createNotifyNotification(it)
+      } catch (e: Exception) {
+        // TODO: Remove try-catch and convert to publish message 'notification-sent' instead of direct API call.
+        LOG.info("Call to capture email notification creation on visit-scheduler failed with exception: $e")
+      }
+    }
   }
 }
