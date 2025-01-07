@@ -51,7 +51,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     prisonerSearchResult = PrisonerSearchResultDto("Prisoner", "One")
 
     prisonerContactsResult = listOf(
-      PrisonerContactRegistryContactDto("1234", "Visitor", "One", LocalDate.of(1995, 1, 1)),
+      PrisonerContactRegistryContactDto("1234", "Visitor", "One", (LocalDate.now().minusYears(30))),
       PrisonerContactRegistryContactDto("9876", "Visitor", "Two"),
     )
 
