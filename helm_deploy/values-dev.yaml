@@ -16,9 +16,13 @@ generic-service:
     PRISONER-CONTACT_REGISTRY_URL: https://prisoner-contact-registry-dev.prison.service.justice.gov.uk
     PRISON-REGISTER_API_URL: https://prison-register-dev.hmpps.service.justice.gov.uk
 
+  scheduledDowntime:
+    enabled: true
+
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
 generic-prometheus-alerts:
+  businessHoursOnly: true
   alertSeverity: visits-alerts-nonprod
   sqsAlertsQueueNames:
     - "book-a-prison-visit-dev-hmpps_prison_visits_notification_alerts_queue"

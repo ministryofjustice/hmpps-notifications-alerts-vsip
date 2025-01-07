@@ -51,12 +51,12 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     prisonerSearchResult = PrisonerSearchResultDto("Prisoner", "One")
 
     prisonerContactsResult = listOf(
-      PrisonerContactRegistryContactDto("1234", "Visitor", "One", LocalDate.of(1995, 1, 1)),
+      PrisonerContactRegistryContactDto("1234", "Visitor", "One", LocalDate.now().minusYears(30)),
       PrisonerContactRegistryContactDto("9876", "Visitor", "Two"),
     )
 
     prisonVisitors = listOf(
-      "Visitor One (29 years old)",
+      "Visitor One (30 years old)",
       "Visitor Two (age not known)",
     )
 
@@ -368,7 +368,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     val bookingReference = visitWithOneVisitor.reference
     val visitAdditionalInfo = VisitAdditionalInfo(visitWithOneVisitor.reference, "123456")
 
-    prisonVisitors = listOf("Visitor One (29 years old)")
+    prisonVisitors = listOf("Visitor One (30 years old)")
 
     val domainEvent = createDomainEventJson(PRISON_VISIT_CHANGED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
