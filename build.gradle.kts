@@ -1,7 +1,7 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.2"
-  kotlin("plugin.spring") version "2.0.21"
-  id("org.jetbrains.kotlin.plugin.noarg") version "2.0.21"
+  kotlin("plugin.spring") version "2.1.0"
+  id("org.jetbrains.kotlin.plugin.noarg") version "2.1.0"
 }
 
 configurations {
@@ -30,9 +30,9 @@ dependencies {
   implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.11.0")
 
   implementation("org.springframework.data:spring-data-commons:3.4.1")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.7.0")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
-  implementation("org.springdoc:springdoc-openapi-starter-common:2.7.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.3")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.3")
+  implementation("org.springdoc:springdoc-openapi-starter-common:2.8.3")
   implementation("uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE")
   implementation("org.springframework.boot:spring-boot-configuration-processor")
 
