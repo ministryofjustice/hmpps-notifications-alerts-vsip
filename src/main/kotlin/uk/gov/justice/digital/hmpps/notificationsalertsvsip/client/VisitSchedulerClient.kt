@@ -32,8 +32,7 @@ class VisitSchedulerClient(
       .accept(MediaType.APPLICATION_JSON)
       .retrieve()
       .bodyToMono<VisitDto>()
-      .onErrorResume {
-          e ->
+      .onErrorResume { e ->
         if (!isNotFoundError(e)) {
           LOG.error("getVisitByReference Failed get request $uri")
           Mono.error(e)

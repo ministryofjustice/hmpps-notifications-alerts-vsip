@@ -7,7 +7,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @Component
 class ClientUtils {
   companion object {
-    fun isNotFoundError(e: Throwable?) =
-      e is WebClientResponseException && e.statusCode == NOT_FOUND
+    fun isNotFoundError(e: Throwable?) = e is WebClientResponseException && e.statusCode == NOT_FOUND
   }
 }

@@ -49,7 +49,5 @@ class PrisonRegisterMockServer(@Autowired private val objectMapper: ObjectMapper
     )
   }
 
-  private fun getJsonString(obj: Any): String {
-    return objectMapper.writer().withDefaultPrettyPrinter().writeValueAsString(obj)
-  }
+  private fun getJsonString(obj: Any): String = objectMapper.writer().withDefaultPrettyPrinter().writeValueAsString(obj)
 }

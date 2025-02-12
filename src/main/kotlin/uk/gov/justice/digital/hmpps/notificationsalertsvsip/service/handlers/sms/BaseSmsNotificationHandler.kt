@@ -22,9 +22,7 @@ abstract class BaseSmsNotificationHandler {
 
   abstract fun handle(visit: VisitDto): SendSmsNotificationDto
 
-  protected fun getTemplateName(template: SmsTemplateNames): String {
-    return templatesConfig.smsTemplates[template.name]!!
-  }
+  protected fun getTemplateName(template: SmsTemplateNames): String = templatesConfig.smsTemplates[template.name]!!
 
   protected fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, String> {
     val templateVars = mutableMapOf(

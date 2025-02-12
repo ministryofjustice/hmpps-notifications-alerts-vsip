@@ -170,30 +170,22 @@ abstract class EventsIntegrationTestBase {
     client.purgeQueue(PurgeQueueRequest.builder().queueUrl(url).build()).get()
   }
 
-  fun createDomainEvent(eventType: String, additionalInformation: String = "test"): DomainEvent {
-    return DomainEvent(eventType = eventType, additionalInformation)
-  }
+  fun createDomainEvent(eventType: String, additionalInformation: String = "test"): DomainEvent = DomainEvent(eventType = eventType, additionalInformation)
 
   fun createSQSMessage(domainEventJson: String): String {
     val sqaMessage = SQSMessage(type = "Notification", messageId = "123", message = domainEventJson)
     return objectMapper.writeValueAsString(sqaMessage)
   }
 
-  fun createDomainEventPublishRequest(eventType: String, domainEvent: String): PublishRequest? {
-    return PublishRequest.builder()
-      .topicArn(topicArn)
-      .message(domainEvent).build()
-  }
+  fun createDomainEventPublishRequest(eventType: String, domainEvent: String): PublishRequest? = PublishRequest.builder()
+    .topicArn(topicArn)
+    .message(domainEvent).build()
 
-  fun createDomainEventPublishRequest(eventType: String): PublishRequest? {
-    return PublishRequest.builder()
-      .topicArn(topicArn)
-      .message(objectMapper.writeValueAsString(createDomainEvent(eventType, ""))).build()
-  }
+  fun createDomainEventPublishRequest(eventType: String): PublishRequest? = PublishRequest.builder()
+    .topicArn(topicArn)
+    .message(objectMapper.writeValueAsString(createDomainEvent(eventType, ""))).build()
 
-  fun createDomainEventJson(eventType: String, additionalInformation: String): String {
-    return "{\"eventType\":\"$eventType\",\"additionalInformation\":$additionalInformation}"
-  }
+  fun createDomainEventJson(eventType: String, additionalInformation: String): String = "{\"eventType\":\"$eventType\",\"additionalInformation\":$additionalInformation}"
 
   fun createAdditionalInformationJson(visitAdditionalInfo: VisitAdditionalInfo): String {
     val builder = StringBuilder()
@@ -204,19 +196,17 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>, outcomeStatus: String? = null): VisitDto {
-    return VisitDto(
-      reference = bookingReference,
-      prisonCode = prisonCode,
-      startTimestamp = visitDate.atTime(visitTime),
-      endTimestamp = visitDate.atTime(visitTime).plus(duration),
-      visitContact = visitContact,
-      prisonerId = prisonerId,
-      visitRestriction = visitRestriction,
-      visitors = visitors,
-      outcomeStatus = outcomeStatus,
-    )
-  }
+  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>, outcomeStatus: String? = null): VisitDto = VisitDto(
+    reference = bookingReference,
+    prisonCode = prisonCode,
+    startTimestamp = visitDate.atTime(visitTime),
+    endTimestamp = visitDate.atTime(visitTime).plus(duration),
+    visitContact = visitContact,
+    prisonerId = prisonerId,
+    visitRestriction = visitRestriction,
+    visitors = visitors,
+    outcomeStatus = outcomeStatus,
+  )
 
   fun buildSendEmailResponse(
     id: UUID = UUID.randomUUID(),
