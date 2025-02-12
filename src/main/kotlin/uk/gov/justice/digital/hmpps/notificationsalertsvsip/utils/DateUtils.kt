@@ -13,9 +13,7 @@ class DateUtils {
     private const val SMS_TIME_PATTERN_WHEN_MINUTES_IS_ZERO = "ha"
     private const val SMS_DAY_OF_WEEK_PATTERN = "EEEE"
 
-    fun getFormattedDate(visitDate: LocalDate): String {
-      return visitDate.format(DateTimeFormatter.ofPattern(SMS_DATE_PATTERN))
-    }
+    fun getFormattedDate(visitDate: LocalDate): String = visitDate.format(DateTimeFormatter.ofPattern(SMS_DATE_PATTERN))
 
     fun getFormattedTime(visitStartTime: LocalTime): String {
       val formatter = if (visitStartTime.minute == 0) {
@@ -27,8 +25,6 @@ class DateUtils {
       return visitStartTime.format(formatter).lowercase()
     }
 
-    fun getFormattedDayOfWeek(visitDate: LocalDate): String {
-      return visitDate.format(DateTimeFormatter.ofPattern(SMS_DAY_OF_WEEK_PATTERN))
-    }
+    fun getFormattedDayOfWeek(visitDate: LocalDate): String = visitDate.format(DateTimeFormatter.ofPattern(SMS_DAY_OF_WEEK_PATTERN))
   }
 }

@@ -36,9 +36,7 @@ abstract class BaseEmailNotificationHandler {
 
   abstract fun handle(visit: VisitDto): SendEmailNotificationDto
 
-  protected fun getTemplateName(template: EmailTemplateNames): String {
-    return templatesConfig.emailTemplates[template.name]!!
-  }
+  protected fun getTemplateName(template: EmailTemplateNames): String = templatesConfig.emailTemplates[template.name]!!
 
   protected fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, Any> {
     val templateVars: MutableMap<String, Any> = mutableMapOf(
@@ -89,9 +87,7 @@ abstract class BaseEmailNotificationHandler {
     }
   }
 
-  protected fun calculateAge(visitor: PrisonerContactRegistryContactDto): String {
-    return visitor.dateOfBirth?.let {
-      ChronoUnit.YEARS.between(it, LocalDate.now()).toInt().toString() + " years old"
-    } ?: "age not known"
-  }
+  protected fun calculateAge(visitor: PrisonerContactRegistryContactDto): String = visitor.dateOfBirth?.let {
+    ChronoUnit.YEARS.between(it, LocalDate.now()).toInt().toString() + " years old"
+  } ?: "age not known"
 }

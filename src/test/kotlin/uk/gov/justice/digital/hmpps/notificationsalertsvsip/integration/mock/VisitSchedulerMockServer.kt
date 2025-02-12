@@ -43,11 +43,7 @@ class VisitSchedulerMockServer(@Autowired private val objectMapper: ObjectMapper
     )
   }
 
-  private fun getJsonString(obj: VisitDto): String {
-    return objectMapper.writer().writeValueAsString(obj)
-  }
+  private fun getJsonString(obj: VisitDto): String = objectMapper.writer().writeValueAsString(obj)
 
-  private fun createJsonResponseBuilder(): ResponseDefinitionBuilder {
-    return aResponse().withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-  }
+  private fun createJsonResponseBuilder(): ResponseDefinitionBuilder = aResponse().withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 }

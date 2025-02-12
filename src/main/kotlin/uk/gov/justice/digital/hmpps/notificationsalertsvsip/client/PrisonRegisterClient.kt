@@ -27,8 +27,7 @@ class PrisonRegisterClient(
     return webClient.get().uri(uri)
       .retrieve()
       .bodyToMono<PrisonDto>()
-      .onErrorResume {
-          e ->
+      .onErrorResume { e ->
         if (!isNotFoundError(e)) {
           LOG.error("getPrison Failed get request $uri")
           Mono.error(e)
@@ -48,8 +47,7 @@ class PrisonRegisterClient(
     }
       .retrieve()
       .bodyToMono<PrisonContactDetailsDto>()
-      .onErrorResume {
-          e ->
+      .onErrorResume { e ->
         if (!isNotFoundError(e)) {
           LOG.error("getSocialVisitContact Failed get request $uri")
           Mono.error(e)

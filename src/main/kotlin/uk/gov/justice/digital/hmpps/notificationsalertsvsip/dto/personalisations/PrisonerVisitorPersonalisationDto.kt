@@ -5,7 +5,5 @@ data class PrisonerVisitorPersonalisationDto(
   val lastNameText: String,
   val ageText: String,
 ) {
-  override fun toString(): String {
-    return "$firstNameText $lastNameText ($ageText)"
-  }
+  override fun toString(): String = "$firstNameText $lastNameText ($ageText)"
 }

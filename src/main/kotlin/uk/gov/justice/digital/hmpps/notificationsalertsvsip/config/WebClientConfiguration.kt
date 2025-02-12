@@ -64,19 +64,15 @@ class WebClientConfiguration(
     return oauth2Client
   }
 
-  private fun getExchangeStrategies(): ExchangeStrategies {
-    return ExchangeStrategies.builder()
-      .codecs { configurer: ClientCodecConfigurer -> configurer.defaultCodecs().maxInMemorySize(-1) }
-      .build()
-  }
+  private fun getExchangeStrategies(): ExchangeStrategies = ExchangeStrategies.builder()
+    .codecs { configurer: ClientCodecConfigurer -> configurer.defaultCodecs().maxInMemorySize(-1) }
+    .build()
 
-  private fun getWebClient(baseUrl: String, oauth2Client: ServletOAuth2AuthorizedClientExchangeFilterFunction): WebClient {
-    return WebClient.builder()
-      .baseUrl(baseUrl)
-      .apply(oauth2Client.oauth2Configuration())
-      .exchangeStrategies(getExchangeStrategies())
-      .build()
-  }
+  private fun getWebClient(baseUrl: String, oauth2Client: ServletOAuth2AuthorizedClientExchangeFilterFunction): WebClient = WebClient.builder()
+    .baseUrl(baseUrl)
+    .apply(oauth2Client.oauth2Configuration())
+    .exchangeStrategies(getExchangeStrategies())
+    .build()
 
   @Bean
   fun authorizedClientManager(

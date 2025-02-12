@@ -45,7 +45,5 @@ class NotifyCallbackAuthorizationManager(
   override fun check(
     authentication: Supplier<Authentication>,
     requestAuthorizationContext: RequestAuthorizationContext,
-  ): AuthorizationDecision? {
-    return authorize(authentication, requestAuthorizationContext)
-  }
+  ): AuthorizationDecision? = authorize(authentication, requestAuthorizationContext)
 }
