@@ -26,14 +26,14 @@ class SmsSenderService(
       val sendSmsNotificationDto = handlerFactory.getHandler(visitEventType).handle(visit)
 
       try {
-        LOG.info("Calling notification client")
+        LOG.info("Calling notification client for event - $eventAuditId")
         val response = notificationClient.sendSms(
           sendSmsNotificationDto.templateName,
           visit.visitContact.telephone,
           sendSmsNotificationDto.templateVars,
           eventAuditId,
         )
-        LOG.info("Calling notification client finished with response ${response.notificationId}")
+        LOG.info("Calling notification client finished with response ${response.notificationId}, for event - $eventAuditId")
 
         return NotifyCreateNotificationDto(response)
       } catch (e: NotificationClientException) {
