@@ -26,7 +26,7 @@ class EmailSenderService(
       val sendEmailNotificationDto = handlerFactory.getHandler(visitEventType).handle(visit)
 
       try {
-        LOG.info("Calling notification client")
+        LOG.info("Calling notification client for event - $eventAuditId")
         val response = notificationClient.sendEmail(
           sendEmailNotificationDto.templateName,
           visit.visitContact.email,
