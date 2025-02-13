@@ -33,7 +33,7 @@ class EmailSenderService(
           sendEmailNotificationDto.templateVars,
           eventAuditId,
         )
-        LOG.info("Calling notification client finished with response ${response.notificationId}")
+        LOG.info("Calling notification client finished with response ${response.notificationId}, for event - $eventAuditId")
 
         return NotifyCreateNotificationDto(response)
       } catch (e: NotificationClientException) {
