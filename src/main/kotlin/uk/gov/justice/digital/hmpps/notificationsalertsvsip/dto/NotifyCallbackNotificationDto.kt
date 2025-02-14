@@ -14,7 +14,7 @@ data class NotifyCallbackNotificationDto(
   val notificationId: UUID,
   @Schema(description = "The id of the event audit which the notification is linked to", required = true)
   @JsonAlias("reference")
-  val eventAuditReference: String,
+  val eventAuditReference: String?,
   @Schema(description = "The final status of the notification", required = true)
   val status: String,
   @Schema(description = "The timestamp for when the vsip notification service sent the notification to gov notify", required = true)

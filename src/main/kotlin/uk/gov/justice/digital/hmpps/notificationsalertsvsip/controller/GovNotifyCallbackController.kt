@@ -50,8 +50,12 @@ class GovNotifyCallbackController(
     @RequestBody
     govNotifyCallbackNotificationDto: NotifyCallbackNotificationDto,
   ) {
-    LOG.info("Gov notify callback body - {}", govNotifyCallbackNotificationDto)
-    LOG.info("Received callback with valid token, processing request for event - ${govNotifyCallbackNotificationDto.eventAuditReference}")
-    visitSchedulerService.processNotifyCallback(govNotifyCallbackNotificationDto)
+    govNotifyCallbackNotificationDto.eventAuditReference?.let {
+      LOG.info("Gov notify callback body - {}", govNotifyCallbackNotificationDto)
+      LOG.info("Received callback with valid token, processing request for event - ${govNotifyCallbackNotificationDto.eventAuditReference}")
+      visitSchedulerService.processNotifyCallback(govNotifyCallbackNotificationDto)
+    } ?: {
+      LOG.info("Received callback with a null reference, skipping processing")
+    }
   }
 }
