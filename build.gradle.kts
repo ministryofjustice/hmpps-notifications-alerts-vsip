@@ -27,7 +27,7 @@ dependencies {
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.13.0")
+  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.13.1")
 
   implementation("org.springframework.data:spring-data-commons:3.4.3")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.5")
@@ -39,8 +39,8 @@ dependencies {
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.25")
   testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
   testImplementation("org.mockito:mockito-inline:5.2.0")
-  testImplementation("org.testcontainers:localstack:1.20.4")
-  testImplementation("org.awaitility:awaitility-kotlin:4.2.2")
+  testImplementation("org.testcontainers:localstack:1.20.5")
+  testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
   testImplementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("io.jsonwebtoken:jjwt:0.12.6")
