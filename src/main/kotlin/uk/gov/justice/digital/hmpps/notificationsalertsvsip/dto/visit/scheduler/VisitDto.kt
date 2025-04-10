@@ -30,4 +30,6 @@ data class VisitDto(
   val visitors: List<VisitorDto> = listOf(),
   @Schema(description = "Outcome Status", example = "VISITOR_CANCELLED", required = false)
   val outcomeStatus: String? = null,
+  @Schema(description = "External system details associated with the visit")
+  val visitExternalSystemDetails: VisitExternalSystemDetailsDto?,
 )

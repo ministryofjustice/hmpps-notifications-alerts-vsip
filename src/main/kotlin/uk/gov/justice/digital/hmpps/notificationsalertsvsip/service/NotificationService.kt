@@ -23,18 +23,31 @@ class NotificationService(
     LOG.info("Received call to send notification for event type $visitEventType, visit - ${additionalInfo.bookingReference}")
 
     val visit = visitSchedulerService.getVisit(additionalInfo.bookingReference)
+    if (isVisitInvalidForNotifications(visit, additionalInfo)) {
+      return
+    }
+
+    sendSmsNotificationIfAvailable(visit!!, visitEventType, additionalInfo)
+    sendEmailNotificationIfAvailable(visit, visitEventType, additionalInfo)
+  }
+
+  private fun isVisitInvalidForNotifications(visit: VisitDto?, additionalInfo: VisitAdditionalInfo): Boolean {
     if (visit == null) {
       LOG.warn("No visit found for booking reference ${additionalInfo.bookingReference}")
-      return
+      return true
+    }
+
+    if (visit.visitExternalSystemDetails != null) {
+      LOG.info("External visit found for booking reference ${additionalInfo.bookingReference}, skipping notifications")
+      return true
     }
 
     if (visit.startTimestamp < LocalDateTime.now()) {
       LOG.info("Visit in the past - ${visit.reference}")
-      return
+      return true
     }
 
-    sendSmsNotificationIfAvailable(visit, visitEventType, additionalInfo)
-    sendEmailNotificationIfAvailable(visit, visitEventType, additionalInfo)
+    return false
   }
 
   private fun sendSmsNotificationIfAvailable(visit: VisitDto, visitEventType: VisitEventType, additionalInfo: VisitAdditionalInfo) {
