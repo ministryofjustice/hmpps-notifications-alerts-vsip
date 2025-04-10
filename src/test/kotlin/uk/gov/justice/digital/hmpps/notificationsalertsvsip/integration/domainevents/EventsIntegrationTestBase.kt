@@ -22,6 +22,7 @@ import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitExternalSystemDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
@@ -196,7 +197,7 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>, outcomeStatus: String? = null): VisitDto = VisitDto(
+  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>, outcomeStatus: String? = null, externalSystemDetailsDto: VisitExternalSystemDetailsDto? = null): VisitDto = VisitDto(
     reference = bookingReference,
     prisonCode = prisonCode,
     startTimestamp = visitDate.atTime(visitTime),
@@ -206,6 +207,7 @@ abstract class EventsIntegrationTestBase {
     visitRestriction = visitRestriction,
     visitors = visitors,
     outcomeStatus = outcomeStatus,
+    visitExternalSystemDetails = externalSystemDetailsDto,
   )
 
   fun buildSendEmailResponse(

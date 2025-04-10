@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.search.PrisonerSearchResultDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitExternalSystemDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
@@ -522,6 +523,32 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     verifyEmailSent(templateId!!, visit, visitAdditionalInfo, templateVars)
+  }
+
+  @Test
+  fun `when visit booked by an external system, message is received and notifications are skipped`() {
+    // Given
+    val externalVisit = createVisitDto(
+      bookingReference = "aa-bb-cc-dd",
+      visitDate = LocalDate.now().plusWeeks(1),
+      visitTime = LocalTime.now().minusMinutes(1),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("Contact One", email = "example@email.com"),
+      visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      externalSystemDetailsDto = VisitExternalSystemDetailsDto(clientName = "nexus", clientVisitReference = "abc"),
+    )
+    val bookingReference = externalVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(externalVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, null, HttpStatus.NOT_FOUND)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+
+    // Then
+    verifyEmailNotSent(visitAdditionalInfo)
   }
 
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
