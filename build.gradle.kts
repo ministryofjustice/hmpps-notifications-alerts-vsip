@@ -30,9 +30,9 @@ dependencies {
   implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.15.0")
 
   implementation("org.springframework.data:spring-data-commons:3.4.5")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.6")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
-  implementation("org.springdoc:springdoc-openapi-starter-common:2.8.6")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.8")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
+  implementation("org.springdoc:springdoc-openapi-starter-common:2.8.8")
   implementation("uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE")
   implementation("org.springframework.boot:spring-boot-configuration-processor")
 
