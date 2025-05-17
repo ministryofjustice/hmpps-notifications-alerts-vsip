@@ -1,7 +1,7 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.1.0"
-  kotlin("plugin.spring") version "2.1.20"
-  id("org.jetbrains.kotlin.plugin.noarg") version "2.1.20"
+  kotlin("plugin.spring") version "2.1.21"
+  id("org.jetbrains.kotlin.plugin.noarg") version "2.1.21"
 }
 
 configurations {
@@ -27,16 +27,16 @@ dependencies {
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.15.0")
+  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.16.0")
 
-  implementation("org.springframework.data:spring-data-commons:3.4.5")
+  implementation("org.springframework.data:spring-data-commons:3.5.0")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.8")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
   implementation("org.springdoc:springdoc-openapi-starter-common:2.8.8")
   implementation("uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE")
   implementation("org.springframework.boot:spring-boot-configuration-processor")
 
-  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.26")
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.28")
   testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.testcontainers:localstack:1.21.0")
