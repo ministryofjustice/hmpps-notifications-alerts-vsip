@@ -10,5 +10,6 @@ data class PrisonerSearchResultDto(
   @Schema(description = "Prisoner last name", example = "Smith", required = true)
   val lastName: String,
 ) {
-  override fun toString(): String = "$firstName $lastName"
+  // Takes the full name and converts it from all capitals, to correct format (JOHN SMITH -> John Smith).
+  override fun toString(): String = listOf(firstName, lastName).joinToString(" ") { it.lowercase().replaceFirstChar { char -> char.titlecaseChar() } }
 }
