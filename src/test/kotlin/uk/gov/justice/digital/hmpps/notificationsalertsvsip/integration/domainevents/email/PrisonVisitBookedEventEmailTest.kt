@@ -49,7 +49,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
 
     prison = PrisonDto("HEI", "Hewell", true)
 
-    prisonerSearchResult = PrisonerSearchResultDto("Prisoner", "One")
+    prisonerSearchResult = PrisonerSearchResultDto("PRISONER", "ONE")
 
     prisonerContactsResult = listOf(
       PrisonerContactRegistryContactDto("1234", "Visitor", "One", (LocalDate.now().minusYears(30))),
