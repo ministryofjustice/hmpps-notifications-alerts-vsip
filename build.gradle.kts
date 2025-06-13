@@ -29,10 +29,10 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
   implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.16.0")
 
-  implementation("org.springframework.data:spring-data-commons:3.5.0")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.8")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
-  implementation("org.springdoc:springdoc-openapi-starter-common:2.8.8")
+  implementation("org.springframework.data:spring-data-commons:3.5.1")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.9")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
+  implementation("org.springdoc:springdoc-openapi-starter-common:2.8.9")
   implementation("uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE")
   implementation("org.springframework.boot:spring-boot-configuration-processor")
 
