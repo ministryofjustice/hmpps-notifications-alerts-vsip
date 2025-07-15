@@ -48,6 +48,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
       visitors = emptyList(),
+      visitSubStatus = "BOOKED",
     )
 
     visit2 = createVisitDto(
@@ -57,6 +58,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
       visitors = emptyList(),
+      visitSubStatus = "BOOKED",
     )
 
     visit3 = createVisitDto(
@@ -66,6 +68,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
       visitors = emptyList(),
+      visitSubStatus = "BOOKED",
     )
 
     pastDatedVisit = createVisitDto(
@@ -75,6 +78,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
       visitors = emptyList(),
+      visitSubStatus = "BOOKED",
     )
 
     noContactVisit = createVisitDto(
@@ -84,6 +88,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", null),
       visitors = emptyList(),
+      visitSubStatus = "BOOKED",
     )
 
     singleDigitDateVisit = createVisitDto(
@@ -93,6 +98,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", "01234567890"),
       visitors = emptyList(),
+      visitSubStatus = "BOOKED",
     )
 
     prison = PrisonDto("HEI", "Hewell", true)
@@ -322,6 +328,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "VISITOR_CANCELLED",
       externalSystemDetailsDto = VisitExternalSystemDetailsDto(clientName = "nexus", clientVisitReference = "abc"),
+      visitSubStatus = "BOOKED",
     )
     val bookingReference = externalVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(bookingReference, "123456")

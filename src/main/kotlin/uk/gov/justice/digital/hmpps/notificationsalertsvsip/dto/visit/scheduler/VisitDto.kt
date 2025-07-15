@@ -32,4 +32,6 @@ data class VisitDto(
   val outcomeStatus: String? = null,
   @Schema(description = "External system details associated with the visit")
   val visitExternalSystemDetails: VisitExternalSystemDetailsDto?,
+  @Schema(description = "Visit Sub Status", example = "AUTO_APPROVED", required = true)
+  val visitSubStatus: String,
 )

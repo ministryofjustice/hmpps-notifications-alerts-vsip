@@ -1,0 +1,165 @@
+package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.sms
+
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.untilAsserted
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.springframework.http.HttpStatus
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonContactDetailsDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_REQUESTED
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_BOOKED
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+
+class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
+  lateinit var visit: VisitDto
+  lateinit var pastDatedVisit: VisitDto
+  lateinit var noContactVisit: VisitDto
+  lateinit var prison: PrisonDto
+  lateinit var prisonContactDetailsDto: PrisonContactDetailsDto
+
+  @BeforeEach
+  internal fun setUp() {
+    visit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
+      visitSubStatus = "REQUESTED",
+    )
+
+    pastDatedVisit = createVisitDto(
+      bookingReference = "aa-bb-cc-dd",
+      visitDate = LocalDate.now(),
+      visitTime = LocalTime.now().minusMinutes(1),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
+      visitSubStatus = "REQUESTED",
+    )
+
+    noContactVisit = createVisitDto(
+      bookingReference = "bb-cc-dd-zz",
+      visitDate = LocalDate.now(),
+      visitTime = LocalTime.now().minusMinutes(1),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("John Smith", null),
+      visitors = emptyList(),
+      visitSubStatus = "REQUESTED",
+    )
+
+    prison = PrisonDto("HEI", "Hewell", true)
+
+    prisonContactDetailsDto = PrisonContactDetailsDto(phoneNumber = "0111222333")
+  }
+
+  @Test
+  fun `when visit requested message is received then request message is sent`() {
+    // Given
+    val bookingReference = visit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = templatesConfig.smsTemplates[VISIT_REQUESTED.name]
+    val visitDate = visit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateVars = mutableMapOf<String, Any>(
+      "prison" to prison.prisonName,
+      "time" to "10:30am",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "ref number" to bookingReference,
+    )
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+
+    // Then
+    await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendSms(
+        templateId,
+        visit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      )
+    }
+  }
+
+  @Test
+  fun `when visit requested message is received but the visit could not be found then request message is not sent`() {
+    // Given
+    val bookingReference = visit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, null, HttpStatus.NOT_FOUND)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+
+    // Then
+    await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+  }
+
+  @Test
+  fun `when visit requested message is received but the visit is in the past then request message is not sent`() {
+    // Given
+    val bookingReference = pastDatedVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(pastDatedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, null, HttpStatus.NOT_FOUND)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+
+    // Then
+    await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+  }
+
+  @Test
+  fun `when visit booked message is requested but no visit contact found then booking message is not sent`() {
+    // Given
+    val bookingReference = noContactVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(noContactVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, null, HttpStatus.NOT_FOUND)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+
+    // Then
+    await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+  }
+}

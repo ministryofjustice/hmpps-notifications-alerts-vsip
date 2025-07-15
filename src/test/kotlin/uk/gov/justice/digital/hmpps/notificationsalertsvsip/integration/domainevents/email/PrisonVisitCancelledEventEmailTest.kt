@@ -44,6 +44,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "BOOKER_CANCELLED",
+      visitSubStatus = "CANCELLED",
     )
 
     prison = PrisonDto("HEI", "Hewell", true)
@@ -93,6 +94,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "VISITOR_CANCELLED",
+      visitSubStatus = "CANCELLED",
     )
     val visitAdditionalInfo = VisitAdditionalInfo(singleDigitDateVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
@@ -134,6 +136,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "ESTABLISHMENT_CANCELLED",
+      visitSubStatus = "CANCELLED",
     )
     val visitAdditionalInfo = VisitAdditionalInfo(cancelledByPrisonVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
@@ -175,6 +178,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "PRISONER_CANCELLED",
+      visitSubStatus = "CANCELLED",
     )
     val visitAdditionalInfo = VisitAdditionalInfo(cancelledByPrisonerVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
@@ -216,6 +220,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "NOT_RECORDED",
+      visitSubStatus = "CANCELLED",
     )
     val visitAdditionalInfo = VisitAdditionalInfo(unsupportedCancelledTypeVisit.reference, "123456")
 
@@ -293,6 +298,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "VISITOR_CANCELLED",
+      visitSubStatus = "CANCELLED",
     )
     val visitAdditionalInfo = VisitAdditionalInfo(pastDatedVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
@@ -317,6 +323,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("John Smith", null, null),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "VISITOR_CANCELLED",
+      visitSubStatus = "CANCELLED",
     )
     val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
@@ -342,6 +349,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       outcomeStatus = "VISITOR_CANCELLED",
       externalSystemDetailsDto = VisitExternalSystemDetailsDto(clientName = "nexus", clientVisitReference = "abc"),
+      visitSubStatus = "CANCELLED",
     )
     val visitAdditionalInfo = VisitAdditionalInfo(externalVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))

@@ -5,4 +5,5 @@ enum class SmsTemplateNames {
   VISIT_UPDATE,
   VISIT_CANCEL,
   VISIT_CANCEL_NO_PRISON_NUMBER,
+  VISIT_REQUESTED,
 }
