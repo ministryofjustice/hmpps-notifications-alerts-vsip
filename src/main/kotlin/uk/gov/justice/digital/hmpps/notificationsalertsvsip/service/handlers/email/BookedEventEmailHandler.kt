@@ -4,7 +4,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames.VISIT_BOOKING
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames.VISIT_REQUESTED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
@@ -16,7 +17,7 @@ class BookedEventEmailHandler : BaseEmailNotificationHandler() {
   }
 
   override fun handle(visit: VisitDto): SendEmailNotificationDto {
-    LOG.info("handleBookedEvent (email) - Entered")
+    LOG.info("handleBookedEvent (email) - Entered, visit reference: {}, visit sub status: {}", visit.reference, visit.visitSubStatus)
 
     val templateVars = getCommonTemplateVars(visit).toMutableMap()
 
@@ -31,8 +32,14 @@ class BookedEventEmailHandler : BaseEmailNotificationHandler() {
     )
 
     return SendEmailNotificationDto(
-      templateName = getTemplateName(EmailTemplateNames.VISIT_BOOKING),
+      templateName = getTemplateName(visit),
       templateVars = templateVars,
     )
+  }
+
+  private fun getTemplateName(visit: VisitDto): String = if (visit.visitSubStatus == "REQUESTED") {
+    getTemplateName(VISIT_REQUESTED)
+  } else {
+    getTemplateName(VISIT_BOOKING)
   }
 }

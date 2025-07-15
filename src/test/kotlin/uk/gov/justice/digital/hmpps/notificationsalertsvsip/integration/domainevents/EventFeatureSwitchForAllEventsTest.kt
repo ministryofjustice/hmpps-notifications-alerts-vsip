@@ -19,12 +19,12 @@ internal class EventFeatureSwitchForAllEventsTest : IntegrationTestBase() {
   private lateinit var featureSwitch: EventFeatureSwitch
 
   @Test
-  fun `should return false when feature is disabled for evenet`() {
+  fun `should return false when feature is disabled for event`() {
     assertThat(featureSwitch.isEnabled(PRISON_VISIT_BOOKED)).isFalse
   }
 
   @Test
-  fun `should return false when feature is disabled for all evenets`() {
+  fun `should return false when feature is disabled for all events`() {
     assertThat(featureSwitch.isAllEventsEnabled()).isFalse
   }
 }

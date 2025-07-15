@@ -45,6 +45,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      visitSubStatus = "BOOKED",
     )
 
     prison = PrisonDto("HEI", "Hewell", true)
@@ -127,6 +128,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      visitSubStatus = "BOOKED",
     )
     val bookingReference = visit3.reference
     val visitAdditionalInfo = VisitAdditionalInfo(visit3.reference, "123456")
@@ -185,6 +187,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      visitSubStatus = "BOOKED",
     )
     val bookingReference = visit2.reference
     val visitAdditionalInfo = VisitAdditionalInfo(visit2.reference, "123456")
@@ -260,6 +263,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      visitSubStatus = "BOOKED",
     )
     val bookingReference = pastDatedVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(pastDatedVisit.reference, "123456")
@@ -285,6 +289,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("John Smith", null, null),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      visitSubStatus = "BOOKED",
     )
     val bookingReference = noContactVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(noContactVisit.reference, "123456")
@@ -310,6 +315,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      visitSubStatus = "BOOKED",
     )
     val bookingReference = singleDigitDateVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(singleDigitDateVisit.reference, "123456")
@@ -321,7 +327,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     val expectedVisitDate = "1 January $visitYear"
     val expectedDayOfWeek = singleDigitDateVisit.startTimestamp.toLocalDate().dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
-    val templateVars = mutableMapOf<String, Any>(
+    val templateVars = mutableMapOf(
       "ref number" to bookingReference,
       "prison" to prison.prisonName,
       "time" to "1:05am",
@@ -370,6 +376,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234)),
+      visitSubStatus = "BOOKED",
     )
     val bookingReference = visitWithOneVisitor.reference
     val visitAdditionalInfo = VisitAdditionalInfo(visitWithOneVisitor.reference, "123456")
@@ -536,6 +543,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
       externalSystemDetailsDto = VisitExternalSystemDetailsDto(clientName = "nexus", clientVisitReference = "abc"),
+      visitSubStatus = "BOOKED",
     )
     val bookingReference = externalVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(externalVisit.reference, "123456")

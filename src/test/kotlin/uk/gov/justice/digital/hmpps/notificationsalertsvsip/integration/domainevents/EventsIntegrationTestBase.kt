@@ -197,7 +197,20 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createVisitDto(bookingReference: String, prisonCode: String = "HEI", prisonerId: String = "AA123456", visitDate: LocalDate, visitTime: LocalTime, duration: Duration, visitContact: ContactDto, visitRestriction: VisitRestriction = VisitRestriction.OPEN, visitors: List<VisitorDto>, outcomeStatus: String? = null, externalSystemDetailsDto: VisitExternalSystemDetailsDto? = null): VisitDto = VisitDto(
+  fun createVisitDto(
+    bookingReference: String,
+    prisonCode: String = "HEI",
+    prisonerId: String = "AA123456",
+    visitDate: LocalDate,
+    visitTime: LocalTime,
+    duration: Duration,
+    visitContact: ContactDto,
+    visitRestriction: VisitRestriction = VisitRestriction.OPEN,
+    visitors: List<VisitorDto>,
+    outcomeStatus: String? = null,
+    externalSystemDetailsDto: VisitExternalSystemDetailsDto? = null,
+    visitSubStatus: String,
+  ): VisitDto = VisitDto(
     reference = bookingReference,
     prisonCode = prisonCode,
     startTimestamp = visitDate.atTime(visitTime),
@@ -208,6 +221,7 @@ abstract class EventsIntegrationTestBase {
     visitors = visitors,
     outcomeStatus = outcomeStatus,
     visitExternalSystemDetails = externalSystemDetailsDto,
+    visitSubStatus = visitSubStatus,
   )
 
   fun buildSendEmailResponse(
