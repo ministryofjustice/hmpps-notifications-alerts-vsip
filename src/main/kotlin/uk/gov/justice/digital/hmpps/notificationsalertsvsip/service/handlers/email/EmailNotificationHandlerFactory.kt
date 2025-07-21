@@ -8,11 +8,13 @@ class EmailNotificationHandlerFactory(
   private val bookedHandler: BookedEventEmailHandler,
   private val cancelledHandler: CancelledEventEmailHandler,
   private val updatedEventHandler: UpdatedEventEmailHandler,
+  private val requestActionedEventHandler: RequestActionedEventEmailHandler,
 ) {
 
   fun getHandler(eventType: VisitEventType): BaseEmailNotificationHandler = when (eventType) {
     VisitEventType.BOOKED -> bookedHandler
     VisitEventType.CANCELLED -> cancelledHandler
     VisitEventType.UPDATED -> updatedEventHandler
+    VisitEventType.REQUEST_ACTIONED -> requestActionedEventHandler
   }
 }

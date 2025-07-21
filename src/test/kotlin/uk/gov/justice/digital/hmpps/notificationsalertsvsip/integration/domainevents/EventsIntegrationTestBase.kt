@@ -45,6 +45,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.ev
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitBookedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitCancelledEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitChangedEventNotifier
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitRequestActionedEventNotifier
 import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
@@ -127,6 +128,9 @@ abstract class EventsIntegrationTestBase {
 
   @MockitoSpyBean
   lateinit var prisonVisitCancelledEventNotifierSpy: PrisonVisitCancelledEventNotifier
+
+  @MockitoSpyBean
+  lateinit var prisonVisitRequestActionedEventNotifierSpy: PrisonVisitRequestActionedEventNotifier
 
   @MockitoBean
   lateinit var notificationClient: NotificationClient

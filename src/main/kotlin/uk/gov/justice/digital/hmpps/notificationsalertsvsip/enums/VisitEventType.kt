@@ -4,4 +4,5 @@ enum class VisitEventType {
   BOOKED,
   UPDATED,
   CANCELLED,
+  REQUEST_ACTIONED,
 }

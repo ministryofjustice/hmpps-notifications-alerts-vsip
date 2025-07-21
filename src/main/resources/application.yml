@@ -84,15 +84,19 @@ notify:
   apikey: ${notify.api.key}
   callback-token: ${notify.callback.token}
   sms-templates:
+    # this template is used on both visit booked and visit request approved
     VISIT_BOOKING: 85904166-e539-43f5-9f51-7ba106cc61bd
     VISIT_UPDATE: 386e83ff-5734-4d99-8279-b3eacb7cc8b8
     VISIT_CANCEL: 42a995f2-abbc-474b-8563-ca2995529111
     VISIT_CANCEL_NO_PRISON_NUMBER: 3103b319-267d-4265-83a6-a38e93fc2342
     VISIT_REQUESTED: ce1ee7ec-5129-48c9-a488-9c9f504f1de0
+    VISIT_REQUEST_REJECTED: 0c601971-eaeb-43ec-8893-d9e6806d647b
   email-templates:
+    # this template is used on both visit booked and visit request approved
     VISIT_BOOKING: 35dffc03-c13a-4838-90f9-ade9fc325616
     VISIT_UPDATED: 1427fefb-86af-4e22-b145-ca00093410c3
     VISIT_CANCELLED: 37c64f9f-67b7-47de-ad61-c739a9d80f35
     VISIT_CANCELLED_BY_PRISONER: 97d4d521-0142-4d50-a37d-de759b85f4e2
     VISIT_CANCELLED_BY_PRISON: eb9e2cf2-ffbf-4469-bce1-d6410bee04a2
     VISIT_REQUESTED: c6d65acf-4ab5-48b6-992d-96833611b92a
+    VISIT_REQUEST_REJECTED: b4735212-1e62-4cea-9a5e-95597d1232cc
