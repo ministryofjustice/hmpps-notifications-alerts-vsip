@@ -65,7 +65,7 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
+    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
     val visitDate = approvedVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
@@ -119,7 +119,7 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING.name]
+    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
     val visitDate = autoApprovedVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }

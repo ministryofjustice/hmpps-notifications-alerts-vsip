@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_BOOKING
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_REQUEST_REJECTED
 
 @Service
@@ -27,7 +27,7 @@ class RequestActionedEventSmsHandler : BaseSmsNotificationHandler() {
   private fun getRequestActionedSmsTemplateName(visitSubStatus: String): String {
     val template = when (visitSubStatus) {
       "APPROVED", "AUTO_APPROVED" -> {
-        VISIT_BOOKING
+        VISIT_BOOKING_OR_REQUEST_APPROVED
       }
 
       "REJECTED", "AUTO_REJECTED" -> {

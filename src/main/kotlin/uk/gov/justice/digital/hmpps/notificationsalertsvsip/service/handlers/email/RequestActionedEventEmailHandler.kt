@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames.VISIT_BOOKING
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames.VISIT_REQUEST_REJECTED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
@@ -38,7 +38,7 @@ class RequestActionedEventEmailHandler : BaseEmailNotificationHandler() {
   private fun getRequestActionedEmailTemplateName(visitSubStatus: String): String {
     val template = when (visitSubStatus) {
       "APPROVED", "AUTO_APPROVED" -> {
-        VISIT_BOOKING
+        VISIT_BOOKING_OR_REQUEST_APPROVED
       }
 
       "REJECTED", "AUTO_REJECTED" -> {
