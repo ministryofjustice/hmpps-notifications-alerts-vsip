@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_BOOKING
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_REQUESTED
 
 @Service
@@ -29,6 +29,6 @@ class BookedEventSmsHandler : BaseSmsNotificationHandler() {
   private fun getTemplateName(visit: VisitDto): String = if (visit.visitSubStatus == "REQUESTED") {
     getTemplateName(VISIT_REQUESTED)
   } else {
-    getTemplateName(VISIT_BOOKING)
+    getTemplateName(VISIT_BOOKING_OR_REQUEST_APPROVED)
   }
 }

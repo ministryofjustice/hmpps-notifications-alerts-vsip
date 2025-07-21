@@ -110,7 +110,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING.name]
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
     val visitDate = visit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
@@ -155,7 +155,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     val visitDate = visit3.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
-    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING.name]
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
@@ -189,7 +189,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val visitDate = visit2.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING.name]
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
       "time" to "8am",
@@ -315,7 +315,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val visitYear = singleDigitDateVisit.startTimestamp.toLocalDate().year
     val expectedVisitDate = "1 January $visitYear"
     val expectedDayOfWeek = singleDigitDateVisit.startTimestamp.toLocalDate().dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING.name]
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
       "time" to "1:05am",
