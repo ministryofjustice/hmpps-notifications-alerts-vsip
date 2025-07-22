@@ -8,13 +8,13 @@ class SmsNotificationHandlerFactory(
   private val bookedHandler: BookedEventSmsHandler,
   private val cancelledHandler: CancelledEventSmsHandler,
   private val updatedHandler: UpdatedEventSmsHandler,
-  private val requestActionedHandler: RequestActionedEventSmsHandler,
+  private val requestApprovedHandler: RequestApprovedEventSmsHandler,
 ) {
 
   fun getHandler(eventType: VisitEventType): BaseSmsNotificationHandler = when (eventType) {
     VisitEventType.BOOKED -> bookedHandler
     VisitEventType.CANCELLED -> cancelledHandler
     VisitEventType.UPDATED -> updatedHandler
-    VisitEventType.REQUEST_ACTIONED -> requestActionedHandler
+    VisitEventType.REQUEST_APPROVED -> requestApprovedHandler
   }
 }

@@ -17,17 +17,17 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.REQUEST_ACTIONED
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.REQUEST_APPROVED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_REQUEST_ACTIONED
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_REQUEST_APPROVED
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
+class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
   lateinit var approvedVisit: VisitDto
   lateinit var prison: PrisonDto
   lateinit var prisonerSearchResult: PrisonerSearchResultDto
@@ -57,12 +57,12 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit request actioned event received and visit was approved then visit booked email is sent`() {
+  fun `when visit request approved event received and visit was approved then visit booked email is sent`() {
     // Given
     val bookingReference = approvedVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(approvedVisit.reference, "123456")
 
-    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
+    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
@@ -110,13 +110,13 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit request actioned event received and visit was auto approved then visit booked email is sent`() {
+  fun `when visit request approved event received and visit was auto approved then visit booked email is sent`() {
     // Given
     val autoApprovedVisit = createVisitDto("auto-approved-visit", "AUTO_APPROVED")
     val bookingReference = autoApprovedVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(autoApprovedVisit.reference, "123456")
 
-    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
+    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
@@ -164,121 +164,13 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit request actioned event received and visit was rejected then visit request rejected email is sent`() {
-    // Given
-    val rejectedVisit = createVisitDto("rejected-visit", "REJECTED")
-    val bookingReference = rejectedVisit.reference
-    val visitAdditionalInfo = VisitAdditionalInfo(rejectedVisit.reference, "123456")
-
-    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
-    val jsonSqsMessage = createSQSMessage(domainEvent)
-
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_REQUEST_REJECTED.name]
-    val visitDate = rejectedVisit.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
-    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateVars = mutableMapOf<String, Any>(
-      "ref number" to bookingReference,
-      "prison" to prison.prisonName,
-      "time" to "10:30am",
-      "end time" to "11am",
-      "arrival time" to "45",
-      "dayofweek" to expectedDayOfWeek,
-      "date" to expectedVisitDate,
-      "main contact name" to "Contact One",
-      "closed visit" to "false",
-      "opening sentence" to "visit to see Prisoner One",
-      "prisoner" to "Prisoner One",
-      "visitors" to prisonVisitors,
-      "phone" to prisonContactDetailsDto.phoneNumber!!,
-      "website" to prisonContactDetailsDto.webAddress!!,
-    )
-
-    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
-
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    visitSchedulerMockServer.stubGetVisit(bookingReference, rejectedVisit)
-    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
-    prisonerOffenderSearchMockServer.stubGetPrisoner(rejectedVisit.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(rejectedVisit.prisonerId, prisonerContactsResult)
-    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
-    Mockito.`when`(
-      notificationClient.sendEmail(
-        templateId,
-        rejectedVisit.visitContact.email,
-        templateVars,
-        visitAdditionalInfo.eventAuditId,
-      ),
-    ).thenReturn(notificationClientResponse)
-    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
-
-    // Then
-    verifyEmailSent(templateId!!, rejectedVisit, visitAdditionalInfo, templateVars)
-  }
-
-  @Test
-  fun `when visit request actioned event received and visit was auto rejected then visit request rejected email is sent`() {
-    // Given
-    val autoRejectedVisit = createVisitDto("auto-rejected-visit", "AUTO_REJECTED")
-    val bookingReference = autoRejectedVisit.reference
-    val visitAdditionalInfo = VisitAdditionalInfo(autoRejectedVisit.reference, "123456")
-
-    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
-    val jsonSqsMessage = createSQSMessage(domainEvent)
-
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_REQUEST_REJECTED.name]
-    val visitDate = autoRejectedVisit.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
-    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateVars = mutableMapOf<String, Any>(
-      "ref number" to bookingReference,
-      "prison" to prison.prisonName,
-      "time" to "10:30am",
-      "end time" to "11am",
-      "arrival time" to "45",
-      "dayofweek" to expectedDayOfWeek,
-      "date" to expectedVisitDate,
-      "main contact name" to "Contact One",
-      "closed visit" to "false",
-      "opening sentence" to "visit to see Prisoner One",
-      "prisoner" to "Prisoner One",
-      "visitors" to prisonVisitors,
-      "phone" to prisonContactDetailsDto.phoneNumber!!,
-      "website" to prisonContactDetailsDto.webAddress!!,
-    )
-
-    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
-
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    visitSchedulerMockServer.stubGetVisit(bookingReference, autoRejectedVisit)
-    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
-    prisonerOffenderSearchMockServer.stubGetPrisoner(autoRejectedVisit.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(autoRejectedVisit.prisonerId, prisonerContactsResult)
-    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
-    Mockito.`when`(
-      notificationClient.sendEmail(
-        templateId,
-        autoRejectedVisit.visitContact.email,
-        templateVars,
-        visitAdditionalInfo.eventAuditId,
-      ),
-    ).thenReturn(notificationClientResponse)
-    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
-
-    // Then
-    verifyEmailSent(templateId!!, autoRejectedVisit, visitAdditionalInfo, templateVars)
-  }
-
-  @Test
-  fun `when visit request actioned message is received but the visit substatus is not APPROVED, AUTO_APPROVED, REJECTED or AUTO_REJECTED then request email is not sent`() {
+  fun `when visit request approved message is received but the visit substatus is not APPROVED or AUTO_APPROVED then request email is not sent`() {
     // Given
     val otherSubStatusVisit = createVisitDto("other-substatus-visit", "UPDATED")
 
     val bookingReference = otherSubStatusVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(otherSubStatusVisit.reference, "123456")
-    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
+    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -291,11 +183,11 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit request actioned message is received but the visit could not be found then request email is not sent`() {
+  fun `when visit request approved message is received but the visit could not be found then request email is not sent`() {
     // Given
     val bookingReference = approvedVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(approvedVisit.reference, "123456")
-    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
+    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -308,7 +200,7 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit request actioned message is received but the visit is in the past then request email is not sent`() {
+  fun `when visit request approved message is received but the visit is in the past then request email is not sent`() {
     // Given
     val pastDatedVisit = createVisitDto(
       bookingReference = "aa-bb-cc-dd",
@@ -321,7 +213,7 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
     )
     val bookingReference = pastDatedVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(pastDatedVisit.reference, "123456")
-    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
+    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -347,7 +239,7 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
     )
     val bookingReference = noContactVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(noContactVisit.reference, "123456")
-    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_ACTIONED, createAdditionalInformationJson(visitAdditionalInfo))
+    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     // When
@@ -360,9 +252,9 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
-    await untilAsserted { verify(prisonVisitRequestActionedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(REQUEST_ACTIONED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, REQUEST_ACTIONED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(prisonVisitRequestApprovedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(REQUEST_APPROVED, visitAdditionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, REQUEST_APPROVED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
@@ -377,16 +269,16 @@ class PrisonVisitRequestActionedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   private fun verifyEmailNotSent(visitAdditionalInfo: VisitAdditionalInfo) {
-    await untilAsserted { verify(prisonVisitRequestActionedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(REQUEST_ACTIONED, visitAdditionalInfo) }
+    await untilAsserted { verify(prisonVisitRequestApprovedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(REQUEST_APPROVED, visitAdditionalInfo) }
     await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
     await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }
 
   private fun verifyEmailNotSentIfIncorrectSubStatus(visitAdditionalInfo: VisitAdditionalInfo) {
-    await untilAsserted { verify(prisonVisitRequestActionedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(REQUEST_ACTIONED, visitAdditionalInfo) }
+    await untilAsserted { verify(prisonVisitRequestApprovedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(REQUEST_APPROVED, visitAdditionalInfo) }
     await untilAsserted { verify(emailSenderService, times(1)).sendEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
     await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
