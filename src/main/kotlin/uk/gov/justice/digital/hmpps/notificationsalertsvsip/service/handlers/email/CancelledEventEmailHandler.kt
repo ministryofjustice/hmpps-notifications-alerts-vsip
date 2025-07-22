@@ -1,20 +1,32 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email
 
 import jakarta.validation.ValidationException
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService.Companion.LOG
 
 @Service
 class CancelledEventEmailHandler : BaseEmailNotificationHandler() {
+  companion object {
+    private val LOG = LoggerFactory.getLogger(this::class.java)
+  }
 
   override fun handle(visit: VisitDto): SendEmailNotificationDto {
-    LOG.info("handleCancelledEvent (email) - Entered")
+    LOG.info("handleCancelledEvent (email)- Entered for visit reference - ${visit.reference} with sub status - ${visit.visitSubStatus}")
+
+    val templateName = when (visit.visitSubStatus) {
+      "REJECTED", "AUTO_REJECTED" -> {
+        getTemplateName(EmailTemplateNames.VISIT_REQUEST_REJECTED)
+      }
+      else -> {
+        getCancelledEmailTemplateName(visit.outcomeStatus!!)
+      }
+    }
 
     return SendEmailNotificationDto(
-      templateName = getCancelledEmailTemplateName(visit.outcomeStatus!!),
+      templateName = templateName,
       templateVars = getCommonTemplateVars(visit),
     )
   }
