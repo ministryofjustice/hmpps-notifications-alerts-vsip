@@ -33,7 +33,6 @@ class CancelledEventSmsHandler : BaseSmsNotificationHandler() {
   private fun getCancelledSmsTemplateName(visitSubStatus: String, isPrisonContactNumberAvailable: Boolean): String {
     val template = when (visitSubStatus) {
       "REJECTED", "AUTO_REJECTED" -> {
-        // TODO - add template for VISIT_REQUEST_REJECTED and no prison contact number
         VISIT_REQUEST_REJECTED
       }
 
