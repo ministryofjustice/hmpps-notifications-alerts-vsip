@@ -416,4 +416,226 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
   }
+
+  @Test
+  fun `when visit cancelled message is received once a visit is rejected then rejected message is sent`() {
+    // Given
+    val rejectedVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
+      visitSubStatus = "REJECTED",
+    )
+    val bookingReference = rejectedVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(rejectedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+    val visitDate = rejectedVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_REQUEST_REJECTED.name]
+    val templateVars = mutableMapOf<String, Any>(
+      "prison" to prison.prisonName,
+      "time" to "10:30am",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "reference" to bookingReference,
+      "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
+    )
+    val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, rejectedVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendSms(
+        templateId,
+        rejectedVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(rejectedVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendSms(
+        templateId,
+        rejectedVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      )
+    }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
+    }
+  }
+
+  @Test
+  fun `when visit cancelled message is received once a visit is auto rejected then rejected message is sent`() {
+    // Given
+    val rejectedVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
+      visitSubStatus = "AUTO_REJECTED",
+    )
+    val bookingReference = rejectedVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(rejectedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+    val visitDate = rejectedVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_REQUEST_REJECTED.name]
+    val templateVars = mutableMapOf<String, Any>(
+      "prison" to prison.prisonName,
+      "time" to "10:30am",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "reference" to bookingReference,
+      "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
+    )
+    val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, rejectedVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendSms(
+        templateId,
+        rejectedVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(rejectedVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendSms(
+        templateId,
+        rejectedVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      )
+    }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
+    }
+  }
+
+  @Test
+  fun `when visit cancelled message is received once a visit is rejected but no prison contact number then cancel message is sent`() {
+    // Given
+
+    val rejectedVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
+      visitSubStatus = "REJECTED",
+    )
+    val bookingReference = rejectedVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(rejectedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+    val visitDate = rejectedVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_REQUEST_REJECTED.name]
+    val templateVars = mutableMapOf<String, Any>(
+      "prison" to prison.prisonName,
+      "time" to "10:30am",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "reference" to bookingReference,
+    )
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, rejectedVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null, HttpStatus.NOT_FOUND)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(rejectedVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendSms(
+        templateId,
+        rejectedVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      )
+    }
+  }
+
+  @Test
+  fun `when visit cancelled message is received once a visit is auto rejected but no prison contact number then cancel message is sent`() {
+    // Given
+
+    val rejectedVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("John Smith", "01234567890"),
+      visitors = emptyList(),
+      visitSubStatus = "AUTO_REJECTED",
+    )
+    val bookingReference = rejectedVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(rejectedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+    val visitDate = rejectedVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_REQUEST_REJECTED.name]
+    val templateVars = mutableMapOf<String, Any>(
+      "prison" to prison.prisonName,
+      "time" to "10:30am",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "reference" to bookingReference,
+    )
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, rejectedVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null, HttpStatus.NOT_FOUND)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(rejectedVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendSms(
+        templateId,
+        rejectedVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      )
+    }
+  }
 }
