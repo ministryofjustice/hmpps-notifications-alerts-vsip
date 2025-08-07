@@ -26,6 +26,7 @@ abstract class BaseSmsNotificationHandler {
 
   protected fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, String> {
     val templateVars = mutableMapOf(
+      "ref number" to visit.reference,
       "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
       "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
       "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),

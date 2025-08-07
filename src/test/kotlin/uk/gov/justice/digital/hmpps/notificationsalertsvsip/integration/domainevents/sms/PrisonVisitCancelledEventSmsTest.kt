@@ -136,6 +136,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "reference" to bookingReference,
       "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
+      "ref number" to bookingReference,
     )
     val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
 
@@ -189,6 +190,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "reference" to bookingReference,
       "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
+      "ref number" to bookingReference,
     )
 
     // When
@@ -229,6 +231,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "reference" to bookingReference,
       "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
+      "ref number" to bookingReference,
     )
 
     // When
@@ -268,6 +271,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
       "reference" to bookingReference,
+      "ref number" to bookingReference,
     )
 
     // When
@@ -366,6 +370,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "reference" to bookingReference,
       "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
+      "ref number" to bookingReference,
     )
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
@@ -444,6 +449,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "reference" to bookingReference,
       "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
+      "ref number" to bookingReference,
     )
     val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
 
@@ -506,6 +512,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "date" to expectedVisitDate,
       "reference" to bookingReference,
       "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
+      "ref number" to bookingReference,
     )
     val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
 
@@ -568,6 +575,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
       "reference" to bookingReference,
+      "ref number" to bookingReference,
     )
 
     // When
@@ -617,6 +625,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
       "reference" to bookingReference,
+      "ref number" to bookingReference,
     )
 
     // When

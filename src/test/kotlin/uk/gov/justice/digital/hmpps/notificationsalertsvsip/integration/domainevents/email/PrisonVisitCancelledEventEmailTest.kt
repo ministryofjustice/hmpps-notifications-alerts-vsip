@@ -89,7 +89,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val singleDigitDateVisit = createVisitDto(
       bookingReference = "bb-cc-dd-xd",
       visitDate = LocalDate.now().plusYears(1).withMonth(1).withDayOfMonth(1),
-      visitTime = LocalTime.of(1, 5),
+      visitTime = LocalTime.of(10, 30),
       duration = Duration.of(30, ChronoUnit.MINUTES),
       visitContact = ContactDto("Contact One", email = "example@email.com"),
       visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
@@ -373,6 +373,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       "prison" to prison.prisonName,
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
+      "time" to "10:30am",
+      "end time" to "11am",
       "main contact name" to visit.visitContact.name,
       "opening sentence" to openingSentence!!,
       "prisoner" to prisoner!!,
