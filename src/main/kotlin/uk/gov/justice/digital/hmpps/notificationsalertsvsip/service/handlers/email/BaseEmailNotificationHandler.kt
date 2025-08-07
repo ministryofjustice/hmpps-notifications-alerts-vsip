@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.Pri
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -41,6 +42,8 @@ abstract class BaseEmailNotificationHandler {
   protected fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, Any> {
     val templateVars: MutableMap<String, Any> = mutableMapOf(
       "ref number" to visit.reference,
+      "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
+      "end time" to getFormattedTime(visit.endTimestamp.toLocalTime()),
       "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
       "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
       "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
