@@ -84,6 +84,48 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
+  fun `when visit cancelled message is received with outcomeStaus as ADMINISTRATIVE_CANCELLATION then cancelled email is sent`() {
+    // Given
+    val cancelledVisit = createVisitDto(
+      bookingReference = "aa-bb-cc-dd",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("Contact One", email = "email@example.com"),
+      visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      outcomeStatus = "ADMINISTRATIVE_CANCELLATION",
+      visitSubStatus = "CANCELLED",
+    )
+
+    val visitAdditionalInfo = VisitAdditionalInfo(cancelledVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISON.name]
+    val templateVars = createTemplateVars(cancelledVisit)
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(cancelledVisit.reference, cancelledVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(cancelledVisit.prisonerId, prisonerSearchResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        cancelledVisit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // Then
+    verifyEmailSent(templateId!!, cancelledVisit, visitAdditionalInfo, templateVars)
+  }
+
+  @Test
   fun `when single digit visit date booked then message is sent out with the right visit date format`() {
     // Given
     val singleDigitDateVisit = createVisitDto(
