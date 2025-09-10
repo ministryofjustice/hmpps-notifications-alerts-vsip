@@ -78,7 +78,7 @@ abstract class BaseEmailNotificationHandler {
   protected fun getVisitors(visit: VisitDto): List<String> {
     val visitors = prisonerContactRegistryService.getPrisonerContacts(visit)
     return if (visitors.isNotEmpty()) {
-      visitors.map {
+      visitors.distinctBy { it.personId }.map {
         PrisonerVisitorPersonalisationDto(
           firstNameText = it.firstName,
           lastNameText = it.lastName,
