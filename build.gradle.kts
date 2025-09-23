@@ -17,6 +17,7 @@ repositories {
 dependencyCheck {
   suppressionFiles.add("dependency-check-suppress-json.xml")
   nvd.datafeedUrl = "file:///opt/vulnz/cache"
+  analyzers.ossIndex.enabled = false
 }
 
 dependencies {
