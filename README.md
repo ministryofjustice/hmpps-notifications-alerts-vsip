@@ -1,6 +1,9 @@
 # hmpps-notifications-alerts-vsip
 
-[![CircleCI](https://circleci.com/gh/ministryofjustice/hmpps-notifications-alerts-vsip/tree/main.svg?style=shield)](https://app.circleci.com/pipelines/github/ministryofjustice/hmpps-notifications-alerts-vsip)
+[![repo standards badge](https://img.shields.io/badge/endpoint.svg?&style=flat&logo=github&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-notifications-alerts-vsip)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-report/hmpps-notifications-alerts-vsip "Link to report")
+[![Docker Repository on ghcr](https://img.shields.io/badge/ghcr.io-repository-2496ED.svg?logo=docker)](https://ghcr.io/ministryofjustice/hmpps-notifications-alerts-vsip)
+[![API docs](https://img.shields.io/badge/API_docs_-view-85EA2D.svg?logo=swagger)](https://hmpps-notifi-alerts-vsip-dev.prison.service.justice.gov.uk/swagger-ui/index.html)
+[![GitHub Actions Pipeline](https://github.com/ministryofjustice/hmpps-notifications-alerts-vsip/actions/workflows/pipeline.yml/badge.svg)](https://github.com/ministryofjustice/hmpps-visit-allocation-api/actions/workflows/pipeline.yml)
 
 This is a Spring Boot application, written in Kotlin, used to send notifications to users about their visits. Used by [Visits](https://developer-portal.hmpps.service.justice.gov.uk/products/v-isit-someone-in-prison-v-si-p-2).
 
