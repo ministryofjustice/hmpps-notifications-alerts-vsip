@@ -13,6 +13,13 @@ generic-service:
     enabled: true
     host: app-hostname.local # override per environment
     tlsSecretName: hmpps-notifications-alerts-vsip-cert
+    annotations:
+      nginx.ingress.kubernetes.io/server-snippet: |
+        server_tokens off;
+        location /queue-admin/retry-all-dlqs {
+          deny all;
+          return 401;
+        }
 
   # Environment variables to load into the deployment
   env:
@@ -50,6 +57,10 @@ generic-service:
     gov-notify-3: 54.216.159.202
     groups:
       - internal
+
+  retryDlqCronjob:
+    enabled: true
+    retryDlqSchedule: "*/15 * * * *" # Override to every 15 minutes for the DLQ retry. Allows for downstream API issues to resolve before retrying.
 
 generic-prometheus-alerts:
   targetApplication: hmpps-notifications-alerts-vsip
