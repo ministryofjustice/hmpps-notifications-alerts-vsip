@@ -34,9 +34,9 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.Pri
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.VisitSchedulerMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.DomainEventListenerService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitNotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PRISON_VISITS_NOTIFICATION_ALERTS_QUEUE_CONFIG_KEY
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.SmsSenderService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitNotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.VisitSchedulerService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.EventFeatureSwitch
