@@ -10,7 +10,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.ev
 import java.time.LocalDateTime
 
 @Service
-class NotificationService(
+class VisitNotificationService(
   val visitSchedulerService: VisitSchedulerService,
   val smsSenderService: SmsSenderService,
   val emailSenderService: EmailSenderService,

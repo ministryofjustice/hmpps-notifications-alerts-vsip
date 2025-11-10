@@ -157,7 +157,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -201,7 +201,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit3, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -242,7 +242,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit4, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -282,7 +282,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -309,7 +309,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
   }
 
@@ -328,7 +328,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
   }
 
@@ -347,7 +347,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
   }
 
@@ -380,7 +380,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(singleDigitDateVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -418,7 +418,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
   }
 
@@ -470,7 +470,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(rejectedVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -533,7 +533,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(rejectedVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -586,7 +586,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(rejectedVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
@@ -636,7 +636,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(notificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
     await untilAsserted { verify(smsSenderService, times(1)).sendSms(rejectedVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
