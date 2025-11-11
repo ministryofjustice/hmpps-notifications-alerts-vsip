@@ -48,11 +48,20 @@ prison-register:
   api:
     url: http://localhost:8096
 
+booker-registry:
+  api:
+    url: http://localhost:8097
+
+
 notify:
   sms:
     enabled: true
   email:
     enabled: true
+    visits:
+      enabled: true
+    booker:
+      enabled: true
   api:
     key: "test"
   callback:
