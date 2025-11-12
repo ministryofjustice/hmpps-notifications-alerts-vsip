@@ -51,7 +51,7 @@ class EmailSenderService(
     }
   }
 
-  fun sendBookerEmail(bookerInfo: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, bookerEventType: BookerEventType, reference: String) {
+  fun sendBookerEmail(bookerInfo: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, bookerEventType: BookerEventType, reference: String? = null) {
     if (enabled && bookerEmailEnabled) {
       val sendEmailNotificationDto = handlerFactory.getHandler(bookerEventType).handle(bookerInfo, contactDto)
 

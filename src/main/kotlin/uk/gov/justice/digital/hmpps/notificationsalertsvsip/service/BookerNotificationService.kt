@@ -10,14 +10,12 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorApprovedAdditionalInfo
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.EmailReferenceGeneratorUtil
 
 @Service
 class BookerNotificationService(
   val emailSenderService: EmailSenderService,
   val bookerRegistryClient: BookerRegistryClient,
   val prisonerContactRegistryClient: PrisonerContactRegistryClient,
-  val emailReferenceGeneratorUtil: EmailReferenceGeneratorUtil,
 ) {
   private companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
@@ -36,9 +34,8 @@ class BookerNotificationService(
   }
 
   private fun sendEmailNotificationWhenVisitorApproved(bookerInfoDto: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto) {
-    // TODO - what needs to be the reference- currently using a random value?
-    val reference = emailReferenceGeneratorUtil.generateReference()
+    val reference = null
     emailSenderService.sendBookerEmail(bookerInfoDto, contactDto, BookerEventType.VISITOR_APPROVED, reference)
-    LOG.info("Email notification sent for event type ${BookerEventType.VISITOR_APPROVED}, reference $reference")
+    LOG.info("Email notification sent for event type ${BookerEventType.VISITOR_APPROVED}, booker email - ${bookerInfoDto.email}")
   }
 }

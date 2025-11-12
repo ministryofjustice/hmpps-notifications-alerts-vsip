@@ -9,7 +9,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
@@ -17,12 +16,9 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registr
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorApprovedAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BOOKER_VISITOR_APPROVED
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.EmailReferenceGeneratorUtil
 import java.time.LocalDate
 
 class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
-  @MockitoBean
-  lateinit var emailReferenceGeneratorUtilMockBean: EmailReferenceGeneratorUtil
   private val prisonerId = "A1234BC"
   private val bookerReference = "booker-ref"
   private val bookerEmailAddress = "test@example.com"
@@ -50,17 +46,12 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val emailReference = "email-reference"
-    Mockito.`when`(
-      emailReferenceGeneratorUtilMockBean.generateReference(),
-    ).thenReturn(emailReference)
-
     Mockito.`when`(
       notificationClient.sendEmail(
         templateId,
         bookerInfo.email,
         templateVars,
-        emailReference,
+        null,
       ),
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
@@ -70,7 +61,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(prisonerId, prisonerContactsResult)
 
     // Then
-    verifyBookerEmailSent(templateId!!, bookerAdditionalInfo, bookerInfo, contact1, templateVars, emailReference)
+    verifyBookerEmailSent(templateId!!, bookerAdditionalInfo, bookerInfo, contact1, templateVars, null)
   }
 
   @Test
@@ -171,7 +162,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     verifyBookerEmailNotSent(bookerAdditionalInfo)
   }
 
-  private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, templateVars: Map<String, Any>, emailReference: String) {
+  private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, templateVars: Map<String, Any>, emailReference: String?) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(bookerNotificationService, times(1)).sendMessage(BookerEventType.VISITOR_APPROVED, additionalInfo) }
     await untilAsserted { verify(emailSenderService, times(1)).sendBookerEmail(bookerInfoDto, contactDto, BookerEventType.VISITOR_APPROVED, emailReference) }
