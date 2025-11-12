@@ -6,14 +6,14 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registr
 
 @Component
 class EmailNotificationHandlerFactory(
-  private val bookedHandler: BookedEventEmailHandler,
-  private val cancelledHandler: CancelledEventEmailHandler,
-  private val updatedEventHandler: UpdatedEventEmailHandler,
-  private val requestApprovedEventHandler: RequestApprovedEventEmailHandler,
+  private val bookedHandler: BookedEventVisitsEmailHandler,
+  private val cancelledHandler: CancelledEventVisitsEmailHandler,
+  private val updatedEventHandler: UpdatedEventVisitsEmailHandler,
+  private val requestApprovedEventHandler: RequestApprovedEventVisitsEmailHandler,
   private val visitorApprovedEventHandler: VisitorApprovedEventBookerEmailHandler,
 ) {
 
-  fun getHandler(eventType: VisitEventType): BaseEmailNotificationHandler = when (eventType) {
+  fun getHandler(eventType: VisitEventType): BaseVisitsEmailNotificationHandler = when (eventType) {
     VisitEventType.BOOKED -> bookedHandler
     VisitEventType.CANCELLED -> cancelledHandler
     VisitEventType.UPDATED -> updatedEventHandler

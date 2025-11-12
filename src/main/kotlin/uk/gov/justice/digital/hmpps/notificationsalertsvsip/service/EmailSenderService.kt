@@ -26,7 +26,7 @@ class EmailSenderService(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun sendEmail(visit: VisitDto, visitEventType: VisitEventType, eventAuditId: String): NotifyCreateNotificationDto? {
+  fun sendVisitsEmail(visit: VisitDto, visitEventType: VisitEventType, eventAuditId: String): NotifyCreateNotificationDto? {
     if (enabled && visitsEmailEnabled) {
       val sendEmailNotificationDto = handlerFactory.getHandler(visitEventType).handle(visit)
 
@@ -51,7 +51,7 @@ class EmailSenderService(
     }
   }
 
-  fun sendBookerContactEmail(bookerInfo: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, bookerEventType: BookerEventType, reference: String) {
+  fun sendBookerEmail(bookerInfo: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, bookerEventType: BookerEventType, reference: String) {
     if (enabled && bookerEmailEnabled) {
       val sendEmailNotificationDto = handlerFactory.getHandler(bookerEventType).handle(bookerInfo, contactDto)
 

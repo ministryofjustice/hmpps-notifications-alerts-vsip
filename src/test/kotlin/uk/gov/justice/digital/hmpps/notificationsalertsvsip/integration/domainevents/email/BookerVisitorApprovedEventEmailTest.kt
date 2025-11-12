@@ -174,7 +174,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, templateVars: Map<String, Any>, emailReference: String) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(bookerNotificationService, times(1)).sendMessage(BookerEventType.VISITOR_APPROVED, additionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendBookerContactEmail(bookerInfoDto, contactDto, BookerEventType.VISITOR_APPROVED, emailReference) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendBookerEmail(bookerInfoDto, contactDto, BookerEventType.VISITOR_APPROVED, emailReference) }
 
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
@@ -189,6 +189,6 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyBookerEmailNotSent(additionalInfo: VisitorApprovedAdditionalInfo) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(bookerNotificationService, times(1)).sendMessage(BookerEventType.VISITOR_APPROVED, additionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(0)).sendBookerContactEmail(any(), any(), any(), any()) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendBookerEmail(any(), any(), any(), any()) }
   }
 }

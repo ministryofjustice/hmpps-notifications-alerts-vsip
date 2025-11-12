@@ -38,7 +38,7 @@ class BookerNotificationService(
   private fun sendEmailNotificationWhenVisitorApproved(bookerInfoDto: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto) {
     // TODO - what needs to be the reference- currently using a random value?
     val reference = emailReferenceGeneratorUtil.generateReference()
-    emailSenderService.sendBookerContactEmail(bookerInfoDto, contactDto, BookerEventType.VISITOR_APPROVED, reference)
+    emailSenderService.sendBookerEmail(bookerInfoDto, contactDto, BookerEventType.VISITOR_APPROVED, reference)
     LOG.info("Email notification sent for event type ${BookerEventType.VISITOR_APPROVED}, reference $reference")
   }
 }
