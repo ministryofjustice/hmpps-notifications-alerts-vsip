@@ -5,12 +5,12 @@ import jakarta.validation.constraints.NotBlank
 
 @Suppress("PropertyName")
 data class SQSMessage(
-  @NotBlank
-  @JsonProperty("Type")
+  @field:NotBlank
+  @param:JsonProperty("Type")
   val type: String,
-  @NotBlank
-  @JsonProperty("Message")
+  @field:NotBlank
+  @param:JsonProperty("Message")
   val message: String,
-  @JsonProperty("MessageId")
+  @param:JsonProperty("MessageId")
   val messageId: String? = null,
 )

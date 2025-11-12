@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.e
 import jakarta.validation.constraints.NotBlank
 
 data class VisitorApprovedAdditionalInfo(
-  @NotBlank
+  @field:NotBlank
   val bookerReference: String,
-  @NotBlank
+  @field:NotBlank
   val prisonerId: String,
-  @NotBlank
+  @field:NotBlank
   val visitorId: String,
 )

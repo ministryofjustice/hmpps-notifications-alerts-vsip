@@ -24,18 +24,12 @@ class BookerNotificationService(
   fun sendMessage(bookerEventType: BookerEventType, additionalInfo: VisitorApprovedAdditionalInfo) {
     LOG.info("Received call to send notification for event type $bookerEventType, additional info - $additionalInfo")
     val bookerDetails = bookerRegistryClient.getBookerByBookerReference(additionalInfo.bookerReference) ?: throw NotFoundException("Booker details not found for reference ${additionalInfo.bookerReference}")
-    val visitorDetails = prisonerContactRegistryClient.getPrisonersSocialContacts(additionalInfo.prisonerId)?.firstOrNull { it.personId == additionalInfo.visitorId }
-
-    if (visitorDetails != null) {
-      sendEmailNotificationWhenVisitorApproved(bookerDetails, visitorDetails)
-    } else {
-      LOG.error("Visitor details not found for prisonerId ${additionalInfo.prisonerId} and visitorId ${additionalInfo.visitorId}")
-    }
+    val visitorDetails = prisonerContactRegistryClient.getPrisonersSocialContacts(additionalInfo.prisonerId)?.firstOrNull { it.personId == additionalInfo.visitorId } ?: throw NotFoundException("Visitor details not found for prisonerId - ${additionalInfo.prisonerId} and visitorId - ${additionalInfo.visitorId}")
+    sendEmailNotificationWhenVisitorApproved(bookerDetails, visitorDetails)
   }
 
   private fun sendEmailNotificationWhenVisitorApproved(bookerInfoDto: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto) {
-    val reference = null
-    emailSenderService.sendBookerEmail(bookerInfoDto, contactDto, BookerEventType.VISITOR_APPROVED, reference)
+    emailSenderService.sendBookerEmail(bookerInfoDto, contactDto, BookerEventType.VISITOR_APPROVED)
     LOG.info("Email notification sent for event type ${BookerEventType.VISITOR_APPROVED}, booker email - ${bookerInfoDto.email}")
   }
 }

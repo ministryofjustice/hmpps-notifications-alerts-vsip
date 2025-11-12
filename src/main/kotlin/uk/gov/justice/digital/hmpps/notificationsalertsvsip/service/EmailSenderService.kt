@@ -16,9 +16,9 @@ import uk.gov.service.notify.NotificationClientException
 
 @Service
 class EmailSenderService(
-  @Value("\${notify.email.enabled:}") private val enabled: Boolean,
-  @Value("\${notify.email.booker.enabled:true}") private val bookerEmailEnabled: Boolean,
-  @Value("\${notify.email.visits.enabled:true}") private val visitsEmailEnabled: Boolean,
+  @param:Value("\${notify.email.enabled:}") private val enabled: Boolean,
+  @param:Value("\${notify.email.booker.enabled:true}") private val bookerEmailEnabled: Boolean,
+  @param:Value("\${notify.email.visits.enabled:true}") private val visitsEmailEnabled: Boolean,
   private val notificationClient: NotificationClient,
   private val handlerFactory: EmailNotificationHandlerFactory,
 ) {
@@ -51,7 +51,7 @@ class EmailSenderService(
     }
   }
 
-  fun sendBookerEmail(bookerInfo: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, bookerEventType: BookerEventType, reference: String? = null) {
+  fun sendBookerEmail(bookerInfo: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, bookerEventType: BookerEventType) {
     if (enabled && bookerEmailEnabled) {
       val sendEmailNotificationDto = handlerFactory.getHandler(bookerEventType).handle(bookerInfo, contactDto)
 
@@ -61,7 +61,7 @@ class EmailSenderService(
           sendEmailNotificationDto.templateName,
           bookerInfo.email,
           sendEmailNotificationDto.templateVars,
-          reference,
+          null,
         )
 
         LOG.info("Calling notification client finished with response ${response.notificationId}, for booker event - $bookerEventType, booker email: ${bookerInfo.email}, contact details: $contactDto")

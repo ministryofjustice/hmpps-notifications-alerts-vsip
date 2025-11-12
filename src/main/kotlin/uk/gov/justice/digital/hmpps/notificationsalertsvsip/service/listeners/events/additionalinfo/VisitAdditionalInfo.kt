@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotBlank
 
 data class VisitAdditionalInfo(
-  @JsonProperty("reference")
-  @NotBlank
+  @param:JsonProperty("reference")
+  @field:NotBlank
   val bookingReference: String,
-  @NotBlank
+  @field:NotBlank
   val eventAuditId: String,
 )
