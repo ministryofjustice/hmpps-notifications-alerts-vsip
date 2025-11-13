@@ -37,8 +37,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     val visitorId = 1234L
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.BOOKER_VISITOR_APPROVED.name]
     val templateVars = mapOf(
-      "visitorFirstName" to contact1.firstName,
-      "visitorLastName" to contact1.lastName,
+      "visitor" to contact1.firstName + " " + contact1.lastName,
     )
 
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)

@@ -18,8 +18,7 @@ class VisitorApprovedEventBookerEmailHandler : BaseBookerEmailNotificationHandle
     LOG.info("handle visitor approved event (email) - Entered, booker reference: {}, contact details: {}", bookerInfoDto.reference, contactDto)
     val templateName = templatesConfig.emailTemplates[EmailTemplateNames.BOOKER_VISITOR_APPROVED.name]!!
     val templateVars = mapOf(
-      "visitorFirstName" to contactDto.firstName,
-      "visitorLastName" to contactDto.lastName,
+      "visitor" to contactDto.firstName.plus(" ").plus(contactDto.lastName),
     )
 
     return SendEmailNotificationDto(templateName, templateVars)
