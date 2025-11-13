@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Prison Information")
 data class PrisonDto(
-  @Schema(description = "Prison ID", example = "MDI", required = true) val prisonId: String,
-  @Schema(description = "Name of the prison", example = "Moorland HMP", required = true) val prisonName: String,
-  @Schema(description = "Whether the prison is still active", required = true) val active: Boolean,
+  @param:Schema(description = "Prison ID", example = "MDI", required = true) val prisonId: String,
+  @param:Schema(description = "Name of the prison", example = "Moorland HMP", required = true) val prisonName: String,
+  @param:Schema(description = "Whether the prison is still active", required = true) val active: Boolean,
 )

@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
 
 @Service
-class UpdatedEventSmsHandler : BaseSmsNotificationHandler() {
+class UpdatedEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() {
 
   companion object {
     private val LOG = LoggerFactory.getLogger(this::class.java)

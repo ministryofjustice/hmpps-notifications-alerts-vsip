@@ -24,6 +24,9 @@ class WebClientConfiguration(
   @Value("\${prison-register.api.url}")
   private val prisonRegisterBaseUrl: String,
 
+  @Value("\${booker-registry.api.url}")
+  private val bookerRegistryBaseUrl: String,
+
   @Value("\${prisoner-contact.registry.url}")
   private val prisonerContactRegistryBaseUrl: String,
 ) {
@@ -32,6 +35,7 @@ class WebClientConfiguration(
     PRISONER_SEARCH("other-hmpps-apis"),
     PRISON_REGISTER_CLIENT("other-hmpps-apis"),
     PRISON_CONTACT_REGISTRY_CLIENT("other-hmpps-apis"),
+    BOOKER_REGISTRY("other-hmpps-apis"),
   }
 
   @Bean
@@ -56,6 +60,12 @@ class WebClientConfiguration(
   fun prisonRegisterWebClient(authorizedClientManager: OAuth2AuthorizedClientManager): WebClient {
     val oauth2Client = getOauth2Client(authorizedClientManager, HmppsAuthClientRegistrationId.PRISON_REGISTER_CLIENT.clientRegistrationId)
     return getWebClient(prisonRegisterBaseUrl, oauth2Client)
+  }
+
+  @Bean
+  fun bookerRegistryWebClient(authorizedClientManager: OAuth2AuthorizedClientManager): WebClient {
+    val oauth2Client = getOauth2Client(authorizedClientManager, HmppsAuthClientRegistrationId.BOOKER_REGISTRY.clientRegistrationId)
+    return getWebClient(bookerRegistryBaseUrl, oauth2Client)
   }
 
   private fun getOauth2Client(authorizedClientManager: OAuth2AuthorizedClientManager, clientRegistrationId: String): ServletOAuth2AuthorizedClientExchangeFilterFunction {

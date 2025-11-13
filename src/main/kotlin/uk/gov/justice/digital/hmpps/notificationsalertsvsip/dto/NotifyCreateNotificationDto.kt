@@ -11,18 +11,18 @@ import java.util.*
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Gov Notify Create Notification")
 data class NotifyCreateNotificationDto(
-  @Schema(description = "The UUID of the notification", required = true)
+  @param:Schema(description = "The UUID of the notification", required = true)
   val notificationId: UUID,
-  @Schema(description = "The id of the event audit which the notification is linked to", example = "123456", required = true)
-  @JsonProperty("reference")
+  @param:Schema(description = "The id of the event audit which the notification is linked to", example = "123456", required = true)
+  @param:JsonProperty("reference")
   val eventAuditId: String,
-  @Schema(description = "The timestamp for when the vsip notification service sent the notification to gov notify", required = true)
+  @param:Schema(description = "The timestamp for when the vsip notification service sent the notification to gov notify", required = true)
   val createdAt: LocalDateTime,
-  @Schema(description = "The type of the notification", required = true)
+  @param:Schema(description = "The type of the notification", required = true)
   val notificationType: String,
-  @Schema(description = "The id the template used for the notification", required = true)
+  @param:Schema(description = "The id the template used for the notification", required = true)
   val templateId: UUID,
-  @Schema(description = "The version of the template used for the notification", required = true)
+  @param:Schema(description = "The version of the template used for the notification", required = true)
   val templateVersion: Int,
 ) {
   constructor(sendEmailResponse: SendEmailResponse) : this(

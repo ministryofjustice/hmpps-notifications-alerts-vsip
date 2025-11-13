@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotBlank
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.deserializers.RawJsonDeserializer
 
 data class DomainEvent(
-  @NotBlank
+  @field:NotBlank
   val eventType: String,
 
-  @JsonDeserialize(using = RawJsonDeserializer::class)
-  @NotBlank
+  @param:JsonDeserialize(using = RawJsonDeserializer::class)
+  @field:NotBlank
   val additionalInformation: String,
 )

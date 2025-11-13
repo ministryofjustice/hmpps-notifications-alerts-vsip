@@ -18,7 +18,7 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 @Service
-abstract class BaseEmailNotificationHandler {
+abstract class BaseVisitsEmailNotificationHandler {
   companion object {
     const val GOV_UK_PRISON_PAGE = "https://www.gov.uk/government/collections/prisons-in-england-and-wales"
   }

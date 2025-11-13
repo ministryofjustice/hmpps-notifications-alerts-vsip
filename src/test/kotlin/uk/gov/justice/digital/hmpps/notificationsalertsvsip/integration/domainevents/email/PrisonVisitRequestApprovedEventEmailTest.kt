@@ -254,7 +254,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
     await untilAsserted { verify(prisonVisitRequestApprovedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(REQUEST_APPROVED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, REQUEST_APPROVED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, REQUEST_APPROVED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
@@ -271,7 +271,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailNotSent(visitAdditionalInfo: VisitAdditionalInfo) {
     await untilAsserted { verify(prisonVisitRequestApprovedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(REQUEST_APPROVED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendVisitsEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
     await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }
@@ -279,7 +279,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailNotSentIfIncorrectSubStatus(visitAdditionalInfo: VisitAdditionalInfo) {
     await untilAsserted { verify(prisonVisitRequestApprovedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(REQUEST_APPROVED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(any(), any(), any()) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
     await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }

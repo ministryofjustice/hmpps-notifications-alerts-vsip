@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Comp
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
 @Service
-abstract class BaseSmsNotificationHandler {
+abstract class BaseVisitsSmsNotificationHandler {
 
   @Autowired
   lateinit var prisonRegisterService: PrisonRegisterService

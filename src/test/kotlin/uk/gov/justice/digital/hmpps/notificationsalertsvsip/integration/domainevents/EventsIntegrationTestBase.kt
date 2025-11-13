@@ -27,11 +27,13 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.LocalStackContainer.setLocalStackProperties
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.BookerRegistryMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.HmppsAuthExtension
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonRegisterMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonerContactRegistryMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.PrisonerOffenderSearchMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.VisitSchedulerMockServer
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.BookerNotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.DomainEventListenerService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PRISON_VISITS_NOTIFICATION_ALERTS_QUEUE_CONFIG_KEY
@@ -42,6 +44,8 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.ev
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.EventFeatureSwitch
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.SQSMessage
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorApprovedAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorApprovedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitBookedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitCancelledEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitChangedEventNotifier
@@ -70,6 +74,7 @@ abstract class EventsIntegrationTestBase {
     val prisonRegisterMockServer = PrisonRegisterMockServer(objectMapper)
     val prisonerContactRegisterMockServer = PrisonerContactRegistryMockServer(objectMapper)
     val prisonerOffenderSearchMockServer = PrisonerOffenderSearchMockServer(objectMapper)
+    val bookerRegistryMockServer = BookerRegistryMockServer(objectMapper)
 
     @JvmStatic
     @DynamicPropertySource
@@ -84,6 +89,7 @@ abstract class EventsIntegrationTestBase {
       prisonRegisterMockServer.start()
       prisonerContactRegisterMockServer.start()
       prisonerOffenderSearchMockServer.start()
+      bookerRegistryMockServer.start()
     }
 
     @AfterAll
@@ -93,6 +99,7 @@ abstract class EventsIntegrationTestBase {
       prisonRegisterMockServer.stop()
       prisonerContactRegisterMockServer.stop()
       prisonerOffenderSearchMockServer.stop()
+      bookerRegistryMockServer.stop()
     }
   }
 
@@ -107,6 +114,9 @@ abstract class EventsIntegrationTestBase {
 
   @MockitoSpyBean
   lateinit var visitNotificationService: VisitNotificationService
+
+  @MockitoSpyBean
+  lateinit var bookerNotificationService: BookerNotificationService
 
   @MockitoSpyBean
   lateinit var smsSenderService: SmsSenderService
@@ -131,6 +141,9 @@ abstract class EventsIntegrationTestBase {
 
   @MockitoSpyBean
   lateinit var prisonVisitRequestApprovedEventNotifierSpy: PrisonVisitRequestApprovedEventNotifier
+
+  @MockitoSpyBean
+  lateinit var bookerVisitorApprovedEventNotifierSpy: BookerVisitorApprovedEventNotifier
 
   @MockitoBean
   lateinit var notificationClient: NotificationClient
@@ -197,6 +210,16 @@ abstract class EventsIntegrationTestBase {
     builder.append("{")
     builder.append("\"reference\":\"${visitAdditionalInfo.bookingReference}\",")
     builder.append("\"eventAuditId\":\"${visitAdditionalInfo.eventAuditId}\"")
+    builder.append("}")
+    return builder.toString()
+  }
+
+  fun createAdditionalInformationJson(visitorApprovedAdditionalInfo: VisitorApprovedAdditionalInfo): String {
+    val builder = StringBuilder()
+    builder.append("{")
+    builder.append("\"bookerReference\":\"${visitorApprovedAdditionalInfo.bookerReference}\",")
+    builder.append("\"prisonerId\":\"${visitorApprovedAdditionalInfo.prisonerId}\",")
+    builder.append("\"visitorId\":\"${visitorApprovedAdditionalInfo.visitorId}\"")
     builder.append("}")
     return builder.toString()
   }
