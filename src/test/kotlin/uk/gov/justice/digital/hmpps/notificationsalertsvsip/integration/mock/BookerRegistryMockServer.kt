@@ -10,7 +10,7 @@ import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.client.GET_BOOKER_BY_BOOKING_REFERENCE
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
 
-class BookerRegistryMockServer(@Autowired private val objectMapper: ObjectMapper) : WireMockServer(8097) {
+class BookerRegistryMockServer(@param:Autowired private val objectMapper: ObjectMapper) : WireMockServer(8097) {
   fun stubGetBooker(bookerReference: String, bookerInfoDto: BookerInfoDto?, httpStatus: HttpStatus = HttpStatus.NOT_FOUND) {
     val responseBuilder = aResponse()
       .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)

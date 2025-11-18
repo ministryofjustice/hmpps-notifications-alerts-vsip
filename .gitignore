@@ -5,6 +5,8 @@
 
 .idea/
 .gradle/
+.kotlin/
+volume/
 build/
 
 # CMake

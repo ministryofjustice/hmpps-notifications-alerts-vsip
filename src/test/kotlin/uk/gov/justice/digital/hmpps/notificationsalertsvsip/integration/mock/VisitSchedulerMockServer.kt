@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 
-class VisitSchedulerMockServer(@Autowired private val objectMapper: ObjectMapper) : WireMockServer(8092) {
+class VisitSchedulerMockServer(@param:Autowired private val objectMapper: ObjectMapper) : WireMockServer(8092) {
   fun stubGetVisit(reference: String, visitDto: VisitDto?, httpStatus: HttpStatus = HttpStatus.NOT_FOUND) {
     val responseBuilder = createJsonResponseBuilder()
     stubFor(

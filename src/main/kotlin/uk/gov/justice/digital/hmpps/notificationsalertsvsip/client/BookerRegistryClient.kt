@@ -19,8 +19,8 @@ const val GET_BOOKER_BY_BOOKING_REFERENCE: String = "$BOOKER_ADMIN_ENDPOINT/{boo
 
 @Component
 class BookerRegistryClient(
-  @Qualifier("bookerRegistryWebClient") private val webClient: WebClient,
-  @Value("\${booker-registry.api.timeout:10s}") private val apiTimeout: Duration,
+  @param:Qualifier("bookerRegistryWebClient") private val webClient: WebClient,
+  @param:Value("\${booker-registry.api.timeout:10s}") private val apiTimeout: Duration,
   val objectMapper: ObjectMapper,
 ) {
   companion object {

@@ -13,7 +13,7 @@ import java.util.function.Supplier
 
 @Service
 class NotifyCallbackAuthorizationManager(
-  @Value("\${notify.callback-token}") private val govNotifyAccessToken: String,
+  @param:Value("\${notify.callback-token}") private val govNotifyAccessToken: String,
 ) : AuthorizationManager<RequestAuthorizationContext> {
   companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
@@ -42,6 +42,7 @@ class NotifyCallbackAuthorizationManager(
     return MessageDigest.isEqual(providedToken.toByteArray(), govNotifyAccessToken.toByteArray())
   }
 
+  @Deprecated("Deprecated in Java")
   override fun check(
     authentication: Supplier<Authentication>,
     requestAuthorizationContext: RequestAuthorizationContext,

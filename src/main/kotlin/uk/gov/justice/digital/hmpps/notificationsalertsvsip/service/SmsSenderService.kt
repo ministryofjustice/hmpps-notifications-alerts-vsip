@@ -13,7 +13,7 @@ import uk.gov.service.notify.NotificationClientException
 
 @Service
 class SmsSenderService(
-  @Value("\${notify.sms.enabled:}") private val enabled: Boolean,
+  @param:Value("\${notify.sms.enabled:}") private val enabled: Boolean,
   val notificationClient: NotificationClient,
   val handlerFactory: SmsNotificationHandlerFactory,
 ) {
