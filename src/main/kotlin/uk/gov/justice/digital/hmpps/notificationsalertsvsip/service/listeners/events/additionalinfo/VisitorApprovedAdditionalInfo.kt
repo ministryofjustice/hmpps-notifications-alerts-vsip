@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotBlank
 
-data class VisitAdditionalInfo(
-  @param:JsonProperty("reference")
+data class VisitorApprovedAdditionalInfo(
   @field:NotBlank
-  val bookingReference: String,
+  val bookerReference: String,
   @field:NotBlank
-  val eventAuditId: String,
+  val prisonerId: String,
+  @field:NotBlank
+  val visitorId: String,
 )

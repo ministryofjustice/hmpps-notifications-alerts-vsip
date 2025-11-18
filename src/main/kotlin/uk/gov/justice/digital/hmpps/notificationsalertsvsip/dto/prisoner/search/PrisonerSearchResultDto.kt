@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Prisoner information")
 data class PrisonerSearchResultDto(
-  @Schema(description = "Prisoner first name", example = "John", required = true)
+  @param:Schema(description = "Prisoner first name", example = "John", required = true)
   val firstName: String,
 
-  @Schema(description = "Prisoner last name", example = "Smith", required = true)
+  @param:Schema(description = "Prisoner last name", example = "Smith", required = true)
   val lastName: String,
 ) {
   // Takes the full name and converts it from all capitals, to correct format (JOHN SMITH -> John Smith).

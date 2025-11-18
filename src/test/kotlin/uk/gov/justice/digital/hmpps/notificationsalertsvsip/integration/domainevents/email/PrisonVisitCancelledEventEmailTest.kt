@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email.BaseEmailNotificationHandler.Companion.GOV_UK_PRISON_PAGE
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email.BaseVisitsEmailNotificationHandler.Companion.GOV_UK_PRISON_PAGE
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PRISON_VISIT_CANCELLED
 import java.time.Duration
@@ -276,7 +276,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(any(), any(), any()) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
     await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }
@@ -428,7 +428,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendEmail(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
@@ -445,7 +445,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailNotSent(visitAdditionalInfo: VisitAdditionalInfo) {
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(0)).sendEmail(any(), any(), any()) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendVisitsEmail(any(), any(), any()) }
     await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
     await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }

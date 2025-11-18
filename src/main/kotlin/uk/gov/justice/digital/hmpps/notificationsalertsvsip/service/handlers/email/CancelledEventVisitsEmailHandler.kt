@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 
 @Service
-class CancelledEventEmailHandler : BaseEmailNotificationHandler() {
+class CancelledEventVisitsEmailHandler : BaseVisitsEmailNotificationHandler() {
   companion object {
     private val LOG = LoggerFactory.getLogger(this::class.java)
   }

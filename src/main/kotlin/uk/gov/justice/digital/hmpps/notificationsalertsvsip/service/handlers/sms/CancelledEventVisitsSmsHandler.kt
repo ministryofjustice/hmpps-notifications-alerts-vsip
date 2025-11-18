@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNam
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_REQUEST_REJECTED
 
 @Service
-class CancelledEventSmsHandler : BaseSmsNotificationHandler() {
+class CancelledEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() {
 
   companion object {
     private val LOG = LoggerFactory.getLogger(this::class.java)
