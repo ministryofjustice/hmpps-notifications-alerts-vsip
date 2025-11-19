@@ -15,19 +15,19 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
 class WebClientConfiguration(
-  @Value("\${visit-scheduler.api.url}")
+  @param:Value("\${visit-scheduler.api.url}")
   private val visitSchedulerBaseUrl: String,
 
-  @Value("\${prisoner.offender.search.url}")
+  @param:Value("\${prisoner.offender.search.url}")
   private val prisonOffenderSearchBaseUrl: String,
 
-  @Value("\${prison-register.api.url}")
+  @param:Value("\${prison-register.api.url}")
   private val prisonRegisterBaseUrl: String,
 
-  @Value("\${booker-registry.api.url}")
+  @param:Value("\${booker-registry.api.url}")
   private val bookerRegistryBaseUrl: String,
 
-  @Value("\${prisoner-contact.registry.url}")
+  @param:Value("\${prisoner-contact.registry.url}")
   private val prisonerContactRegistryBaseUrl: String,
 ) {
   private enum class HmppsAuthClientRegistrationId(val clientRegistrationId: String) {

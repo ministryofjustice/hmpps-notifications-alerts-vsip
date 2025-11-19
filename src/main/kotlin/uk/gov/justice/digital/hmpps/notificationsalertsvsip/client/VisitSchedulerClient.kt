@@ -18,8 +18,8 @@ import java.time.Duration
 
 @Component
 class VisitSchedulerClient(
-  @Qualifier("visitSchedulerWebClient") private val webClient: WebClient,
-  @Value("\${visit-scheduler.api.timeout:10s}") val apiTimeout: Duration,
+  @param:Qualifier("visitSchedulerWebClient") private val webClient: WebClient,
+  @param:Value("\${visit-scheduler.api.timeout:10s}") val apiTimeout: Duration,
 ) {
   companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)

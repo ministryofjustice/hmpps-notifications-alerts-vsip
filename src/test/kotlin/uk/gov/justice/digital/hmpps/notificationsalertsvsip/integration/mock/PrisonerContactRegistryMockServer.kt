@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
 
-class PrisonerContactRegistryMockServer(@Autowired private val objectMapper: ObjectMapper) : WireMockServer(8095) {
+class PrisonerContactRegistryMockServer(@param:Autowired private val objectMapper: ObjectMapper) : WireMockServer(8095) {
   fun stubGetPrisonersSocialContacts(prisonerId: String, prisonerContact: List<PrisonerContactRegistryContactDto>?, httpStatus: HttpStatus = HttpStatus.NOT_FOUND) {
     val responseBuilder = aResponse()
       .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
