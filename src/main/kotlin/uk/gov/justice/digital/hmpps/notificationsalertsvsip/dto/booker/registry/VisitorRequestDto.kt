@@ -35,4 +35,10 @@ data class VisitorRequestDto(
 
   @param:Schema(description = "Date request was submitted", example = "2025-10-28", required = true)
   val requestedOn: LocalDate,
+
+  @param:Schema(description = "If approved, this field will contain the visitorId who was added to the booker prisoner", example = "123456", required = true)
+  val visitorId: Long? = null,
+
+  @param:Schema(description = "If rejected, this field will contain the rejection reason", example = "REJECTED", required = true)
+  val rejectionReason: String? = null,
 )

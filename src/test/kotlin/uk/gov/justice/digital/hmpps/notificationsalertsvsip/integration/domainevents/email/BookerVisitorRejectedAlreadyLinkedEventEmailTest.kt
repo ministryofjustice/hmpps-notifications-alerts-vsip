@@ -19,10 +19,10 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.ev
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BOOKER_VISITOR_REJECTED
 import java.time.LocalDate
 
-class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
+class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBase() {
 
   @Test
-  fun `when visitor rejected event is received a visitor rejected email is sent to the booker`() {
+  fun `when visitor rejected (with reason already linked) event is received a visitor rejected email is sent to the booker`() {
     // Given
     val prisonerId = "A1234BC"
     val bookerReference = "booker-ref"
@@ -41,10 +41,10 @@ class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
       dateOfBirth = LocalDate.now().minusYears(21),
       requestedOn = LocalDate.now(),
       visitorId = null,
-      rejectionReason = "REJECTED",
+      rejectionReason = "ALREADY_LINKED",
     )
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.BOOKER_VISITOR_REJECTED.name]
+    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.BOOKER_VISITOR_REJECTED_ALREADY_LINKED.name]
     val templateVars = mapOf(
       "visitor" to "$firstName $lastName",
     )
@@ -63,7 +63,6 @@ class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
         null,
       ),
     ).thenReturn(buildSendEmailResponse(reference = "test"))
-
     bookerRegistryMockServer.stubGetVisitorRequestByReference(visitorRequestReference, visitorRequest)
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
@@ -107,8 +106,8 @@ class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
 
   private fun verifyBookerEmailSent(templateId: String, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorRejectedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestRejectedEmail(eq(BookerEventType.VISITOR_REJECTED), any()) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_REJECTED) }
+    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestRejectedEmail(eq(BookerEventType.VISITOR_REJECTED_ALREADY_LINKED), any()) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_REJECTED_ALREADY_LINKED) }
 
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
