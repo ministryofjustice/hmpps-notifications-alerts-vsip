@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.json.JSONObject
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
@@ -45,7 +46,9 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.ev
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.SQSMessage
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorApprovedAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRejectedAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorApprovedEventNotifier
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorRejectedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitBookedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitCancelledEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitChangedEventNotifier
@@ -145,6 +148,9 @@ abstract class EventsIntegrationTestBase {
   @MockitoSpyBean
   lateinit var bookerVisitorApprovedEventNotifierSpy: BookerVisitorApprovedEventNotifier
 
+  @MockitoSpyBean
+  lateinit var bookerVisitorRejectedEventNotifierSpy: BookerVisitorRejectedEventNotifier
+
   @MockitoBean
   lateinit var notificationClient: NotificationClient
 
@@ -172,6 +178,7 @@ abstract class EventsIntegrationTestBase {
   protected lateinit var jwtAuthHelper: JwtAuthHelper
 
   @BeforeEach
+  @AfterEach
   fun cleanQueue() {
     purgeQueue(sqsClient, queueUrl)
     purgeQueue(sqsDlqClient!!, dlqUrl!!)
@@ -220,6 +227,14 @@ abstract class EventsIntegrationTestBase {
     builder.append("\"bookerReference\":\"${visitorApprovedAdditionalInfo.bookerReference}\",")
     builder.append("\"prisonerId\":\"${visitorApprovedAdditionalInfo.prisonerId}\",")
     builder.append("\"visitorId\":\"${visitorApprovedAdditionalInfo.visitorId}\"")
+    builder.append("}")
+    return builder.toString()
+  }
+
+  fun createAdditionalInformationJson(visitorRejectedAdditionalInfo: VisitorRejectedAdditionalInfo): String {
+    val builder = StringBuilder()
+    builder.append("{")
+    builder.append("\"requestReference\":\"${visitorRejectedAdditionalInfo.requestReference}\"")
     builder.append("}")
     return builder.toString()
   }

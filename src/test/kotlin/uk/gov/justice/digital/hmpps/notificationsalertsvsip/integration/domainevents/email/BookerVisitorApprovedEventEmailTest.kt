@@ -10,6 +10,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestVisitorInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
@@ -60,7 +61,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(prisonerId, prisonerContactsResult)
 
     // Then
-    verifyBookerEmailSent(templateId!!, bookerAdditionalInfo, bookerInfo, contact1, templateVars)
+    verifyBookerEmailSent(templateId!!, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(contact1), templateVars)
   }
 
   @Test
@@ -161,10 +162,10 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     verifyBookerEmailNotSent(bookerAdditionalInfo)
   }
 
-  private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, templateVars: Map<String, Any>) {
+  private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(bookerNotificationService, times(1)).sendMessage(BookerEventType.VISITOR_APPROVED, additionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendBookerEmail(bookerInfoDto, contactDto, BookerEventType.VISITOR_APPROVED) }
+    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestApprovedEmail(BookerEventType.VISITOR_APPROVED, additionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_APPROVED) }
 
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
@@ -178,7 +179,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
 
   private fun verifyBookerEmailNotSent(additionalInfo: VisitorApprovedAdditionalInfo) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(bookerNotificationService, times(1)).sendMessage(BookerEventType.VISITOR_APPROVED, additionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(0)).sendBookerEmail(any(), any(), any()) }
+    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestApprovedEmail(BookerEventType.VISITOR_APPROVED, additionalInfo) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendBookerVisitorEmail(any(), any(), any()) }
   }
 }

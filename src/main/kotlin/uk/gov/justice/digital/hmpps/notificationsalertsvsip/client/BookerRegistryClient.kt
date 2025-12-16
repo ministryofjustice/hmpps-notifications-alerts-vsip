@@ -11,11 +11,14 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.ClientUtils.Companion.isNotFoundError
 import java.time.Duration
 
 const val BOOKER_ADMIN_ENDPOINT = "/public/booker/config"
 const val GET_BOOKER_BY_BOOKING_REFERENCE: String = "$BOOKER_ADMIN_ENDPOINT/{bookerReference}"
+
+const val GET_VISITOR_REQUEST_BY_REFERENCE: String = "/visitor-requests/{requestReference}"
 
 @Component
 class BookerRegistryClient(
@@ -44,5 +47,19 @@ class BookerRegistryClient(
         }
       }
       .block(apiTimeout)
+  }
+
+  fun getVisitorRequestByReference(visitorRequestReference: String): VisitorRequestDto {
+    val uri = GET_VISITOR_REQUEST_BY_REFERENCE.replace("{requestReference}", visitorRequestReference)
+    return webClient.get()
+      .uri(uri)
+      .accept(MediaType.APPLICATION_JSON)
+      .retrieve()
+      .bodyToMono<VisitorRequestDto>()
+      .onErrorResume { e ->
+        logger.error("getVisitorRequestByReference - failed get request $uri")
+        Mono.error(e)
+      }
+      .block(apiTimeout) ?: throw IllegalStateException("Visitor request no response for request with reference $visitorRequestReference")
   }
 }

@@ -11,6 +11,7 @@ class EmailNotificationHandlerFactory(
   private val updatedEventHandler: UpdatedEventVisitsEmailHandler,
   private val requestApprovedEventHandler: RequestApprovedEventVisitsEmailHandler,
   private val visitorApprovedEventHandler: VisitorApprovedEventBookerEmailHandler,
+  private val visitorRejectedEventHandler: VisitorRejectedEventBookerEmailHandler,
 ) {
 
   fun getHandler(eventType: VisitEventType): BaseVisitsEmailNotificationHandler = when (eventType) {
@@ -22,5 +23,6 @@ class EmailNotificationHandlerFactory(
 
   fun getHandler(eventType: BookerEventType): BaseBookerEmailNotificationHandler = when (eventType) {
     BookerEventType.VISITOR_APPROVED -> visitorApprovedEventHandler
+    BookerEventType.VISITOR_REJECTED -> visitorRejectedEventHandler
   }
 }
