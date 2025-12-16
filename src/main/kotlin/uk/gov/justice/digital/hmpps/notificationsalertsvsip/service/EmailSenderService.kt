@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.NotifyCreateNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestVisitorInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
@@ -51,12 +51,12 @@ class EmailSenderService(
     }
   }
 
-  fun sendBookerEmail(bookerInfo: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto, bookerEventType: BookerEventType) {
+  fun sendBookerVisitorEmail(bookerInfo: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, bookerEventType: BookerEventType) {
     if (enabled && bookerEmailEnabled) {
-      val sendEmailNotificationDto = handlerFactory.getHandler(bookerEventType).handle(bookerInfo, contactDto)
+      val sendEmailNotificationDto = handlerFactory.getHandler(bookerEventType).handle(bookerInfo, visitorInfo)
 
       try {
-        LOG.info("Calling notification client for booker event - $bookerEventType, booker email: ${bookerInfo.email}, contact details: $contactDto")
+        LOG.info("Calling notification client for booker event - $bookerEventType, booker email: ${bookerInfo.email}, contact details: $visitorInfo")
         val response = notificationClient.sendEmail(
           sendEmailNotificationDto.templateName,
           bookerInfo.email,
@@ -64,7 +64,7 @@ class EmailSenderService(
           null,
         )
 
-        LOG.info("Calling notification client finished with response ${response.notificationId}, for booker event - $bookerEventType, booker email: ${bookerInfo.email}, contact details: $contactDto")
+        LOG.info("Calling notification client finished with response ${response.notificationId}, for booker event - $bookerEventType, booker email: ${bookerInfo.email}, contact details: $visitorInfo")
       } catch (e: NotificationClientException) {
         LOG.error("Error sending booker email with exception: $e")
       }

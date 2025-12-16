@@ -8,15 +8,15 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 
 @Service
-class VisitorApprovedEventBookerEmailHandler : BaseBookerEmailNotificationHandler() {
+class VisitorRejectedEventBookerEmailHandler : BaseBookerEmailNotificationHandler() {
 
   companion object {
     private val LOG = LoggerFactory.getLogger(this::class.java)
   }
 
   override fun handle(bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto): SendEmailNotificationDto {
-    LOG.info("handle visitor approved event (email) - Entered, booker reference: {}, contact details: {}", bookerInfoDto.reference, visitorInfo)
-    val templateName = templatesConfig.emailTemplates[EmailTemplateNames.BOOKER_VISITOR_APPROVED.name]!!
+    LOG.info("handle visitor rejected event (email) - Entered, booker reference: {}, contact details: {}", bookerInfoDto.reference, visitorInfo)
+    val templateName = templatesConfig.emailTemplates[EmailTemplateNames.BOOKER_VISITOR_REJECTED.name]!!
     val templateVars = mapOf(
       "visitor" to visitorInfo.firstName.plus(" ").plus(visitorInfo.lastName),
     )

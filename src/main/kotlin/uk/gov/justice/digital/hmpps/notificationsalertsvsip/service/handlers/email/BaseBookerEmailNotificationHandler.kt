@@ -5,12 +5,12 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestVisitorInfoDto
 
 @Service
 abstract class BaseBookerEmailNotificationHandler {
   @Autowired
   lateinit var templatesConfig: TemplatesConfig
 
-  abstract fun handle(bookerInfoDto: BookerInfoDto, contactDto: PrisonerContactRegistryContactDto): SendEmailNotificationDto
+  abstract fun handle(bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto): SendEmailNotificationDto
 }
