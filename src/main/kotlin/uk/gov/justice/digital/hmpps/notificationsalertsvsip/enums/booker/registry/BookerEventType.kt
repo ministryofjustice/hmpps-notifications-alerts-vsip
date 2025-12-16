@@ -3,4 +3,5 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.regist
 enum class BookerEventType {
   VISITOR_APPROVED,
   VISITOR_REJECTED,
+  VISITOR_REJECTED_ALREADY_LINKED,
 }
