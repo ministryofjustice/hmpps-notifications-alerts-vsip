@@ -106,8 +106,8 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
 
   private fun verifyBookerEmailSent(templateId: String, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorRejectedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestRejectedEmail(eq(BookerEventType.VISITOR_REJECTED), any()) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_REJECTED) }
+    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestRejectedEmail(eq(BookerEventType.VISITOR_REJECTED_ALREADY_LINKED), any()) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_REJECTED_ALREADY_LINKED) }
 
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
