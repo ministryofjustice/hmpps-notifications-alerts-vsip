@@ -41,7 +41,7 @@ class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
       dateOfBirth = LocalDate.now().minusYears(21),
       requestedOn = LocalDate.now(),
       visitorId = null,
-      rejectionReason = "REJECTED",
+      rejectionReason = "REJECT",
     )
 
     val templateId = templatesConfig.emailTemplates[EmailTemplateNames.BOOKER_VISITOR_REJECTED.name]

@@ -24,7 +24,7 @@ class BookerVisitorRejectedEventNotifier(
     val visitorRequest = bookerRegistryClient.getVisitorRequestByReference(visitorRejectedAdditionalInfo.requestReference)
 
     val eventType: BookerEventType = when (visitorRequest.rejectionReason) {
-      "REJECTED" -> BookerEventType.VISITOR_REJECTED
+      "REJECT" -> BookerEventType.VISITOR_REJECTED
       "ALREADY_LINKED" -> BookerEventType.VISITOR_REJECTED_ALREADY_LINKED
       else -> throw IllegalStateException("Unexpected rejection reason ${visitorRequest.rejectionReason}")
     }
