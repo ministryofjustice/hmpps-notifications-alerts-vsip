@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
+import org.springframework.security.authorization.AuthorizationResult
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 import org.springframework.stereotype.Service
@@ -15,13 +16,15 @@ import java.util.function.Supplier
 class NotifyCallbackAuthorizationManager(
   @param:Value("\${notify.callback-token}") private val govNotifyAccessToken: String,
 ) : AuthorizationManager<RequestAuthorizationContext> {
+
   companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
+
   override fun authorize(
-    authentication: Supplier<Authentication>,
+    authentication: Supplier<out Authentication?>,
     requestAuthorizationContext: RequestAuthorizationContext,
-  ): AuthorizationDecision {
+  ): AuthorizationResult {
     var isTokenValid = false
     val providedToken = requestAuthorizationContext.request.getHeader("Authorization")?.removePrefix("Bearer ")
 
@@ -41,10 +44,4 @@ class NotifyCallbackAuthorizationManager(
     // Using MessageDigest to mitigate against timed attacks and other potential attack vectors
     return MessageDigest.isEqual(providedToken.toByteArray(), govNotifyAccessToken.toByteArray())
   }
-
-  @Deprecated("Deprecated in Java")
-  override fun check(
-    authentication: Supplier<Authentication>,
-    requestAuthorizationContext: RequestAuthorizationContext,
-  ): AuthorizationDecision? = authorize(authentication, requestAuthorizationContext)
 }
