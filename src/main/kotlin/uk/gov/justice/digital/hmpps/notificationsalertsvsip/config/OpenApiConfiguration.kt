@@ -26,8 +26,8 @@ class OpenApiConfiguration(
   buildProperties: BuildProperties,
   val serviceUrlHelper: ServiceUrlHelper,
 ) {
-  private val buildName: String = buildProperties.name
-  private val buildVersion: String = buildProperties.version
+  private val buildName: String? = buildProperties.name
+  private val buildVersion: String? = buildProperties.version
 
   @Value("\${info.app.description}")
   private val description: String = "VSIP notifications service is a notify users via various channels to changes to visits"

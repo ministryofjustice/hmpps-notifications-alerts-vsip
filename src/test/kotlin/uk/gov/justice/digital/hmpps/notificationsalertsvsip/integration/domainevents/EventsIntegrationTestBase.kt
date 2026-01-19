@@ -1,7 +1,10 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.kotlinModule
 import org.json.JSONObject
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -10,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -67,12 +71,21 @@ import java.util.*
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @ExtendWith(HmppsAuthExtension::class)
+@AutoConfigureWebTestClient
 abstract class EventsIntegrationTestBase {
 
   companion object {
     const val EXPECTED_DATE_PATTERN = "d MMMM yyyy"
     private val localStackContainer = LocalStackContainer.instance
-    private val objectMapper: ObjectMapper = ObjectMapper().registerModule(JavaTimeModule())
+
+    private val objectMapper: ObjectMapper = JsonMapper.builder()
+      .addModule(JavaTimeModule())
+      .addModule(kotlinModule())
+      .defaultPropertyInclusion(
+        JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL),
+      )
+      .build()
+
     val visitSchedulerMockServer = VisitSchedulerMockServer(objectMapper)
     val prisonRegisterMockServer = PrisonRegisterMockServer(objectMapper)
     val prisonerContactRegisterMockServer = PrisonerContactRegistryMockServer(objectMapper)

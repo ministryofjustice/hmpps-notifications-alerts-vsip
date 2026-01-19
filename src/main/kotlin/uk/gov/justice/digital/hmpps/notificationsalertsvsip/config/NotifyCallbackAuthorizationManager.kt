@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
+import org.springframework.security.authorization.AuthorizationResult
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 import org.springframework.stereotype.Service
@@ -19,9 +20,9 @@ class NotifyCallbackAuthorizationManager(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
   override fun authorize(
-    authentication: Supplier<Authentication>,
+    authentication: Supplier<out Authentication?>,
     requestAuthorizationContext: RequestAuthorizationContext,
-  ): AuthorizationDecision {
+  ): AuthorizationResult? {
     var isTokenValid = false
     val providedToken = requestAuthorizationContext.request.getHeader("Authorization")?.removePrefix("Bearer ")
 
@@ -43,8 +44,8 @@ class NotifyCallbackAuthorizationManager(
   }
 
   @Deprecated("Deprecated in Java")
-  override fun check(
+  fun check(
     authentication: Supplier<Authentication>,
     requestAuthorizationContext: RequestAuthorizationContext,
-  ): AuthorizationDecision? = authorize(authentication, requestAuthorizationContext)
+  ): AuthorizationDecision? = authorize(authentication, requestAuthorizationContext) as AuthorizationDecision?
 }
