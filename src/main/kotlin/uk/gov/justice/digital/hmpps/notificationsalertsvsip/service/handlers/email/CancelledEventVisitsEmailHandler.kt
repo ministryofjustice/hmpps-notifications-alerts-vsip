@@ -31,7 +31,8 @@ class CancelledEventVisitsEmailHandler : BaseVisitsEmailNotificationHandler() {
           EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER
         }
 
-        "ESTABLISHMENT_CANCELLED", "DETAILS_CHANGED_AFTER_BOOKING", "ADMINISTRATIVE_ERROR", "BATCH_CANCELLATION", "ADMINISTRATIVE_CANCELLATION" -> {
+        // Also handles NULL (NOMIS doesn't require an outcomeStatus when cancelling a visit.
+        "ESTABLISHMENT_CANCELLED", "DETAILS_CHANGED_AFTER_BOOKING", "ADMINISTRATIVE_ERROR", "BATCH_CANCELLATION", "ADMINISTRATIVE_CANCELLATION", null -> {
           EmailTemplateNames.VISIT_CANCELLED_BY_PRISON
         }
 
