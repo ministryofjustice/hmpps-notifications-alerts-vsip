@@ -1,15 +1,14 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import tools.jackson.databind.ObjectMapper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
 
-class PrisonerContactRegistryMockServer(@param:Autowired private val objectMapper: ObjectMapper) : WireMockServer(8095) {
+class PrisonerContactRegistryMockServer(private val objectMapper: ObjectMapper) : WireMockServer(8095) {
   fun stubGetPrisonersSocialContacts(prisonerId: String, prisonerContact: List<PrisonerContactRegistryContactDto>?, httpStatus: HttpStatus = HttpStatus.NOT_FOUND) {
     val responseBuilder = aResponse()
       .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)

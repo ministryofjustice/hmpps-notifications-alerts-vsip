@@ -346,12 +346,12 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, singleDigitDateVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(singleDigitDateVisit.prisonerId, prisonerSearchResult)
     prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(singleDigitDateVisit.prisonerId, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     Mockito.`when`(
       notificationClient.sendEmail(
         templateId,
