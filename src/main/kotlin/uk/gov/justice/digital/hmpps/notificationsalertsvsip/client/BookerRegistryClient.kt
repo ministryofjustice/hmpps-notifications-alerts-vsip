@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.client
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
+import tools.jackson.databind.ObjectMapper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.ClientUtils.Companion.isNotFoundError
@@ -24,7 +24,7 @@ const val GET_VISITOR_REQUEST_BY_REFERENCE: String = "/visitor-requests/{request
 class BookerRegistryClient(
   @param:Qualifier("bookerRegistryWebClient") private val webClient: WebClient,
   @param:Value("\${booker-registry.api.timeout:10s}") private val apiTimeout: Duration,
-  val objectMapper: ObjectMapper,
+  @param:Qualifier("objectMapper") private val objectMapper: ObjectMapper,
 ) {
   companion object {
     val logger: Logger = LoggerFactory.getLogger(this::class.java)

@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.json.JSONObject
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -21,6 +19,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
@@ -74,7 +74,7 @@ abstract class EventsIntegrationTestBase {
   companion object {
     const val EXPECTED_DATE_PATTERN = "d MMMM yyyy"
     private val localStackContainer = LocalStackContainer.instance
-    private val objectMapper: ObjectMapper = ObjectMapper().registerModule(JavaTimeModule())
+    private val objectMapper = jacksonObjectMapper()
     val visitSchedulerMockServer = VisitSchedulerMockServer(objectMapper)
     val prisonRegisterMockServer = PrisonRegisterMockServer(objectMapper)
     val prisonerContactRegisterMockServer = PrisonerContactRegistryMockServer(objectMapper)
@@ -185,6 +185,15 @@ abstract class EventsIntegrationTestBase {
     purgeQueue(sqsClient, queueUrl)
     purgeQueue(sqsDlqClient!!, dlqUrl!!)
     roleVisitSchedulerHttpHeaders = setAuthorisation(roles = listOf("ROLE_VISIT_SCHEDULER"))
+  }
+
+  @BeforeEach
+  fun resetStubs() {
+    visitSchedulerMockServer.resetAll()
+    prisonRegisterMockServer.resetAll()
+    prisonerContactRegisterMockServer.resetAll()
+    prisonerOffenderSearchMockServer.resetAll()
+    bookerRegistryMockServer.resetAll()
   }
 
   internal fun setAuthorisation(

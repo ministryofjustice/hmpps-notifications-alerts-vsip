@@ -325,9 +325,9 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     )
 
     // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, singleDigitDateVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }

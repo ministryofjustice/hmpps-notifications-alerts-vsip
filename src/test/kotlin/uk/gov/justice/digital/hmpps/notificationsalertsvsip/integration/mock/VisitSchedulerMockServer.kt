@@ -1,17 +1,16 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.put
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import tools.jackson.databind.ObjectMapper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 
-class VisitSchedulerMockServer(@param:Autowired private val objectMapper: ObjectMapper) : WireMockServer(8092) {
+class VisitSchedulerMockServer(private val objectMapper: ObjectMapper) : WireMockServer(8092) {
   fun stubGetVisit(reference: String, visitDto: VisitDto?, httpStatus: HttpStatus = HttpStatus.NOT_FOUND) {
     val responseBuilder = createJsonResponseBuilder()
     stubFor(
