@@ -21,7 +21,7 @@ class PrisonerContactRegistryClient(
   }
 
   fun getPrisonersSocialContacts(prisonerId: String): List<PrisonerContactRegistryContactDto>? {
-    val uri = "/v2/prisoners/$prisonerId/contacts/social?withAddress=false"
+    val uri = "/v2/prisoners/$prisonerId/contacts/social?withRestrictions=false"
     return webClient.get()
       .uri(uri)
       .retrieve()
