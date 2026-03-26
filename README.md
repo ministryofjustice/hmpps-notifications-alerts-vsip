@@ -1,6 +1,6 @@
 # hmpps-notifications-alerts-vsip
 
-[![repo standards badge](https://img.shields.io/badge/endpoint.svg?&style=flat&logo=github&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-notifications-alerts-vsip)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-report/hmpps-notifications-alerts-vsip "Link to report")
+[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/hmpps-notifications-alerts-vsip/badge?style=flat)](https://github-community.service.justice.gov.uk/repository-standards/hmpps-notifications-alerts-vsip)
 [![Docker Repository on ghcr](https://img.shields.io/badge/ghcr.io-repository-2496ED.svg?logo=docker)](https://ghcr.io/ministryofjustice/hmpps-notifications-alerts-vsip)
 [![API docs](https://img.shields.io/badge/API_docs_-view-85EA2D.svg?logo=swagger)](https://hmpps-notifi-alerts-vsip-dev.prison.service.justice.gov.uk/swagger-ui/index.html)
 [![GitHub Actions Pipeline](https://github.com/ministryofjustice/hmpps-notifications-alerts-vsip/actions/workflows/pipeline.yml/badge.svg)](https://github.com/ministryofjustice/hmpps-visit-allocation-api/actions/workflows/pipeline.yml)
