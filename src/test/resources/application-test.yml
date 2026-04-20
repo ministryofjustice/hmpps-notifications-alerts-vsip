@@ -67,3 +67,8 @@ notify:
   callback:
     token: "test-valid-token"
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
