@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.1.0"
-  kotlin("plugin.spring") version "2.3.20"
-  id("org.jetbrains.kotlin.plugin.noarg") version "2.3.20"
-  id("org.owasp.dependencycheck") version "12.2.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.2.3"
+  kotlin("plugin.spring") version "2.3.21"
+  id("org.jetbrains.kotlin.plugin.noarg") version "2.3.21"
+  id("org.owasp.dependencycheck") version "12.2.1"
 }
 
 configurations {
@@ -24,26 +24,26 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.1.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.2.0")
   implementation("org.springframework.boot:spring-boot-starter-webclient")
   implementation("org.springframework.boot:spring-boot-starter-cache")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.3.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.3.1")
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.26.1")
+  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.27.0")
 
-  implementation("org.springframework.data:spring-data-commons:4.0.4")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:3.0.2")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
-  implementation("org.springdoc:springdoc-openapi-starter-common:3.0.2")
+  implementation("org.springframework.data:spring-data-commons:4.0.5")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:3.0.3")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
+  implementation("org.springdoc:springdoc-openapi-starter-common:3.0.3")
   implementation("uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE")
   implementation("org.springframework.boot:spring-boot-configuration-processor")
 
   testImplementation("org.springframework.boot:spring-boot-starter-webclient-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
-  testImplementation("org.testcontainers:testcontainers-localstack:2.0.4")
+  testImplementation("org.testcontainers:testcontainers-localstack:2.0.5")
   testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
   testImplementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
