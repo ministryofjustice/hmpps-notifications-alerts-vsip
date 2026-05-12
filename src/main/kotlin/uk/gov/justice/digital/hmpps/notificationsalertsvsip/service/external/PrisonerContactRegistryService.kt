@@ -4,8 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.client.PrisonerContactRegistryClient
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
 
 @Service
 class PrisonerContactRegistryService(
@@ -15,14 +14,8 @@ class PrisonerContactRegistryService(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun getPrisonerContacts(visit: VisitDto): List<PrisonerContactRegistryContactDto> {
-    LOG.info("PrisonerContactRegistryService getPrisonerContacts called with prisonerId - $visit.prisonerId")
-    val contacts = prisonerContactRegistryClient.getPrisonersSocialContacts(visit.prisonerId)
-
-    val visitorIds = visit.visitors.map { it.nomisPersonId.toString() }
-
-    return contacts?.filter { contact ->
-      contact.personId in visitorIds
-    } ?: emptyList()
+  fun searchPrisonerContacts(prisonerId: String, contactIds: List<Long>, withRestrictions: Boolean = false): List<ContactWithOptionalPrisonerRelationshipDto> {
+    LOG.info("Calling prisoner contact registry searchPrisonerContacts for prisonerId - $prisonerId and contactIds - $contactIds with restrictions - $withRestrictions")
+    return prisonerContactRegistryClient.searchPrisonerContacts(prisonerId = prisonerId, contactIds = contactIds, withRestrictions = withRestrictions) ?: emptyList()
   }
 }

@@ -11,7 +11,7 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonContactDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.search.PrisonerSearchResultDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
@@ -31,7 +31,6 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
   lateinit var approvedVisit: VisitDto
   lateinit var prison: PrisonDto
   lateinit var prisonerSearchResult: PrisonerSearchResultDto
-  lateinit var prisonerContactsResult: List<PrisonerContactRegistryContactDto>
   lateinit var prisonContactDetailsDto: PrisonContactDetailsDto
   lateinit var prisonVisitors: List<String>
 
@@ -42,11 +41,6 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     prison = PrisonDto("HEI", "Hewell", true)
 
     prisonerSearchResult = PrisonerSearchResultDto("PRISONER", "ONE")
-
-    prisonerContactsResult = listOf(
-      PrisonerContactRegistryContactDto("1234", "Visitor", "One", (LocalDate.now().minusYears(30))),
-      PrisonerContactRegistryContactDto("9876", "Visitor", "Two"),
-    )
 
     prisonVisitors = listOf(
       "Visitor One (30 years old)",
@@ -61,6 +55,8 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     // Given
     val bookingReference = approvedVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(approvedVisit.reference, "123456")
+    val visitor1 = ContactWithOptionalPrisonerRelationshipDto(1234, "Visitor", "One", (LocalDate.now().minusYears(30)))
+    val visitor2 = ContactWithOptionalPrisonerRelationshipDto(9876, "Visitor", "Two")
 
     val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
@@ -93,7 +89,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, approvedVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(approvedVisit.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(approvedVisit.prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(approvedVisit.prisonerId, approvedVisit.visitors.map { it.nomisPersonId }, false, listOf(visitor1, visitor2))
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
@@ -115,6 +111,8 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     val autoApprovedVisit = createVisitDto("auto-approved-visit", "AUTO_APPROVED")
     val bookingReference = autoApprovedVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(autoApprovedVisit.reference, "123456")
+    val visitor1 = ContactWithOptionalPrisonerRelationshipDto(1234, "Visitor", "One", (LocalDate.now().minusYears(30)))
+    val visitor2 = ContactWithOptionalPrisonerRelationshipDto(9876, "Visitor", "Two")
 
     val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
@@ -147,7 +145,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, autoApprovedVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(autoApprovedVisit.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(autoApprovedVisit.prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(autoApprovedVisit.prisonerId, autoApprovedVisit.visitors.map { it.nomisPersonId }, false, listOf(visitor1, visitor2))
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
@@ -173,10 +171,11 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, otherSubStatusVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
     verifyEmailNotSentIfIncorrectSubStatus(visitAdditionalInfo)

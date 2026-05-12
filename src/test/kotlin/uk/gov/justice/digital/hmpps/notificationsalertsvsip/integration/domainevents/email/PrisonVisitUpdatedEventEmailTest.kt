@@ -11,7 +11,7 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonContactDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.search.PrisonerSearchResultDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
@@ -32,7 +32,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
   lateinit var visit: VisitDto
   lateinit var prison: PrisonDto
   lateinit var prisonerSearchResult: PrisonerSearchResultDto
-  lateinit var prisonerContactsResult: List<PrisonerContactRegistryContactDto>
+  lateinit var prisonerContactsResult: List<ContactWithOptionalPrisonerRelationshipDto>
   lateinit var prisonContactDetailsDto: PrisonContactDetailsDto
   lateinit var prisonVisitors: List<String>
 
@@ -53,8 +53,8 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     prisonerSearchResult = PrisonerSearchResultDto("Prisoner", "One")
 
     prisonerContactsResult = listOf(
-      PrisonerContactRegistryContactDto("1234", "Visitor", "One", LocalDate.now().minusYears(30)),
-      PrisonerContactRegistryContactDto("9876", "Visitor", "Two"),
+      ContactWithOptionalPrisonerRelationshipDto(1234, "Visitor", "One", LocalDate.now().minusYears(30)),
+      ContactWithOptionalPrisonerRelationshipDto(9876, "Visitor", "Two"),
     )
 
     prisonVisitors = listOf(
@@ -100,7 +100,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit.prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(visit.prisonerId, visit.visitors.map { it.nomisPersonId }, false, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
@@ -158,7 +158,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit3)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit3.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit3.prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(visit3.prisonerId, visit3.visitors.map { it.nomisPersonId }, false, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
@@ -216,7 +216,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit2)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit2.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit2.prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(visit2.prisonerId, visit2.visitors.map { it.nomisPersonId }, false, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
@@ -345,7 +345,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, singleDigitDateVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(singleDigitDateVisit.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(singleDigitDateVisit.prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(singleDigitDateVisit.prisonerId, singleDigitDateVisit.visitors.map { it.nomisPersonId }, false, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
@@ -375,6 +375,8 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     )
     val bookingReference = visitWithOneVisitor.reference
     val visitAdditionalInfo = VisitAdditionalInfo(visitWithOneVisitor.reference, "123456")
+
+    val visitor1 = ContactWithOptionalPrisonerRelationshipDto(1234, "Visitor", "One", LocalDate.now().minusYears(30))
 
     prisonVisitors = listOf("Visitor One (30 years old)")
 
@@ -407,7 +409,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visitWithOneVisitor)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visitWithOneVisitor.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visitWithOneVisitor.prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(visitWithOneVisitor.prisonerId, visitWithOneVisitor.visitors.map { it.nomisPersonId }, false, listOf(visitor1))
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
@@ -457,7 +459,8 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit.prisonerId, null)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(visit.prisonerId, visit.visitors.map { it.nomisPersonId }, false, null, HttpStatus.INTERNAL_SERVER_ERROR)
+
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
@@ -508,7 +511,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, null)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(visit.prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(visit.prisonerId, visit.visitors.map { it.nomisPersonId }, false, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(

@@ -6,23 +6,31 @@ import com.github.tomakehurst.wiremock.client.WireMock.get
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import tools.jackson.databind.ObjectMapper
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
 
 class PrisonerContactRegistryMockServer(private val objectMapper: ObjectMapper) : WireMockServer(8095) {
-  fun stubGetPrisonersSocialContacts(prisonerId: String, prisonerContact: List<PrisonerContactRegistryContactDto>?, httpStatus: HttpStatus = HttpStatus.NOT_FOUND) {
+  fun stubSearchPrisonerContacts(
+    prisonerId: String,
+    contactIds: List<Long>,
+    withRestrictions: Boolean = true,
+    contactsList: List<ContactWithOptionalPrisonerRelationshipDto>?,
+    httpStatus: HttpStatus = HttpStatus.NOT_FOUND,
+  ) {
     val responseBuilder = aResponse()
       .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 
+    val uri = "/v2/prisoners/$prisonerId/contacts/search?contactIds=${contactIds.joinToString(",")}&withRestrictions=$withRestrictions"
+
     stubFor(
-      get("/v2/prisoners/$prisonerId/contacts/social?withRestrictions=false")
+      get(uri)
         .willReturn(
-          if (prisonerContact == null) {
+          if (contactsList == null) {
             responseBuilder
               .withStatus(httpStatus.value())
           } else {
             responseBuilder
               .withStatus(HttpStatus.OK.value())
-              .withBody(getJsonString(prisonerContact))
+              .withBody(getJsonString(contactsList))
           },
         ),
     )

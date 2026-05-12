@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.personalisations.PrisonerVisitorPersonalisationDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
@@ -76,9 +76,10 @@ abstract class BaseVisitsEmailNotificationHandler {
   }
 
   protected fun getVisitors(visit: VisitDto): List<String> {
-    val visitors = prisonerContactRegistryService.getPrisonerContacts(visit)
+    val visitors = prisonerContactRegistryService.searchPrisonerContacts(visit.prisonerId, visit.visitors.map { it.nomisPersonId }, false)
+
     return if (visitors.isNotEmpty()) {
-      visitors.distinctBy { it.personId }.map {
+      visitors.distinctBy { it.contactId }.map {
         PrisonerVisitorPersonalisationDto(
           firstNameText = it.firstName,
           lastNameText = it.lastName,
@@ -90,7 +91,7 @@ abstract class BaseVisitsEmailNotificationHandler {
     }
   }
 
-  protected fun calculateAge(visitor: PrisonerContactRegistryContactDto): String = visitor.dateOfBirth?.let {
+  protected fun calculateAge(visitor: ContactWithOptionalPrisonerRelationshipDto): String = visitor.dateOfBirth?.let {
     ChronoUnit.YEARS.between(it, LocalDate.now()).toInt().toString() + " years old"
   } ?: "age not known"
 }
