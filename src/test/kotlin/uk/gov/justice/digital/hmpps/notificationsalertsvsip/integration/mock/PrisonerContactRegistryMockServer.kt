@@ -12,7 +12,7 @@ class PrisonerContactRegistryMockServer(private val objectMapper: ObjectMapper) 
   fun stubSearchPrisonerContacts(
     prisonerId: String,
     contactIds: List<Long>,
-    withRestrictions: Boolean = true,
+    withRestrictions: Boolean = false,
     contactsList: List<ContactWithOptionalPrisonerRelationshipDto>?,
     httpStatus: HttpStatus = HttpStatus.NOT_FOUND,
   ) {

@@ -23,8 +23,6 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   private val bookerReference = "booker-ref"
   private val bookerEmailAddress = "test@example.com"
   private val contact1 = ContactWithOptionalPrisonerRelationshipDto(1234, "Visitor", "One", (LocalDate.now().minusYears(30)))
-  private val contact2 = ContactWithOptionalPrisonerRelationshipDto(9876, "Visitor", "Two")
-  private lateinit var prisonerContactsResult: List<ContactWithOptionalPrisonerRelationshipDto>
 
   @Test
   fun `when visitor approved event is received a visitor approved email is sent to the booker`() {

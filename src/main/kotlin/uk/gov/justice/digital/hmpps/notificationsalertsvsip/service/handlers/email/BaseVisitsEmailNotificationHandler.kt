@@ -76,7 +76,11 @@ abstract class BaseVisitsEmailNotificationHandler {
   }
 
   protected fun getVisitors(visit: VisitDto): List<String> {
-    val visitors = prisonerContactRegistryService.searchPrisonerContacts(visit.prisonerId, visit.visitors.map { it.nomisPersonId }, false)
+    val visitorIds = visit.visitors.map { it.nomisPersonId }
+    if (visitorIds.isEmpty()) {
+      return listOf("You can view visitor information in the bookings section of your GOV.UK One Login")
+    }
+    val visitors = prisonerContactRegistryService.searchPrisonerContacts(visit.prisonerId, visitorIds, false)
 
     return if (visitors.isNotEmpty()) {
       visitors.distinctBy { it.contactId }.map {
