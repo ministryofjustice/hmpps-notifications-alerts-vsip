@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domaine
 
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -11,7 +10,7 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestVisitorInfoDto
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.PrisonerContactRegistryContactDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
@@ -23,14 +22,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   private val prisonerId = "A1234BC"
   private val bookerReference = "booker-ref"
   private val bookerEmailAddress = "test@example.com"
-  private val contact1 = PrisonerContactRegistryContactDto("1234", "Visitor", "One", (LocalDate.now().minusYears(30)))
-  private val contact2 = PrisonerContactRegistryContactDto("9876", "Visitor", "Two")
-  private lateinit var prisonerContactsResult: List<PrisonerContactRegistryContactDto>
-
-  @BeforeEach
-  internal fun setUp() {
-    prisonerContactsResult = listOf(contact1, contact2)
-  }
+  private val contact1 = ContactWithOptionalPrisonerRelationshipDto(1234, "Visitor", "One", (LocalDate.now().minusYears(30)))
 
   @Test
   fun `when visitor approved event is received a visitor approved email is sent to the booker`() {
@@ -58,7 +50,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, bookerInfo)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
 
     // Then
     verifyBookerEmailSent(templateId!!, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(contact1), templateVars)
@@ -78,27 +70,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, bookerInfo)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(prisonerId, prisonerContactsResult)
-
-    // Then
-    verifyBookerEmailNotSent(bookerAdditionalInfo)
-  }
-
-  @Test
-  fun `when visitor approved event is received but prisoner contact search returns a NOT_FOUND error an email is not sent to the booker`() {
-    // Given
-    // visitor does not exist on the prisoner's social contacts list
-    val visitorId = 9999L
-
-    val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
-    val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
-    val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
-    val jsonSqsMessage = createSQSMessage(domainEvent)
-
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    bookerRegistryMockServer.stubGetBooker(bookerReference, bookerInfo)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(prisonerId, null, HttpStatus.NOT_FOUND)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, emptyList())
 
     // Then
     verifyBookerEmailNotSent(bookerAdditionalInfo)
@@ -118,7 +90,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, bookerInfo)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(prisonerId, null, HttpStatus.INTERNAL_SERVER_ERROR)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, null, HttpStatus.INTERNAL_SERVER_ERROR)
 
     // Then
     verifyBookerEmailNotSent(bookerAdditionalInfo)
@@ -127,8 +99,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   @Test
   fun `when visitor approved event is received but booker registry returns a NOT_FOUND error an email is not sent to the booker`() {
     // Given
-    // visitor does not exist on the prisoner's social contacts list
-    val visitorId = 9999L
+    val visitorId = 1234L
 
     val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
@@ -137,7 +108,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, null, HttpStatus.NOT_FOUND)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
 
     // Then
     verifyBookerEmailNotSent(bookerAdditionalInfo)
@@ -146,8 +117,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   @Test
   fun `when visitor approved event is received but booker registry returns an INTERNAL_SERVER error an email is not sent to the booker`() {
     // Given
-    // visitor does not exist on the prisoner's social contacts list
-    val visitorId = 9999L
+    val visitorId = 1234L
 
     val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
@@ -156,7 +126,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, null, HttpStatus.INTERNAL_SERVER_ERROR)
-    prisonerContactRegisterMockServer.stubGetPrisonersSocialContacts(prisonerId, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
 
     // Then
     verifyBookerEmailNotSent(bookerAdditionalInfo)
