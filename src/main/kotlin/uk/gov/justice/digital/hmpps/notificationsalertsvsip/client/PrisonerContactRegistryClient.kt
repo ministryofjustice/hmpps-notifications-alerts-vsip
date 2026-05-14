@@ -31,7 +31,7 @@ class PrisonerContactRegistryClient(
       .retrieve()
       .bodyToMono<List<ContactWithOptionalPrisonerRelationshipDto>>()
       .onErrorResume { e ->
-        LOG.error("searchPrisonerContacts error for get request $uri, with exception $e")
+        LOG.error("searchContacts error for get request $uri, with exception $e")
         return@onErrorResume Mono.empty()
       }
       .block(apiTimeout)
