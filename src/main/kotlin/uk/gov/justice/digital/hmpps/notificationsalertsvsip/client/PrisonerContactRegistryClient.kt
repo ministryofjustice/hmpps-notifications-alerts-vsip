@@ -21,24 +21,25 @@ class PrisonerContactRegistryClient(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun searchPrisonerContacts(prisonerId: String, contactIds: List<Long>, withRestrictions: Boolean = false): List<ContactWithOptionalPrisonerRelationshipDto>? {
-    val uri = "/v2/prisoners/$prisonerId/contacts/search"
+  fun searchContacts(prisonerId: String, contactIds: List<Long>, withRestrictions: Boolean = false): List<ContactWithOptionalPrisonerRelationshipDto>? {
+    val uri = "/v2/contacts/search"
 
     return webClient.get()
       .uri(uri) {
-        getSearchPrisonerContactsUriBuilder(contactIds, withRestrictions, it).build()
+        getSearchContactsUriBuilder(prisonerId, contactIds, withRestrictions, it).build()
       }
       .retrieve()
       .bodyToMono<List<ContactWithOptionalPrisonerRelationshipDto>>()
       .onErrorResume { e ->
-        LOG.error("searchPrisonerContacts error for get request $uri, with exception $e")
+        LOG.error("searchContacts error for get request $uri, with exception $e")
         return@onErrorResume Mono.empty()
       }
       .block(apiTimeout)
   }
 
-  private fun getSearchPrisonerContactsUriBuilder(contactIds: List<Long>, withRestrictions: Boolean = false, uriBuilder: UriBuilder): UriBuilder {
+  private fun getSearchContactsUriBuilder(prisonerId: String, contactIds: List<Long>, withRestrictions: Boolean = false, uriBuilder: UriBuilder): UriBuilder {
     uriBuilder.queryParam("contactIds", contactIds.joinToString(","))
+    uriBuilder.queryParam("prisonerId", prisonerId)
     uriBuilder.queryParam("withRestrictions", withRestrictions)
     return uriBuilder
   }
