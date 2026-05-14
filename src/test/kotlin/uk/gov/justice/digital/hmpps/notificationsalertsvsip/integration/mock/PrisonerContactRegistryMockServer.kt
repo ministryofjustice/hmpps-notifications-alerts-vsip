@@ -9,7 +9,7 @@ import tools.jackson.databind.ObjectMapper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
 
 class PrisonerContactRegistryMockServer(private val objectMapper: ObjectMapper) : WireMockServer(8095) {
-  fun stubSearchPrisonerContacts(
+  fun stubSearchContacts(
     prisonerId: String,
     contactIds: List<Long>,
     withRestrictions: Boolean = false,
@@ -19,7 +19,7 @@ class PrisonerContactRegistryMockServer(private val objectMapper: ObjectMapper) 
     val responseBuilder = aResponse()
       .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 
-    val uri = "/v2/prisoners/$prisonerId/contacts/search?contactIds=${contactIds.joinToString(",")}&withRestrictions=$withRestrictions"
+    val uri = "/v2/contacts/search?contactIds=${contactIds.joinToString(",")}&prisonerId=$prisonerId&withRestrictions=$withRestrictions"
 
     stubFor(
       get(uri)

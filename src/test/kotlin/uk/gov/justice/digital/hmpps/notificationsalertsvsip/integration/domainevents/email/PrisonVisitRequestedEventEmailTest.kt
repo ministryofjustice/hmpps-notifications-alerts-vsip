@@ -101,7 +101,7 @@ class PrisonVisitRequestedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(visit.prisonerId, visit.visitors.map { it.nomisPersonId }, false, prisonerContactsResult)
+    prisonerContactRegisterMockServer.stubSearchContacts(visit.prisonerId, visit.visitors.map { it.nomisPersonId }, false, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(

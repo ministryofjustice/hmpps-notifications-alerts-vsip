@@ -16,6 +16,6 @@ class PrisonerContactRegistryService(
 
   fun searchPrisonerContacts(prisonerId: String, contactIds: List<Long>, withRestrictions: Boolean = false): List<ContactWithOptionalPrisonerRelationshipDto> {
     LOG.info("Calling prisoner contact registry searchPrisonerContacts for prisonerId - $prisonerId and contactIds - $contactIds with restrictions - $withRestrictions")
-    return prisonerContactRegistryClient.searchPrisonerContacts(prisonerId = prisonerId, contactIds = contactIds, withRestrictions = withRestrictions) ?: emptyList()
+    return prisonerContactRegistryClient.searchContacts(prisonerId = prisonerId, contactIds = contactIds, withRestrictions = withRestrictions) ?: emptyList()
   }
 }

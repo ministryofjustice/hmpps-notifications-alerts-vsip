@@ -50,7 +50,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, bookerInfo)
-    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
+    prisonerContactRegisterMockServer.stubSearchContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
 
     // Then
     verifyBookerEmailSent(templateId!!, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(contact1), templateVars)
@@ -70,7 +70,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, bookerInfo)
-    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, emptyList())
+    prisonerContactRegisterMockServer.stubSearchContacts(prisonerId, listOf(visitorId), false, emptyList())
 
     // Then
     verifyBookerEmailNotSent(bookerAdditionalInfo)
@@ -90,7 +90,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, bookerInfo)
-    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, null, HttpStatus.INTERNAL_SERVER_ERROR)
+    prisonerContactRegisterMockServer.stubSearchContacts(prisonerId, listOf(visitorId), false, null, HttpStatus.INTERNAL_SERVER_ERROR)
 
     // Then
     verifyBookerEmailNotSent(bookerAdditionalInfo)
@@ -108,7 +108,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, null, HttpStatus.NOT_FOUND)
-    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
+    prisonerContactRegisterMockServer.stubSearchContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
 
     // Then
     verifyBookerEmailNotSent(bookerAdditionalInfo)
@@ -126,7 +126,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     bookerRegistryMockServer.stubGetBooker(bookerReference, null, HttpStatus.INTERNAL_SERVER_ERROR)
-    prisonerContactRegisterMockServer.stubSearchPrisonerContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
+    prisonerContactRegisterMockServer.stubSearchContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
 
     // Then
     verifyBookerEmailNotSent(bookerAdditionalInfo)
