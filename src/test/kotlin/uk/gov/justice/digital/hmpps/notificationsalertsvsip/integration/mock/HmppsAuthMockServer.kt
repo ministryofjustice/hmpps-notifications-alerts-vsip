@@ -26,14 +26,14 @@ class HmppsAuthExtension :
 
   override fun beforeAll(context: ExtensionContext) {
     hmppsAuthApi.start()
+  }
+
+  override fun beforeEach(context: ExtensionContext) {
+    hmppsAuthApi.resetAll()
     hmppsAuthApi.stubGrantToken()
     hmppsAuthApi.stubGetUserDetails("created-user")
     hmppsAuthApi.stubGetUserDetails("updated-user")
     hmppsAuthApi.stubGetUserDetails("cancelled-user")
-  }
-
-  override fun beforeEach(context: ExtensionContext) {
-    hmppsAuthApi.resetRequests()
   }
 
   override fun afterAll(context: ExtensionContext) {
