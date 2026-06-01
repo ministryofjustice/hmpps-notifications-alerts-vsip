@@ -14,12 +14,12 @@ class NotificationTemplateResolver(private val templatesConfig: TemplatesConfig)
     languagePreference: LanguagePreference = LanguagePreference.EN,
   ): String = templatesConfig.emailTemplates[languagePreference]?.get(template)
     ?: templatesConfig.emailTemplates[LanguagePreference.EN]?.get(template)
-    ?: throw IllegalArgumentException("Email template $template not configured for language $languagePreference")
+    ?: throw IllegalArgumentException("Email template $template not configured for language $languagePreference (or EN fallback)")
 
   fun getSmsTemplate(
     template: SmsTemplateNames,
     languagePreference: LanguagePreference = LanguagePreference.EN,
   ): String = templatesConfig.smsTemplates[languagePreference]?.get(template)
     ?: templatesConfig.smsTemplates[LanguagePreference.EN]?.get(template)
-    ?: throw IllegalArgumentException("SMS template $template not configured for language $languagePreference")
+    ?: throw IllegalArgumentException("SMS template $template not configured for language $languagePreference (or EN fallback)")
 }
