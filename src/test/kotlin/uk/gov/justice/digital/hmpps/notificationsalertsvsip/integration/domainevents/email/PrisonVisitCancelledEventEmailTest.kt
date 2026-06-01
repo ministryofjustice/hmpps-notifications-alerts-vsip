@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitExternalSystemDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.email.BaseVisitsEmailNotificationHandler.Companion.GOV_UK_PRISON_PAGE
@@ -59,7 +60,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED, LanguagePreference.EN)
     val templateVars = createTemplateVars(visit)
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
@@ -80,7 +81,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, visit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, visit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -101,7 +102,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISON.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED_BY_PRISON, LanguagePreference.EN)
+
     val templateVars = createTemplateVars(cancelledVisit)
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
@@ -122,7 +124,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, cancelledVisit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, cancelledVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -143,7 +145,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISON.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED_BY_PRISON, LanguagePreference.EN)
     val templateVars = createTemplateVars(cancelledVisit)
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
@@ -164,7 +166,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, cancelledVisit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, cancelledVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -184,7 +186,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED, LanguagePreference.EN)
     val templateVars = createTemplateVars(singleDigitDateVisit)
 
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
@@ -206,7 +208,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, singleDigitDateVisit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, singleDigitDateVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -226,7 +228,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISON.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED_BY_PRISON, LanguagePreference.EN)
     val templateVars = createTemplateVars(cancelledByPrisonVisit, phone = GOV_UK_PRISON_PAGE, webAddress = GOV_UK_PRISON_PAGE)
 
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
@@ -248,7 +250,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, cancelledByPrisonVisit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, cancelledByPrisonVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -268,7 +270,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER, LanguagePreference.EN)
     val templateVars = createTemplateVars(cancelledByPrisonerVisit)
 
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
@@ -290,7 +292,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, cancelledByPrisonerVisit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, cancelledByPrisonerVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -330,7 +332,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_CANCELLED.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED, LanguagePreference.EN)
     val templateVars = createTemplateVars(visit, openingSentence = "visit to the prison", prisoner = "the prisoner")
 
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
@@ -352,7 +354,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, visit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, visit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -445,6 +447,37 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     verifyEmailNotSent(visitAdditionalInfo)
+  }
+
+  @Test
+  fun `when visit cancelled message is received with welsh language but no welsh template exists then cancelled email is sent in english`() {
+    // Given
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED, LanguagePreference.CY)
+    val templateVars = createTemplateVars(visit)
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(visit.reference, visit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, prisonerSearchResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        visit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // Then
+    verifyEmailSent(templateId, visit, visitAdditionalInfo, templateVars)
   }
 
   private fun createTemplateVars(visit: VisitDto, openingSentence: String? = "visit to see $prisonerSearchResult", prisoner: String? = prisonerSearchResult.toString(), phone: String? = prisonContactDetailsDto.phoneNumber, webAddress: String? = prisonContactDetailsDto.webAddress): Map<String, Any> {

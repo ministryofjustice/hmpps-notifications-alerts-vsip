@@ -2,12 +2,13 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.em
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.personalisations.PrisonerVisitorPersonalisationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationTemplateResolver
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerContactRegistryService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
@@ -33,11 +34,14 @@ abstract class BaseVisitsEmailNotificationHandler {
   lateinit var prisonerContactRegistryService: PrisonerContactRegistryService
 
   @Autowired
-  lateinit var templatesConfig: TemplatesConfig
+  lateinit var notificationTemplateResolver: NotificationTemplateResolver
 
   abstract fun handle(visit: VisitDto): SendEmailNotificationDto
 
-  protected fun getTemplateName(template: EmailTemplateNames): String = templatesConfig.emailTemplates[template.name]!!
+  protected fun getTemplateName(
+    template: EmailTemplateNames,
+    languagePreference: LanguagePreference = LanguagePreference.EN,
+  ): String = notificationTemplateResolver.getEmailTemplate(template = template, languagePreference = languagePreference)
 
   protected fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, Any> {
     val templateVars: MutableMap<String, Any> = mutableMapOf(
@@ -55,17 +59,15 @@ abstract class BaseVisitsEmailNotificationHandler {
     return templateVars
   }
 
-  protected fun getPrisoner(visit: VisitDto): Map<String, Any> {
-    return prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
-      return mutableMapOf(
-        "opening sentence" to "visit to see $prisoner",
-        "prisoner" to "$prisoner",
-      )
-    } ?: mutableMapOf(
-      "opening sentence" to "visit to the prison",
-      "prisoner" to "the prisoner",
+  protected fun getPrisoner(visit: VisitDto): Map<String, Any> = prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
+    mutableMapOf(
+      "opening sentence" to "visit to see $prisoner",
+      "prisoner" to "$prisoner",
     )
-  }
+  } ?: mutableMapOf(
+    "opening sentence" to "visit to the prison",
+    "prisoner" to "the prisoner",
+  )
 
   protected fun getPrisonContactDetails(visit: VisitDto): Map<String, String> {
     val prisonContactDetails = prisonRegisterService.getPrisonSocialVisitsContactDetails(visit.prisonCode)

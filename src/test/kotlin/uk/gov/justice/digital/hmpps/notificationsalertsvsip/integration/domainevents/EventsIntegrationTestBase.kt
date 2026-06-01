@@ -38,6 +38,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.Vis
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.BookerNotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.DomainEventListenerService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.EmailSenderService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationTemplateResolver
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PRISON_VISITS_NOTIFICATION_ALERTS_QUEUE_CONFIG_KEY
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.SmsSenderService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitNotificationService
@@ -113,6 +114,9 @@ abstract class EventsIntegrationTestBase {
 
   @Autowired
   lateinit var domainEventListenerService: DomainEventListenerService
+
+  @Autowired
+  lateinit var notificationTemplateResolver: NotificationTemplateResolver
 
   @MockitoSpyBean
   lateinit var eventFeatureSwitch: EventFeatureSwitch
