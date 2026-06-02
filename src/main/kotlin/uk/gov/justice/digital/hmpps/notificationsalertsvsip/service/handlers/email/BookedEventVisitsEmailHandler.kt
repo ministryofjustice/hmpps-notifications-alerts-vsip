@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotific
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames.VISIT_REQUESTED
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
@@ -38,8 +39,8 @@ class BookedEventVisitsEmailHandler : BaseVisitsEmailNotificationHandler() {
   }
 
   private fun getTemplateName(visit: VisitDto): String = if (visit.visitSubStatus == "REQUESTED") {
-    getTemplateName(VISIT_REQUESTED)
+    getTemplateName(VISIT_REQUESTED, languagePreference = LanguagePreference.EN)
   } else {
-    getTemplateName(VISIT_BOOKING_OR_REQUEST_APPROVED)
+    getTemplateName(VISIT_BOOKING_OR_REQUEST_APPROVED, languagePreference = LanguagePreference.EN)
   }
 }

@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestVisitorInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRejectedAdditionalInfo
@@ -44,7 +45,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
       rejectionReason = "ALREADY_LINKED",
     )
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.BOOKER_VISITOR_REJECTED_ALREADY_LINKED.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_REJECTED_ALREADY_LINKED, LanguagePreference.EN)
     val templateVars = mapOf(
       "visitor" to "$firstName $lastName",
     )
@@ -67,7 +68,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
-    verifyBookerEmailSent(templateId!!, bookerInfo, VisitorRequestVisitorInfoDto(visitorRequest), templateVars)
+    verifyBookerEmailSent(templateId, bookerInfo, VisitorRequestVisitorInfoDto(visitorRequest), templateVars)
   }
 
   @Test
@@ -102,6 +103,55 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
 
     // Then
     verifyBookerEmailNotSent()
+  }
+
+  @Test
+  fun `when visitor rejected (with reason already linked) event is received with welsh language but no welsh template exists, a visitor rejected email is sent to the booker in english`() {
+    // Given
+    val prisonerId = "A1234BC"
+    val bookerReference = "booker-ref"
+    val bookerEmailAddress = "test@example.com"
+    val firstName = "John"
+    val lastName = "Smith"
+    val visitorRequestReference = "abc-def-ghi"
+
+    val visitorRequest = VisitorRequestDto(
+      reference = visitorRequestReference,
+      bookerReference = bookerReference,
+      bookerEmail = bookerEmailAddress,
+      prisonerId = prisonerId,
+      firstName = firstName,
+      lastName = lastName,
+      dateOfBirth = LocalDate.now().minusYears(21),
+      requestedOn = LocalDate.now(),
+      visitorId = null,
+      rejectionReason = "ALREADY_LINKED",
+    )
+
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_REJECTED_ALREADY_LINKED, LanguagePreference.CY)
+    val templateVars = mapOf(
+      "visitor" to "$firstName $lastName",
+    )
+
+    val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
+    val bookerAdditionalInfo = VisitorRejectedAdditionalInfo(visitorRequestReference)
+    val domainEvent = createDomainEventJson(BOOKER_VISITOR_REJECTED, createAdditionalInformationJson(bookerAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    // When
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        bookerInfo.email,
+        templateVars,
+        null,
+      ),
+    ).thenReturn(buildSendEmailResponse(reference = "test"))
+    bookerRegistryMockServer.stubGetVisitorRequestByReference(visitorRequestReference, visitorRequest)
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+
+    // Then
+    verifyBookerEmailSent(templateId, bookerInfo, VisitorRequestVisitorInfoDto(visitorRequest), templateVars)
   }
 
   private fun verifyBookerEmailSent(templateId: String, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {

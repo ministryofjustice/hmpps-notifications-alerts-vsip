@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestVisitorInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorApprovedAdditionalInfo
@@ -28,7 +29,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visitor approved event is received a visitor approved email is sent to the booker`() {
     // Given
     val visitorId = 1234L
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.BOOKER_VISITOR_APPROVED.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_APPROVED, LanguagePreference.EN)
     val templateVars = mapOf(
       "visitor" to contact1.firstName + " " + contact1.lastName,
     )
@@ -53,7 +54,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     prisonerContactRegisterMockServer.stubSearchContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
 
     // Then
-    verifyBookerEmailSent(templateId!!, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(contact1), templateVars)
+    verifyBookerEmailSent(templateId, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(contact1), templateVars)
   }
 
   @Test
@@ -130,6 +131,38 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     verifyBookerEmailNotSent(bookerAdditionalInfo)
+  }
+
+  @Test
+  fun `when visitor approved message is received and language is welsh but no welsh template exists, a visitor approved email is sent in english`() {
+    // Given
+    val visitorId = 1234L
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_APPROVED, LanguagePreference.CY)
+    val templateVars = mapOf(
+      "visitor" to contact1.firstName + " " + contact1.lastName,
+    )
+
+    val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
+    val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
+    val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        bookerInfo.email,
+        templateVars,
+        null,
+      ),
+    ).thenReturn(buildSendEmailResponse(reference = "test"))
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    bookerRegistryMockServer.stubGetBooker(bookerReference, bookerInfo)
+    prisonerContactRegisterMockServer.stubSearchContacts(prisonerId, listOf(visitorId), false, listOf(contact1))
+
+    // Then
+    verifyBookerEmailSent(templateId, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(contact1), templateVars)
   }
 
   private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {

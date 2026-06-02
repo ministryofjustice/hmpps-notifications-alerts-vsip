@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType.REQUEST_APPROVED
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
@@ -61,7 +62,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.EN)
     val visitDate = approvedVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
@@ -102,7 +103,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, approvedVisit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, approvedVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -117,7 +118,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.emailTemplates[EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.EN)
     val visitDate = autoApprovedVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
@@ -158,7 +159,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId!!, autoApprovedVisit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, autoApprovedVisit, visitAdditionalInfo, templateVars)
   }
 
   @Test
@@ -248,6 +249,61 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
 
     // Then
     verifyEmailNotSent(visitAdditionalInfo)
+  }
+
+  @Test
+  fun `when visit request approved event received in welsh and visit was approved but no welsh template exists then visit booked email is sent in english`() {
+    // Given
+    val bookingReference = approvedVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(approvedVisit.reference, "123456")
+    val visitor1 = ContactWithOptionalPrisonerRelationshipDto(1234, "Visitor", "One", (LocalDate.now().minusYears(30)))
+    val visitor2 = ContactWithOptionalPrisonerRelationshipDto(9876, "Visitor", "Two")
+
+    val domainEvent = createDomainEventJson(PRISON_VISIT_REQUEST_APPROVED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.CY)
+    val visitDate = approvedVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateVars = mutableMapOf<String, Any>(
+      "ref number" to bookingReference,
+      "prison" to prison.prisonName,
+      "time" to "10:30am",
+      "end time" to "11am",
+      "arrival time" to "45",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "main contact name" to "Contact One",
+      "closed visit" to "false",
+      "opening sentence" to "visit to see Prisoner One",
+      "prisoner" to "Prisoner One",
+      "visitors" to prisonVisitors,
+      "phone" to prisonContactDetailsDto.phoneNumber!!,
+      "website" to prisonContactDetailsDto.webAddress!!,
+    )
+
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, approvedVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(approvedVisit.prisonerId, prisonerSearchResult)
+    prisonerContactRegisterMockServer.stubSearchContacts(approvedVisit.prisonerId, approvedVisit.visitors.map { it.nomisPersonId }, false, listOf(visitor1, visitor2))
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        approvedVisit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // Then
+    verifyEmailSent(templateId, approvedVisit, visitAdditionalInfo, templateVars)
   }
 
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {

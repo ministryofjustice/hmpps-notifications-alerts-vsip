@@ -2,10 +2,11 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.handlers.sm
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationTemplateResolver
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
@@ -18,11 +19,14 @@ abstract class BaseVisitsSmsNotificationHandler {
   lateinit var prisonRegisterService: PrisonRegisterService
 
   @Autowired
-  lateinit var templatesConfig: TemplatesConfig
+  lateinit var notificationTemplateResolver: NotificationTemplateResolver
 
   abstract fun handle(visit: VisitDto): SendSmsNotificationDto
 
-  protected fun getTemplateName(template: SmsTemplateNames): String = templatesConfig.smsTemplates[template.name]!!
+  protected fun getTemplateName(
+    template: SmsTemplateNames,
+    languagePreference: LanguagePreference = LanguagePreference.EN,
+  ): String = notificationTemplateResolver.getSmsTemplate(template = template, languagePreference = languagePreference)
 
   protected fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, String> {
     val templateVars = mutableMapOf(

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 
 @Service
 class CancelledEventVisitsEmailHandler : BaseVisitsEmailNotificationHandler() {
@@ -47,6 +48,6 @@ class CancelledEventVisitsEmailHandler : BaseVisitsEmailNotificationHandler() {
       }
     }
 
-    return getTemplateName(template)
+    return getTemplateName(template, languagePreference = LanguagePreference.EN)
   }
 }

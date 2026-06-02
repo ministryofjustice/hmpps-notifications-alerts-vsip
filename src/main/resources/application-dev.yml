@@ -25,6 +25,8 @@ prison-register.api.url: https://prison-register-dev.hmpps.service.justice.gov.u
 
 prisoner-contact.registry.url: https://prisoner-contact-registry-dev.prison.service.justice.gov.uk
 
+booker-registry.api.url: https://hmpps-prison-visit-booker-registry-dev.prison.service.justice.gov.uk
+
 prisoner:
   offender:
     search:

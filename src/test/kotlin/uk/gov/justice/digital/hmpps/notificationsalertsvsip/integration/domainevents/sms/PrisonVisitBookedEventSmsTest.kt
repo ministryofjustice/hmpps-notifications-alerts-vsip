@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitExternalSystemDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.VisitEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
@@ -110,7 +111,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
-    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
+    val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.EN)
     val visitDate = visit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
@@ -155,7 +156,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     val visitDate = visit3.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
-    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
+    val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.EN)
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
@@ -189,7 +190,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val visitDate = visit2.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
+    val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
       "time" to "8am",
@@ -315,7 +316,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val visitYear = singleDigitDateVisit.startTimestamp.toLocalDate().year
     val expectedVisitDate = "1 January $visitYear"
     val expectedDayOfWeek = singleDigitDateVisit.startTimestamp.toLocalDate().dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
-    val templateId = templatesConfig.smsTemplates[SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED.name]
+    val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
       "time" to "1:05am",
@@ -337,6 +338,45 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
       verify(notificationClient, times(1)).sendSms(
         templateId,
         singleDigitDateVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      )
+    }
+  }
+
+  @Test
+  fun `when visit booked message is received and language is welsh but no welsh template exists, then booking message is sent in english`() {
+    // Given
+    val bookingReference = visit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.CY)
+    val visitDate = visit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val templateVars = mutableMapOf<String, Any>(
+      "prison" to prison.prisonName,
+      "time" to "10:30am",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "ref number" to bookingReference,
+    )
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+
+    // Then
+    await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendSms(
+        templateId,
+        visit.visitContact.telephone,
         templateVars,
         visitAdditionalInfo.eventAuditId,
       )
