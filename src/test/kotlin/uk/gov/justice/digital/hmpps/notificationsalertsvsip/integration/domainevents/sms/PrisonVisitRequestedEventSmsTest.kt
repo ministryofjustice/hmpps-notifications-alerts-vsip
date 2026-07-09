@@ -96,7 +96,7 @@ class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
@@ -123,7 +123,7 @@ class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendVisitsSms(any(), any(), any()) }
   }
 
   @Test
@@ -142,7 +142,7 @@ class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendVisitsSms(any(), any(), any()) }
   }
 
   @Test
@@ -161,7 +161,7 @@ class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendVisitsSms(any(), any(), any()) }
   }
 
   @Test
@@ -192,7 +192,7 @@ class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,

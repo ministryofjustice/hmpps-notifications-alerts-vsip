@@ -167,7 +167,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
 
   private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestApprovedEmail(BookerEventType.VISITOR_APPROVED, additionalInfo) }
+    await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestApprovedEmail(additionalInfo) }
     await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_APPROVED) }
 
     await untilAsserted {
@@ -182,7 +182,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
 
   private fun verifyBookerEmailNotSent(additionalInfo: VisitorApprovedAdditionalInfo) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestApprovedEmail(BookerEventType.VISITOR_APPROVED, additionalInfo) }
+    await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestApprovedEmail(additionalInfo) }
     await untilAsserted { verify(emailSenderService, times(0)).sendBookerVisitorEmail(any(), any(), any()) }
   }
 }
