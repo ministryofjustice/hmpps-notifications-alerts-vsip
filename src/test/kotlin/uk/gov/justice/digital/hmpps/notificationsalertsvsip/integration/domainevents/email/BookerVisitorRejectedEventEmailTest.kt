@@ -5,7 +5,6 @@ import org.awaitility.kotlin.untilAsserted
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
@@ -69,7 +68,7 @@ class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
-    verifyBookerEmailSent(templateId, bookerInfo, VisitorRequestVisitorInfoDto(visitorRequest), templateVars)
+    verifyBookerEmailSent(templateId, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(visitorRequest), templateVars)
   }
 
   @Test
@@ -86,7 +85,7 @@ class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
-    verifyBookerEmailNotSent()
+    verifyBookerEmailNotSent(bookerAdditionalInfo)
   }
 
   @Test
@@ -103,7 +102,7 @@ class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
-    verifyBookerEmailNotSent()
+    verifyBookerEmailNotSent(bookerAdditionalInfo)
   }
 
   @Test
@@ -153,12 +152,12 @@ class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
-    verifyBookerEmailSent(templateId, bookerInfo, VisitorRequestVisitorInfoDto(visitorRequest), templateVars)
+    verifyBookerEmailSent(templateId, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(visitorRequest), templateVars)
   }
 
-  private fun verifyBookerEmailSent(templateId: String, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
+  private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorRejectedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorRejectedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestRejectedEmail(eq(BookerEventType.VISITOR_REJECTED), any()) }
+    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestRejectedEmail(additionalInfo) }
     await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_REJECTED) }
 
     await untilAsserted {
@@ -171,9 +170,9 @@ class BookerVisitorRejectedEventEmailTest : EventsIntegrationTestBase() {
     }
   }
 
-  private fun verifyBookerEmailNotSent() {
+  private fun verifyBookerEmailNotSent(additionalInfo: VisitorRejectedAdditionalInfo) {
     await untilAsserted { verify(bookerVisitorRejectedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(bookerNotificationService, times(0)).sendVisitorRequestRejectedEmail(eq(BookerEventType.VISITOR_REJECTED), any()) }
+    await untilAsserted { verify(bookerNotificationService, times(1)).sendVisitorRequestRejectedEmail(additionalInfo) }
     await untilAsserted { verify(emailSenderService, times(0)).sendBookerVisitorEmail(any(), any(), any()) }
   }
 }
