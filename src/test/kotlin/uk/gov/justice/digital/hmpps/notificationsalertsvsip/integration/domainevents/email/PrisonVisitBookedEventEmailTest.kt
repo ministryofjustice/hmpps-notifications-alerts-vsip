@@ -108,6 +108,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
+        "blah@test.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -169,6 +170,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit3.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
+        "blah@test.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -230,6 +232,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit2.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
+        "blah@test.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -362,6 +365,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
+        "blah@test.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -426,6 +430,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
+        "blah@test.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -477,6 +482,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
+        "blah@test.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -531,6 +537,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
+        "blah@test.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -614,6 +621,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
+        "blah@test.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -625,13 +633,14 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId, "blah@test.com") }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
+        "blah@test.com",
       )
     }
     await untilAsserted {
@@ -642,8 +651,8 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailNotSent(visitAdditionalInfo: VisitAdditionalInfo) {
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(0)).sendVisitsEmail(any(), any(), any()) }
-    await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any()) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendVisitsEmail(any(), any(), any(), any()) }
+    await untilAsserted { verify(notificationClient, times(0)).sendEmail(any(), any(), any(), any(), any()) }
     await untilAsserted { verify(visitSchedulerService, times(0)).createNotifyNotification(any()) }
   }
 }

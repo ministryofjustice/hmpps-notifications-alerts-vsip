@@ -45,6 +45,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
         bookerInfo.email,
         templateVars,
         null,
+        "blah@test.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
@@ -153,6 +154,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
         bookerInfo.email,
         templateVars,
         null,
+        "blah@test.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
@@ -168,7 +170,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestApprovedEmail(additionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_APPROVED) }
+    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_APPROVED, "blah@test.com") }
 
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
@@ -176,6 +178,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
         bookerInfoDto.email,
         templateVars,
         null,
+        "blah@test.com",
       )
     }
   }
@@ -183,6 +186,6 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyBookerEmailNotSent(additionalInfo: VisitorApprovedAdditionalInfo) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestApprovedEmail(additionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(0)).sendBookerVisitorEmail(any(), any(), any()) }
+    await untilAsserted { verify(emailSenderService, times(0)).sendBookerVisitorEmail(any(), any(), any(), any()) }
   }
 }

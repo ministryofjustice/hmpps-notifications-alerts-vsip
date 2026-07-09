@@ -14,6 +14,7 @@ class VisitNotificationService(
   val visitSchedulerService: VisitSchedulerService,
   val smsSenderService: SmsSenderService,
   val emailSenderService: EmailSenderService,
+  val replyToEmailService: ReplyToEmailService,
 ) {
   private companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
@@ -75,7 +76,8 @@ class VisitNotificationService(
       return
     }
 
-    val notification = emailSenderService.sendVisitsEmail(visit, visitEventType, additionalInfo.eventAuditId)
+    val replyToEmailId = replyToEmailService.getReplyToEmailIdForPrison(visit.prisonCode)
+    val notification = emailSenderService.sendVisitsEmail(visit, visitEventType, additionalInfo.eventAuditId, replyToEmailId)
     notification?.let {
       try {
         visitSchedulerService.createNotifyNotification(it)

@@ -26,7 +26,7 @@ class EmailSenderService(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun sendVisitsEmail(visit: VisitDto, visitEventType: VisitEventType, eventAuditId: String): NotifyCreateNotificationDto? {
+  fun sendVisitsEmail(visit: VisitDto, visitEventType: VisitEventType, eventAuditId: String, replyToEmailId: String): NotifyCreateNotificationDto? {
     if (enabled && visitsEmailEnabled) {
       val sendEmailNotificationDto = handlerFactory.getHandler(visitEventType).handle(visit)
 
@@ -37,6 +37,7 @@ class EmailSenderService(
           visit.visitContact.email,
           sendEmailNotificationDto.templateVars,
           eventAuditId,
+          replyToEmailId,
         )
         LOG.info("Calling notification client finished with response ${response.notificationId}, for event - $eventAuditId")
 
@@ -51,7 +52,7 @@ class EmailSenderService(
     }
   }
 
-  fun sendBookerVisitorEmail(bookerInfo: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, bookerEventType: BookerEventType) {
+  fun sendBookerVisitorEmail(bookerInfo: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, bookerEventType: BookerEventType, replyToEmailId: String) {
     if (enabled && bookerEmailEnabled) {
       val sendEmailNotificationDto = handlerFactory.getHandler(bookerEventType).handle(bookerInfo, visitorInfo)
 
@@ -62,6 +63,7 @@ class EmailSenderService(
           bookerInfo.email,
           sendEmailNotificationDto.templateVars,
           null,
+          replyToEmailId,
         )
 
         LOG.info("Calling notification client finished with response ${response.notificationId}, for booker event - $bookerEventType, booker email: ${bookerInfo.email}, contact details: $visitorInfo")
