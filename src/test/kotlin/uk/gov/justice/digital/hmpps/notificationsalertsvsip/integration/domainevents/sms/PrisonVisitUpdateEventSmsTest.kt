@@ -134,7 +134,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(visit, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
@@ -172,7 +172,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit2, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(visit2, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
@@ -210,7 +210,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit3, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(visit3, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
@@ -237,7 +237,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendVisitsSms(any(), any(), any()) }
   }
 
   @Test
@@ -256,7 +256,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendVisitsSms(any(), any(), any()) }
   }
 
   @Test
@@ -275,7 +275,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendVisitsSms(any(), any(), any()) }
   }
 
   @Test
@@ -306,7 +306,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(singleDigitDateVisit, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(singleDigitDateVisit, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
@@ -344,7 +344,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(0)).sendSms(any(), any(), any()) }
+    await untilAsserted { verify(smsSenderService, times(0)).sendVisitsSms(any(), any(), any()) }
   }
 
   @Test
@@ -374,7 +374,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(1)).sendSms(visit, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(visit, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,

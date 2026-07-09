@@ -21,7 +21,7 @@ class SmsSenderService(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun sendSms(visit: VisitDto, visitEventType: VisitEventType, eventAuditId: String): NotifyCreateNotificationDto? {
+  fun sendVisitsSms(visit: VisitDto, visitEventType: VisitEventType, eventAuditId: String): NotifyCreateNotificationDto? {
     if (enabled) {
       val sendSmsNotificationDto = handlerFactory.getHandler(visitEventType).handle(visit)
 

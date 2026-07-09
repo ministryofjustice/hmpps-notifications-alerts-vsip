@@ -57,7 +57,7 @@ class VisitNotificationService(
       return
     }
 
-    val notification = smsSenderService.sendSms(visit, visitEventType, additionalInfo.eventAuditId)
+    val notification = smsSenderService.sendVisitsSms(visit, visitEventType, additionalInfo.eventAuditId)
     notification?.let {
       try {
         visitSchedulerService.createNotifyNotification(it)
