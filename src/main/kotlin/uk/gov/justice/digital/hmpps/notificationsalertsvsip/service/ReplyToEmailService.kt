@@ -11,6 +11,8 @@ class ReplyToEmailService(
   private val prisonerSearchService: PrisonerSearchService,
 ) {
   companion object {
+    const val DEFAULT_REPLY_TO_EMAIL_PRISON_CODE = "DEFAULT"
+
     private val LOG = LoggerFactory.getLogger(this::class.java)
   }
 
@@ -19,7 +21,7 @@ class ReplyToEmailService(
 
     if (prisonCode.isNullOrBlank()) {
       LOG.info("Could not resolve prison code for prisoner $prisonerId, using default reply-to email id")
-      return notifyEmailConfig.defaultReplyToEmailId
+      return getDefaultReplyToEmailId()
     }
 
     return getReplyToEmailIdForPrison(prisonCode)
@@ -30,9 +32,13 @@ class ReplyToEmailService(
 
     if (replyToEmailId.isNullOrBlank()) {
       LOG.info("No reply-to email id configured for prison $prisonCode, using default reply-to email id")
-      return notifyEmailConfig.defaultReplyToEmailId
+      return getDefaultReplyToEmailId()
     }
 
     return replyToEmailId
   }
+
+  private fun getDefaultReplyToEmailId(): String = notifyEmailConfig.replyToEmailIds[DEFAULT_REPLY_TO_EMAIL_PRISON_CODE]
+    ?.takeIf { it.isNotBlank() }
+    ?: throw IllegalStateException("Default reply-to email id must be configured against prison code $DEFAULT_REPLY_TO_EMAIL_PRISON_CODE")
 }

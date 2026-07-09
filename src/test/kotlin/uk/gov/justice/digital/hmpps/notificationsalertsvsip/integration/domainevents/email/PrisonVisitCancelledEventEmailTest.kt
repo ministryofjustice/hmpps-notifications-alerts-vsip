@@ -76,7 +76,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "blah@test.com",
+        "default@email.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -120,7 +120,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
         cancelledVisit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "blah@test.com",
+        "default@email.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -163,7 +163,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
         cancelledVisit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "blah@test.com",
+        "default@email.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -206,7 +206,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "blah@test.com",
+        "default@email.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -249,7 +249,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "blah@test.com",
+        "default@email.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -292,7 +292,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "blah@test.com",
+        "default@email.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -355,7 +355,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "blah@test.com",
+        "default@email.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -479,7 +479,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "blah@test.com",
+        "default@email.com",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -511,14 +511,14 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId, "blah@test.com") }
+    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId, "default@email.com") }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "blah@test.com",
+        "default@email.com",
       )
     }
     await untilAsserted {

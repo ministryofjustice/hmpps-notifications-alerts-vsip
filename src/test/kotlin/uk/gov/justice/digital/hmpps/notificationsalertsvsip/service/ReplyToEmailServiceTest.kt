@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -11,8 +12,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.Pri
 class ReplyToEmailServiceTest {
   private val prisonerSearchService: PrisonerSearchService = mock()
   private val notifyEmailConfig = NotifyEmailConfig().apply {
-    defaultReplyToEmailId = "blah@test.com"
-    replyToEmailIds = mapOf("MDI" to "mdi-reply-to-id")
+    replyToEmailIds = mapOf("DEFAULT" to "default-reply-to-id", "MDI" to "mdi-reply-to-id")
   }
   private val replyToEmailService = ReplyToEmailService(notifyEmailConfig, prisonerSearchService)
 
@@ -35,7 +35,7 @@ class ReplyToEmailServiceTest {
 
     val replyToEmailId = replyToEmailService.getReplyToEmailIdForPrisoner("A1234BC")
 
-    assertEquals("blah@test.com", replyToEmailId)
+    assertEquals("default-reply-to-id", replyToEmailId)
   }
 
   @Test
@@ -44,6 +44,24 @@ class ReplyToEmailServiceTest {
 
     val replyToEmailId = replyToEmailService.getReplyToEmailIdForPrisoner("A1234BC")
 
-    assertEquals("blah@test.com", replyToEmailId)
+    assertEquals("default-reply-to-id", replyToEmailId)
+  }
+
+  @Test
+  fun `throws when default reply-to email id is not configured`() {
+    val replyToEmailService = ReplyToEmailService(
+      NotifyEmailConfig().apply { replyToEmailIds = mapOf("MDI" to "mdi-reply-to-id") },
+      prisonerSearchService,
+    )
+
+    whenever(prisonerSearchService.getPrisoner("A1234BC")).thenReturn(
+      PrisonerSearchResultDto(firstName = "John", lastName = "Smith", prisonId = "LEI"),
+    )
+
+    val exception = assertThrows(IllegalStateException::class.java) {
+      replyToEmailService.getReplyToEmailIdForPrisoner("A1234BC")
+    }
+
+    assertEquals("Default reply-to email id must be configured against prison code DEFAULT", exception.message)
   }
 }

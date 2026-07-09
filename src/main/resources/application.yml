@@ -109,8 +109,8 @@ notify:
         BOOKER_VISITOR_REJECTED_ALREADY_LINKED: 988d1e77-6fbd-4fe9-ae7d-e6b594f018b4
       cy: {}
   email:
-    default-reply-to-email-id: blah@test.com
-    reply-to-email-ids: {}
+    reply-to-email-ids:
+      DEFAULT: ${notify.email.reply-to-email-id.default:}
 
 springdoc:
   api-docs:
