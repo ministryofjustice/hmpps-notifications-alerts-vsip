@@ -64,7 +64,7 @@ class VisitNotificationService(
         visitSchedulerService.createNotifyNotification(it)
       } catch (e: Exception) {
         // TODO: Remove try-catch and convert to publish message 'notification-sent' instead of direct API call.
-        LOG.info("Call to capture sms notification creation on visit-scheduler failed with exception: $e")
+        LOG.warn("Call to capture sms notification creation on visit-scheduler failed with exception: $e")
       }
     }
   }
@@ -77,13 +77,14 @@ class VisitNotificationService(
     }
 
     val replyToEmailId = replyToEmailService.getReplyToEmailIdForPrison(visit.prisonCode)
+
     val notification = emailSenderService.sendVisitsEmail(visit, visitEventType, additionalInfo.eventAuditId, replyToEmailId)
     notification?.let {
       try {
         visitSchedulerService.createNotifyNotification(it)
       } catch (e: Exception) {
         // TODO: Remove try-catch and convert to publish message 'notification-sent' instead of direct API call.
-        LOG.info("Call to capture email notification creation on visit-scheduler failed with exception: $e")
+        LOG.warn("Call to capture email notification creation on visit-scheduler failed with exception: $e")
       }
     }
   }
