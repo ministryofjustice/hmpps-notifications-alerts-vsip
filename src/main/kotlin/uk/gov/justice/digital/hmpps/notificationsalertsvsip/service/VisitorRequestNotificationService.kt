@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.ev
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRejectedAdditionalInfo
 
 @Service
-class BookerNotificationService(
+class VisitorRequestNotificationService(
   val emailSenderService: EmailSenderService,
   val bookerRegistryClient: BookerRegistryClient,
   val prisonerContactRegistryService: PrisonerContactRegistryService,
