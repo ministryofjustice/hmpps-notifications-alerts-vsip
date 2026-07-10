@@ -14,6 +14,7 @@ class VisitNotificationService(
   val visitSchedulerService: VisitSchedulerService,
   val smsSenderService: SmsSenderService,
   val emailSenderService: EmailSenderService,
+  val replyToEmailResolver: ReplyToEmailResolver,
 ) {
   private companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
@@ -63,7 +64,7 @@ class VisitNotificationService(
         visitSchedulerService.createNotifyNotification(it)
       } catch (e: Exception) {
         // TODO: Remove try-catch and convert to publish message 'notification-sent' instead of direct API call.
-        LOG.info("Call to capture sms notification creation on visit-scheduler failed with exception: $e")
+        LOG.warn("Call to capture sms notification creation on visit-scheduler failed", e)
       }
     }
   }
@@ -75,13 +76,15 @@ class VisitNotificationService(
       return
     }
 
-    val notification = emailSenderService.sendVisitsEmail(visit, visitEventType, additionalInfo.eventAuditId)
+    val replyToEmailId = replyToEmailResolver.getReplyToEmailIdForPrison(visit.prisonCode)
+
+    val notification = emailSenderService.sendVisitsEmail(visit, visitEventType, additionalInfo.eventAuditId, replyToEmailId)
     notification?.let {
       try {
         visitSchedulerService.createNotifyNotification(it)
       } catch (e: Exception) {
         // TODO: Remove try-catch and convert to publish message 'notification-sent' instead of direct API call.
-        LOG.info("Call to capture email notification creation on visit-scheduler failed with exception: $e")
+        LOG.warn("Call to capture email notification creation on visit-scheduler failed", e)
       }
     }
   }

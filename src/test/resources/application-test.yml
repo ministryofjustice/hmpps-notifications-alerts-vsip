@@ -62,6 +62,9 @@ notify:
       enabled: true
     booker:
       enabled: true
+  reply-to-email-ids:
+    DEFAULT: 00000000-0000-0000-0000-000000000001
+    HEI: 00000000-0000-0000-0000-000000000002
   api:
     key: "test"
   callback:
@@ -72,4 +75,3 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
-

@@ -9,6 +9,9 @@ data class PrisonerSearchResultDto(
 
   @param:Schema(description = "Prisoner last name", example = "Smith", required = true)
   val lastName: String,
+
+  @param:Schema(description = "Prisoner current prison code", example = "MDI", required = false)
+  val prisonId: String? = null,
 ) {
   // Takes the full name and converts it from all capitals, to correct format (JOHN SMITH -> John Smith).
   override fun toString(): String = listOf(firstName, lastName).joinToString(" ") { it.lowercase().replaceFirstChar { char -> char.titlecaseChar() } }
