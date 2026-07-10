@@ -108,7 +108,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "hei@email.com",
+        "00000000-0000-0000-0000-000000000002",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -170,7 +170,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit3.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "hei@email.com",
+        "00000000-0000-0000-0000-000000000002",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -232,7 +232,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit2.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "hei@email.com",
+        "00000000-0000-0000-0000-000000000002",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -365,7 +365,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "hei@email.com",
+        "00000000-0000-0000-0000-000000000002",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -430,7 +430,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "hei@email.com",
+        "00000000-0000-0000-0000-000000000002",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -482,7 +482,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "hei@email.com",
+        "00000000-0000-0000-0000-000000000002",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -537,7 +537,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "hei@email.com",
+        "00000000-0000-0000-0000-000000000002",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -621,7 +621,7 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "hei@email.com",
+        "00000000-0000-0000-0000-000000000002",
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -633,14 +633,14 @@ class PrisonVisitBookedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId, "hei@email.com") }
+    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId, "00000000-0000-0000-0000-000000000002") }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "hei@email.com",
+        "00000000-0000-0000-0000-000000000002",
       )
     }
     await untilAsserted {

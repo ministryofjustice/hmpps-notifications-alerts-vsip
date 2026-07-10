@@ -61,7 +61,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
         bookerInfo.email,
         templateVars,
         null,
-        "default@email.com",
+        "00000000-0000-0000-0000-000000000001",
       ),
     ).thenReturn(buildSendEmailResponse(reference = "test"))
     bookerRegistryMockServer.stubGetVisitorRequestByReference(visitorRequestReference, visitorRequest)
@@ -145,7 +145,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
         bookerInfo.email,
         templateVars,
         null,
-        "default@email.com",
+        "00000000-0000-0000-0000-000000000001",
       ),
     ).thenReturn(buildSendEmailResponse(reference = "test"))
     bookerRegistryMockServer.stubGetVisitorRequestByReference(visitorRequestReference, visitorRequest)
@@ -158,7 +158,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
   private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorRejectedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorRejectedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestRejectedEmail(additionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_REJECTED_ALREADY_LINKED, "default@email.com") }
+    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_REJECTED_ALREADY_LINKED, "00000000-0000-0000-0000-000000000001") }
 
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
@@ -166,7 +166,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
         bookerInfoDto.email,
         templateVars,
         null,
-        "default@email.com",
+        "00000000-0000-0000-0000-000000000001",
       )
     }
   }

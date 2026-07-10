@@ -45,7 +45,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
         bookerInfo.email,
         templateVars,
         null,
-        "default@email.com",
+        "00000000-0000-0000-0000-000000000001",
       ),
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
@@ -154,7 +154,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
         bookerInfo.email,
         templateVars,
         null,
-        "default@email.com",
+        "00000000-0000-0000-0000-000000000001",
       ),
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
@@ -170,7 +170,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestApprovedEmail(additionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_APPROVED, "default@email.com") }
+    await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_APPROVED, "00000000-0000-0000-0000-000000000001") }
 
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
@@ -178,7 +178,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
         bookerInfoDto.email,
         templateVars,
         null,
-        "default@email.com",
+        "00000000-0000-0000-0000-000000000001",
       )
     }
   }

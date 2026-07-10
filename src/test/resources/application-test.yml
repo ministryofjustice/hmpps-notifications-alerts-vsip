@@ -63,8 +63,8 @@ notify:
     booker:
       enabled: true
   reply-to-email-ids:
-    DEFAULT: default@email.com
-    HEI: hei@email.com
+    DEFAULT: 00000000-0000-0000-0000-000000000001
+    HEI: 00000000-0000-0000-0000-000000000002
   api:
     key: "test"
   callback:

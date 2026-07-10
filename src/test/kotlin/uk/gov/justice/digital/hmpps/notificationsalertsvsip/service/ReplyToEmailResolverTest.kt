@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.Pri
 class ReplyToEmailResolverTest {
   private val prisonerSearchService: PrisonerSearchService = mock()
   private val notifyConfig = NotifyConfig().apply {
-    replyToEmailIds = mapOf("DEFAULT" to "default-reply-to-id", "MDI" to "mdi-reply-to-id")
+    replyToEmailIds = mapOf("DEFAULT" to "00000000-0000-0000-0000-000000000001", "MDI" to "00000000-0000-0000-0000-000000000003")
   }
   private val replyToEmailResolver = ReplyToEmailResolver(notifyConfig, prisonerSearchService)
 
@@ -24,7 +24,7 @@ class ReplyToEmailResolverTest {
 
     val replyToEmailId = replyToEmailResolver.getReplyToEmailIdForPrisoner("A1234BC")
 
-    assertEquals("mdi-reply-to-id", replyToEmailId)
+    assertEquals("00000000-0000-0000-0000-000000000003", replyToEmailId)
   }
 
   @Test
@@ -35,7 +35,7 @@ class ReplyToEmailResolverTest {
 
     val replyToEmailId = replyToEmailResolver.getReplyToEmailIdForPrisoner("A1234BC")
 
-    assertEquals("default-reply-to-id", replyToEmailId)
+    assertEquals("00000000-0000-0000-0000-000000000001", replyToEmailId)
   }
 
   @Test
@@ -44,13 +44,13 @@ class ReplyToEmailResolverTest {
 
     val replyToEmailId = replyToEmailResolver.getReplyToEmailIdForPrisoner("A1234BC")
 
-    assertEquals("default-reply-to-id", replyToEmailId)
+    assertEquals("00000000-0000-0000-0000-000000000001", replyToEmailId)
   }
 
   @Test
   fun `throws when default reply-to email id is not configured`() {
     val replyToEmailResolver = ReplyToEmailResolver(
-      NotifyConfig().apply { replyToEmailIds = mapOf("MDI" to "mdi-reply-to-id") },
+      NotifyConfig().apply { replyToEmailIds = mapOf("MDI" to "00000000-0000-0000-0000-000000000003") },
       prisonerSearchService,
     )
 
