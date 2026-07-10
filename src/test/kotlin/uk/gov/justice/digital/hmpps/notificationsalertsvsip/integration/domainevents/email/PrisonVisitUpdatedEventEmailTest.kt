@@ -109,7 +109,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "default@email.com",
+        "hei@email.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId))
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -168,7 +168,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
         visit3.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "default@email.com",
+        "hei@email.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId))
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -227,7 +227,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
         visit2.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "default@email.com",
+        "hei@email.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId))
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -357,7 +357,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "default@email.com",
+        "hei@email.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId))
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -422,7 +422,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "default@email.com",
+        "hei@email.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId))
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -474,7 +474,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "default@email.com",
+        "hei@email.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId))
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -526,7 +526,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "default@email.com",
+        "hei@email.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId))
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -605,7 +605,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "default@email.com",
+        "hei@email.com",
       ),
     ).thenReturn(buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId))
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
@@ -617,14 +617,14 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
     await untilAsserted { verify(prisonVisitChangedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.UPDATED, visitAdditionalInfo) }
-    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId, "default@email.com") }
+    await untilAsserted { verify(emailSenderService, times(1)).sendVisitsEmail(visit, VisitEventType.UPDATED, visitAdditionalInfo.eventAuditId, "hei@email.com") }
     await untilAsserted {
       verify(notificationClient, times(1)).sendEmail(
         templateId,
         visit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
-        "default@email.com",
+        "hei@email.com",
       )
     }
     await untilAsserted {
