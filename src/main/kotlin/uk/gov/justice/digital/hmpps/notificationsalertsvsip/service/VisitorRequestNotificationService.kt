@@ -18,7 +18,7 @@ class VisitorRequestNotificationService(
   val emailSenderService: EmailSenderService,
   val bookerRegistryClient: BookerRegistryClient,
   val prisonerContactRegistryService: PrisonerContactRegistryService,
-  val replyToEmailService: ReplyToEmailService,
+  val replyToEmailResolver: ReplyToEmailResolver,
 ) {
   private companion object {
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
@@ -36,7 +36,7 @@ class VisitorRequestNotificationService(
       ),
     )
 
-    val replyToEmailId = replyToEmailService.getReplyToEmailIdForPrisoner(additionalInfo.prisonerId)
+    val replyToEmailId = replyToEmailResolver.getReplyToEmailIdForPrisoner(additionalInfo.prisonerId)
     emailSenderService.sendBookerVisitorEmail(bookerDetails, visitorDetails, bookerEventType, replyToEmailId)
   }
 
@@ -52,7 +52,7 @@ class VisitorRequestNotificationService(
     val bookerInfo = BookerInfoDto(reference = visitorRequest.bookerReference, email = visitorRequest.bookerEmail)
     val visitorDetails = VisitorRequestVisitorInfoDto(visitorRequest)
 
-    val replyToEmailId = replyToEmailService.getReplyToEmailIdForPrisoner(visitorRequest.prisonerId)
+    val replyToEmailId = replyToEmailResolver.getReplyToEmailIdForPrisoner(visitorRequest.prisonerId)
     emailSenderService.sendBookerVisitorEmail(bookerInfo, visitorDetails, bookerEventType, replyToEmailId)
   }
 

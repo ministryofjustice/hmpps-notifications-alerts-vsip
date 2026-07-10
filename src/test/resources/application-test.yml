@@ -62,8 +62,9 @@ notify:
       enabled: true
     booker:
       enabled: true
-    reply-to-email-ids:
-      DEFAULT: default@email.com
+  reply-to-email-ids:
+    DEFAULT: default@email.com
+    HEI: default@email.com
   api:
     key: "test"
   callback:

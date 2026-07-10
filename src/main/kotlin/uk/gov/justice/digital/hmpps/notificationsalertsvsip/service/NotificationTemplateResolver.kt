@@ -2,13 +2,13 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.TemplatesConfig
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.NotifyConfig
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
 
 @Component
-class NotificationTemplateResolver(private val templatesConfig: TemplatesConfig) {
+class NotificationTemplateResolver(private val notifyConfig: NotifyConfig) {
 
   companion object {
     private val LOG = LoggerFactory.getLogger(this::class.java)
@@ -18,13 +18,13 @@ class NotificationTemplateResolver(private val templatesConfig: TemplatesConfig)
     template: EmailTemplateNames,
     languagePreference: LanguagePreference = LanguagePreference.EN,
   ): String {
-    val requestedTemplate = templatesConfig.emailTemplates[languagePreference]?.get(template)
+    val requestedTemplate = notifyConfig.emailTemplates[languagePreference]?.get(template)
 
     if (requestedTemplate != null) {
       return requestedTemplate
     }
 
-    val fallbackTemplate = templatesConfig.emailTemplates[LanguagePreference.EN]?.get(template)
+    val fallbackTemplate = notifyConfig.emailTemplates[LanguagePreference.EN]?.get(template)
 
     if (fallbackTemplate != null) {
       LOG.error(
@@ -42,13 +42,13 @@ class NotificationTemplateResolver(private val templatesConfig: TemplatesConfig)
     template: SmsTemplateNames,
     languagePreference: LanguagePreference = LanguagePreference.EN,
   ): String {
-    val requestedTemplate = templatesConfig.smsTemplates[languagePreference]?.get(template)
+    val requestedTemplate = notifyConfig.smsTemplates[languagePreference]?.get(template)
 
     if (requestedTemplate != null) {
       return requestedTemplate
     }
 
-    val fallbackTemplate = templatesConfig.smsTemplates[LanguagePreference.EN]?.get(template)
+    val fallbackTemplate = notifyConfig.smsTemplates[LanguagePreference.EN]?.get(template)
 
     if (fallbackTemplate != null) {
       LOG.error(
