@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNam
 @Component
 @ConfigurationProperties(prefix = "notify")
 @Validated
-class NotifyConfig {
+class NotifyProperties {
   @NotNull
   var smsTemplates: Map<LanguagePreference, Map<SmsTemplateNames, String>> = emptyMap()
 
