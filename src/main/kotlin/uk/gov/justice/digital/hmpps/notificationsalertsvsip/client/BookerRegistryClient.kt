@@ -30,7 +30,7 @@ class BookerRegistryClient(
     val logger: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun getBookerByBookerReference(bookerReference: String): BookerInfoDto? {
+  fun getBookerByBookerReference(bookerReference: String): BookerInfoDto {
     val uri = GET_BOOKER_BY_BOOKING_REFERENCE.replace("{bookerReference}", bookerReference)
     return webClient.get()
       .uri(uri)
@@ -43,10 +43,10 @@ class BookerRegistryClient(
           Mono.error(e)
         } else {
           logger.error("getBookerByBookerReference NOT_FOUND for get request $uri")
-          return@onErrorResume Mono.empty()
+          Mono.error(e)
         }
       }
-      .block(apiTimeout)
+      .block(apiTimeout) ?: throw IllegalStateException("Get booker request no response for request with reference $bookerReference")
   }
 
   fun getVisitorRequestByReference(visitorRequestReference: String): VisitorRequestDto {
