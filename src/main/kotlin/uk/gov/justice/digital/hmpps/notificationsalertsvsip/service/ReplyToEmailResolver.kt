@@ -2,12 +2,12 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.NotifyConfig
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.NotifyProperties
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
 
 @Service
 class ReplyToEmailResolver(
-  private val notifyConfig: NotifyConfig,
+  private val notifyProperties: NotifyProperties,
   private val prisonerSearchService: PrisonerSearchService,
 ) {
   companion object {
@@ -28,7 +28,7 @@ class ReplyToEmailResolver(
   }
 
   fun getReplyToEmailIdForPrison(prisonCode: String): String {
-    val replyToEmailId = notifyConfig.replyToEmailIds[prisonCode]
+    val replyToEmailId = notifyProperties.replyToEmailIds[prisonCode]
 
     if (replyToEmailId.isNullOrBlank()) {
       LOG.info("No reply-to email id configured for prison $prisonCode, using default reply-to email id")
@@ -38,7 +38,7 @@ class ReplyToEmailResolver(
     return replyToEmailId
   }
 
-  private fun getDefaultReplyToEmailId(): String = notifyConfig.replyToEmailIds[DEFAULT_REPLY_TO_EMAIL_PRISON_CODE]
+  private fun getDefaultReplyToEmailId(): String = notifyProperties.replyToEmailIds[DEFAULT_REPLY_TO_EMAIL_PRISON_CODE]
     ?.takeIf { it.isNotBlank() }
     ?: throw IllegalStateException("Default reply-to email id must be configured against prison code $DEFAULT_REPLY_TO_EMAIL_PRISON_CODE")
 }

@@ -21,7 +21,7 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import tools.jackson.databind.ObjectMapper
 import tools.jackson.module.kotlin.jacksonObjectMapper
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.NotifyConfig
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.NotifyProperties
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.ContactDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitExternalSystemDetailsDto
@@ -137,7 +137,7 @@ abstract class EventsIntegrationTestBase {
   lateinit var visitSchedulerService: VisitSchedulerService
 
   @MockitoSpyBean
-  lateinit var notifyConfig: NotifyConfig
+  lateinit var notifyProperties: NotifyProperties
 
   @MockitoSpyBean
   lateinit var prisonVisitBookedEventNotifierSpy: PrisonVisitBookedEventNotifier

@@ -5,16 +5,16 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.NotifyConfig
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.config.NotifyProperties
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.search.PrisonerSearchResultDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
 
 class ReplyToEmailResolverTest {
   private val prisonerSearchService: PrisonerSearchService = mock()
-  private val notifyConfig = NotifyConfig().apply {
+  private val notifyProperties = NotifyProperties().apply {
     replyToEmailIds = mapOf("DEFAULT" to "00000000-0000-0000-0000-000000000001", "MDI" to "00000000-0000-0000-0000-000000000003")
   }
-  private val replyToEmailResolver = ReplyToEmailResolver(notifyConfig, prisonerSearchService)
+  private val replyToEmailResolver = ReplyToEmailResolver(notifyProperties, prisonerSearchService)
 
   @Test
   fun `uses configured reply-to email id for prisoner's current prison`() {
@@ -50,7 +50,7 @@ class ReplyToEmailResolverTest {
   @Test
   fun `throws when default reply-to email id is not configured`() {
     val replyToEmailResolver = ReplyToEmailResolver(
-      NotifyConfig().apply { replyToEmailIds = mapOf("MDI" to "00000000-0000-0000-0000-000000000003") },
+      NotifyProperties().apply { replyToEmailIds = mapOf("MDI" to "00000000-0000-0000-0000-000000000003") },
       prisonerSearchService,
     )
 
