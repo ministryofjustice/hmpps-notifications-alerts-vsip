@@ -14,11 +14,6 @@ repositories {
   mavenCentral()
 }
 
-dependencyCheck {
-  suppressionFiles.add("dependency-check-suppress-json.xml")
-  nvd.datafeedUrl = "file:///opt/vulnz/cache"
-}
-
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
