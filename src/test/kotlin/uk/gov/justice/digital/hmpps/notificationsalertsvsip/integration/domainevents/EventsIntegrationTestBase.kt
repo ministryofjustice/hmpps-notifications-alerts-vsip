@@ -27,7 +27,6 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitExternalSystemDetailsDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitorDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.visit.scheduler.VisitRestriction
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.BookerRegistryMockServer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.mock.HmppsAuthExtension
@@ -58,6 +57,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.no
 import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
+import uk.gov.justice.hmpps.test.kotlin.auth.JwtAuthorisationHelper
 import uk.gov.service.notify.NotificationClient
 import uk.gov.service.notify.SendEmailResponse
 import uk.gov.service.notify.SendSmsResponse
@@ -181,7 +181,7 @@ abstract class EventsIntegrationTestBase {
   lateinit var roleVisitSchedulerHttpHeaders: (HttpHeaders) -> Unit
 
   @Autowired
-  protected lateinit var jwtAuthHelper: JwtAuthHelper
+  protected lateinit var jwtAuthHelper: JwtAuthorisationHelper
 
   @BeforeEach
   @AfterEach
@@ -204,7 +204,12 @@ abstract class EventsIntegrationTestBase {
     user: String = "AUTH_ADM",
     roles: List<String> = listOf(),
     scopes: List<String> = listOf(),
-  ): (HttpHeaders) -> Unit = jwtAuthHelper.setAuthorisation(user, roles, scopes)
+  ): (HttpHeaders) -> Unit = jwtAuthHelper.setAuthorisationHeader(
+    clientId = "hmpps-notifications-alerts-vsip",
+    username = user,
+    scope = scopes,
+    roles = roles,
+  )
 
   fun purgeQueue(client: SqsAsyncClient, url: String) {
     client.purgeQueue(PurgeQueueRequest.builder().queueUrl(url).build()).get()
