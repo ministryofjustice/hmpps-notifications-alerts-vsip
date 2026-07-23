@@ -94,7 +94,6 @@ notify:
         VISIT_CANCEL_NO_PRISON_NUMBER: 3103b319-267d-4265-83a6-a38e93fc2342
         VISIT_REQUESTED: ce1ee7ec-5129-48c9-a488-9c9f504f1de0
         VISIT_REQUEST_REJECTED: 0c601971-eaeb-43ec-8893-d9e6806d647b
-      cy: {}
   email-templates:
       en:
         VISIT_BOOKING_OR_REQUEST_APPROVED: 35dffc03-c13a-4838-90f9-ade9fc325616
@@ -107,7 +106,6 @@ notify:
         BOOKER_VISITOR_APPROVED: 1a884da1-708e-4230-83ea-1d5cf076351a
         BOOKER_VISITOR_REJECTED: 64dbcdea-0285-4066-81cf-5917b8cdd7ac
         BOOKER_VISITOR_REJECTED_ALREADY_LINKED: 988d1e77-6fbd-4fe9-ae7d-e6b594f018b4
-      cy: {}
   reply-to-email-ids:
     DEFAULT: 3ea148ec-60f7-455a-b5c0-48467e31b61f
     AGI: 46472678-d2e0-467c-aeee-ab9ba808446f
