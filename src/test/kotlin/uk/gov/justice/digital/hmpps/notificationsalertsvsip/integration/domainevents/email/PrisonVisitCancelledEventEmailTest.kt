@@ -459,24 +459,25 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   @Test
   fun `when visit cancelled message is received with welsh language but no welsh template exists then cancelled email is sent in english`() {
     // Given
-    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val welshVisit = visit.copy(visitContact = visit.visitContact.copy(languagePreference = LanguagePreference.CY))
+    val visitAdditionalInfo = VisitAdditionalInfo(welshVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED, LanguagePreference.CY)
-    val templateVars = createTemplateVars(visit)
+    val templateVars = createTemplateVars(welshVisit)
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    visitSchedulerMockServer.stubGetVisit(visit.reference, visit)
+    visitSchedulerMockServer.stubGetVisit(welshVisit.reference, welshVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
-    prisonerOffenderSearchMockServer.stubGetPrisoner(visit.prisonerId, prisonerSearchResult)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(welshVisit.prisonerId, prisonerSearchResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
         templateId,
-        visit.visitContact.email,
+        welshVisit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
         "00000000-0000-0000-0000-000000000002",
@@ -485,7 +486,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId, visit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, welshVisit, visitAdditionalInfo, templateVars)
   }
 
   private fun createTemplateVars(visit: VisitDto, openingSentence: String? = "visit to see $prisonerSearchResult", prisoner: String? = prisonerSearchResult.toString(), phone: String? = prisonContactDetailsDto.phoneNumber, webAddress: String? = prisonContactDetailsDto.webAddress): Map<String, Any> {

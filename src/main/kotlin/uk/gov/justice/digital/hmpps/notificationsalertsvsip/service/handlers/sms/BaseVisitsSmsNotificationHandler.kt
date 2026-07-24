@@ -8,9 +8,6 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePrefer
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationTemplateResolver
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
 @Service
 abstract class BaseVisitsSmsNotificationHandler {
@@ -27,16 +24,4 @@ abstract class BaseVisitsSmsNotificationHandler {
     template: SmsTemplateNames,
     languagePreference: LanguagePreference = LanguagePreference.EN,
   ): String = notificationTemplateResolver.getSmsTemplate(template = template, languagePreference = languagePreference)
-
-  protected fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, String> {
-    val templateVars = mutableMapOf(
-      "ref number" to visit.reference,
-      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
-      "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
-      "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
-      "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
-    )
-
-    return templateVars
-  }
 }

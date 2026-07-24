@@ -167,13 +167,14 @@ class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
   @Test
   fun `when visit requested message is received and language is welsh but no welsh template exists, then request message is sent in english`() {
     // Given
-    val bookingReference = visit.reference
-    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val welshVisit = visit.copy(visitContact = visit.visitContact.copy(languagePreference = LanguagePreference.CY))
+    val bookingReference = welshVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(welshVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_REQUESTED, LanguagePreference.CY)
-    val visitDate = visit.startTimestamp.toLocalDate()
+    val visitDate = welshVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateVars = mutableMapOf<String, Any>(
@@ -186,17 +187,17 @@ class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, welshVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.BOOKED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(visit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(welshVisit, VisitEventType.BOOKED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
-        visit.visitContact.telephone,
+        welshVisit.visitContact.telephone,
         templateVars,
         visitAdditionalInfo.eventAuditId,
       )

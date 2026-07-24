@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Contact")
@@ -12,4 +13,6 @@ data class ContactDto(
   val telephone: String? = null,
   @param:Schema(description = "Contact Email", example = "example@email.com", required = false)
   val email: String? = null,
+  @param:Schema(description = "Contact language preference", example = "en", required = false)
+  val languagePreference: LanguagePreference = LanguagePreference.EN,
 )

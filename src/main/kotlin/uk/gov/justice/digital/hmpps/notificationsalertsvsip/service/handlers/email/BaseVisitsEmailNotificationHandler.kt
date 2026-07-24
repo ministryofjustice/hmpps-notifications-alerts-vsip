@@ -12,9 +12,6 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.Notification
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerContactRegistryService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -43,38 +40,36 @@ abstract class BaseVisitsEmailNotificationHandler {
     languagePreference: LanguagePreference = LanguagePreference.EN,
   ): String = notificationTemplateResolver.getEmailTemplate(template = template, languagePreference = languagePreference)
 
-  protected fun getCommonTemplateVars(visit: VisitDto): MutableMap<String, Any> {
-    val templateVars: MutableMap<String, Any> = mutableMapOf(
-      "ref number" to visit.reference,
-      "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
-      "end time" to getFormattedTime(visit.endTimestamp.toLocalTime()),
-      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
-      "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
-      "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
-      "main contact name" to visit.visitContact.name,
+  protected fun getPrisoner(visit: VisitDto): Map<String, Any> {
+    val templateVars: MutableMap<String, Any> = prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
+      mutableMapOf(
+        "opening sentence" to "visit to see $prisoner",
+        "prisoner" to "$prisoner",
+      )
+    } ?: mutableMapOf(
+      "opening sentence" to "visit to the prison",
+      "prisoner" to "the prisoner",
     )
-    templateVars.putAll(getPrisoner(visit))
-    templateVars.putAll(getPrisonContactDetails(visit))
+    when (visit.visitContact.languagePreference) {
+      LanguagePreference.CY -> templateVars.putAll(emptyMap<String, Any>())
+      else -> Unit
+    }
 
     return templateVars
   }
 
-  protected fun getPrisoner(visit: VisitDto): Map<String, Any> = prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
-    mutableMapOf(
-      "opening sentence" to "visit to see $prisoner",
-      "prisoner" to "$prisoner",
-    )
-  } ?: mutableMapOf(
-    "opening sentence" to "visit to the prison",
-    "prisoner" to "the prisoner",
-  )
-
   protected fun getPrisonContactDetails(visit: VisitDto): Map<String, String> {
     val prisonContactDetails = prisonRegisterService.getPrisonSocialVisitsContactDetails(visit.prisonCode)
-    return mutableMapOf(
+    val templateVars = mutableMapOf(
       "phone" to (prisonContactDetails?.phoneNumber ?: GOV_UK_PRISON_PAGE),
       "website" to (prisonContactDetails?.webAddress ?: GOV_UK_PRISON_PAGE),
     )
+    when (visit.visitContact.languagePreference) {
+      LanguagePreference.CY -> templateVars.putAll(emptyMap<String, String>())
+      else -> Unit
+    }
+
+    return templateVars
   }
 
   protected fun getVisitors(visit: VisitDto): List<String> {
