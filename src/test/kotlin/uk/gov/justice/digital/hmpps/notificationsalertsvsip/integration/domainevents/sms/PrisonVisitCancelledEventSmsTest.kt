@@ -652,11 +652,12 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
   @Test
   fun `when visit cancelled message is received and language is welsh but no welsh template exists, then cancelled message is sent in english`() {
     // Given
-    val bookingReference = visit.reference
-    val visitAdditionalInfo = VisitAdditionalInfo(visit.reference, "123456")
+    val welshVisit = visit.copy(visitContact = visit.visitContact.copy(languagePreference = LanguagePreference.CY))
+    val bookingReference = welshVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(welshVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
-    val visitDate = visit.startTimestamp.toLocalDate()
+    val visitDate = welshVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_CANCEL, LanguagePreference.CY)
@@ -673,13 +674,13 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    visitSchedulerMockServer.stubGetVisit(bookingReference, visit)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, welshVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendSms(
         templateId,
-        visit.visitContact.telephone,
+        welshVisit.visitContact.telephone,
         templateVars,
         visitAdditionalInfo.eventAuditId,
       ),
@@ -689,11 +690,11 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
-    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(visit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(welshVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
     await untilAsserted {
       verify(notificationClient, times(1)).sendSms(
         templateId,
-        visit.visitContact.telephone,
+        welshVisit.visitContact.telephone,
         templateVars,
         visitAdditionalInfo.eventAuditId,
       )

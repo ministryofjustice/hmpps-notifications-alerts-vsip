@@ -7,6 +7,9 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotific
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
 @Service
 class CancelledEventVisitsEmailHandler : BaseVisitsEmailNotificationHandler() {
@@ -19,8 +22,28 @@ class CancelledEventVisitsEmailHandler : BaseVisitsEmailNotificationHandler() {
 
     return SendEmailNotificationDto(
       templateName = getCancelledEmailTemplateName(visit),
-      templateVars = getCommonTemplateVars(visit),
+      templateVars = getTemplateVars(visit),
     )
+  }
+
+  private fun getTemplateVars(visit: VisitDto): Map<String, Any> {
+    val templateVars: MutableMap<String, Any> = mutableMapOf(
+      "ref number" to visit.reference,
+      "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
+      "end time" to getFormattedTime(visit.endTimestamp.toLocalTime()),
+      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
+      "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
+      "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
+      "main contact name" to visit.visitContact.name,
+    )
+    templateVars.putAll(getPrisoner(visit))
+    templateVars.putAll(getPrisonContactDetails(visit))
+    when (visit.visitContact.languagePreference) {
+      LanguagePreference.CY -> templateVars.putAll(emptyMap<String, Any>())
+      else -> Unit
+    }
+
+    return templateVars
   }
 
   private fun getCancelledEmailTemplateName(visit: VisitDto): String {
@@ -48,6 +71,6 @@ class CancelledEventVisitsEmailHandler : BaseVisitsEmailNotificationHandler() {
       }
     }
 
-    return getTemplateName(template, languagePreference = LanguagePreference.EN)
+    return getTemplateName(template, languagePreference = visit.visitContact.languagePreference)
   }
 }

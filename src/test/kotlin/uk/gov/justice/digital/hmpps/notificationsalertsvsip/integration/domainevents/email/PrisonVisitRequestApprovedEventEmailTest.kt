@@ -256,8 +256,9 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
   @Test
   fun `when visit request approved event received in welsh and visit was approved but no welsh template exists then visit booked email is sent in english`() {
     // Given
-    val bookingReference = approvedVisit.reference
-    val visitAdditionalInfo = VisitAdditionalInfo(approvedVisit.reference, "123456")
+    val welshApprovedVisit = approvedVisit.copy(visitContact = approvedVisit.visitContact.copy(languagePreference = LanguagePreference.CY))
+    val bookingReference = welshApprovedVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(welshApprovedVisit.reference, "123456")
     val visitor1 = ContactWithOptionalPrisonerRelationshipDto(1234, "Visitor", "One", (LocalDate.now().minusYears(30)))
     val visitor2 = ContactWithOptionalPrisonerRelationshipDto(9876, "Visitor", "Two")
 
@@ -265,7 +266,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.CY)
-    val visitDate = approvedVisit.startTimestamp.toLocalDate()
+    val visitDate = welshApprovedVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateVars = mutableMapOf<String, Any>(
@@ -289,15 +290,15 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
-    visitSchedulerMockServer.stubGetVisit(bookingReference, approvedVisit)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, welshApprovedVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
-    prisonerOffenderSearchMockServer.stubGetPrisoner(approvedVisit.prisonerId, prisonerSearchResult)
-    prisonerContactRegisterMockServer.stubSearchContacts(approvedVisit.prisonerId, approvedVisit.visitors.map { it.nomisPersonId }, false, listOf(visitor1, visitor2))
+    prisonerOffenderSearchMockServer.stubGetPrisoner(welshApprovedVisit.prisonerId, prisonerSearchResult)
+    prisonerContactRegisterMockServer.stubSearchContacts(welshApprovedVisit.prisonerId, welshApprovedVisit.visitors.map { it.nomisPersonId }, false, listOf(visitor1, visitor2))
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendEmail(
         templateId,
-        approvedVisit.visitContact.email,
+        welshApprovedVisit.visitContact.email,
         templateVars,
         visitAdditionalInfo.eventAuditId,
         "00000000-0000-0000-0000-000000000002",
@@ -306,7 +307,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
 
     // Then
-    verifyEmailSent(templateId, approvedVisit, visitAdditionalInfo, templateVars)
+    verifyEmailSent(templateId, welshApprovedVisit, visitAdditionalInfo, templateVars)
   }
 
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {

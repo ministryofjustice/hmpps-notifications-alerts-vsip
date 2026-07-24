@@ -4,9 +4,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendSmsNotificationDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.VisitDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_CANCEL
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_CANCEL_NO_PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNames.VISIT_REQUEST_REJECTED
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
 
 @Service
 class CancelledEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() {
@@ -18,20 +22,35 @@ class CancelledEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() {
   override fun handle(visit: VisitDto): SendSmsNotificationDto {
     LOG.info("handleCancelledEvent (sms) - Entered for visit reference - ${visit.reference} with sub status - ${visit.visitSubStatus}")
 
-    val templateVars = getCommonTemplateVars(visit)
-    templateVars["reference"] = visit.reference
-
     val prisonContactNumber: String? = prisonRegisterService.getPrisonSocialVisitsContactDetails(visit.prisonCode)?.phoneNumber
     val isPrisonContactNumberAvailable = !prisonContactNumber.isNullOrEmpty()
-    if (isPrisonContactNumberAvailable) {
-      templateVars["prison phone number"] = prisonContactNumber
-    }
-    val templateName = getCancelledSmsTemplateName(visit.visitSubStatus, isPrisonContactNumberAvailable)
+    val templateVars = getTemplateVars(visit, prisonContactNumber)
+    val templateName = getCancelledSmsTemplateName(visit, isPrisonContactNumberAvailable)
     return SendSmsNotificationDto(templateName, templateVars)
   }
 
-  private fun getCancelledSmsTemplateName(visitSubStatus: String, isPrisonContactNumberAvailable: Boolean): String {
-    val template = when (visitSubStatus) {
+  private fun getTemplateVars(visit: VisitDto, prisonContactNumber: String?): Map<String, String> {
+    val templateVars = mutableMapOf(
+      "ref number" to visit.reference,
+      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
+      "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
+      "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
+      "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
+      "reference" to visit.reference,
+    )
+    if (!prisonContactNumber.isNullOrEmpty()) {
+      templateVars["prison phone number"] = prisonContactNumber
+    }
+    when (visit.visitContact.languagePreference) {
+      LanguagePreference.CY -> templateVars.putAll(emptyMap<String, String>())
+      else -> Unit
+    }
+
+    return templateVars
+  }
+
+  private fun getCancelledSmsTemplateName(visit: VisitDto, isPrisonContactNumberAvailable: Boolean): String {
+    val template = when (visit.visitSubStatus) {
       "REJECTED", "AUTO_REJECTED" -> {
         VISIT_REQUEST_REJECTED
       }
@@ -43,6 +62,6 @@ class CancelledEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() {
       }
     }
 
-    return getTemplateName(template)
+    return getTemplateName(template, languagePreference = visit.visitContact.languagePreference)
   }
 }
