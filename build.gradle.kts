@@ -23,7 +23,7 @@ dependencies {
   implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.30.0")
 
   implementation("org.springframework.data:spring-data-commons:4.1.0")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.0")
   implementation("uk.gov.service.notify:notifications-java-client:6.1.0-RELEASE")
   implementation("org.springframework.boot:spring-boot-configuration-processor")
 
