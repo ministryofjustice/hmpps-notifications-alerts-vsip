@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateN
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRejectedAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRequestAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BOOKER_VISITOR_REJECTED
 import java.time.LocalDate
 
@@ -50,7 +50,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
     )
 
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
-    val bookerAdditionalInfo = VisitorRejectedAdditionalInfo(visitorRequestReference)
+    val bookerAdditionalInfo = VisitorRequestAdditionalInfo(visitorRequestReference)
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_REJECTED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -76,7 +76,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
     // Given
     val visitorRequestReference = "abc-def-ghi"
 
-    val bookerAdditionalInfo = VisitorRejectedAdditionalInfo(visitorRequestReference)
+    val bookerAdditionalInfo = VisitorRequestAdditionalInfo(visitorRequestReference)
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_REJECTED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -93,7 +93,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
     // Given
     val visitorRequestReference = "abc-def-ghi"
 
-    val bookerAdditionalInfo = VisitorRejectedAdditionalInfo(visitorRequestReference)
+    val bookerAdditionalInfo = VisitorRequestAdditionalInfo(visitorRequestReference)
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_REJECTED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -134,7 +134,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
     )
 
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
-    val bookerAdditionalInfo = VisitorRejectedAdditionalInfo(visitorRequestReference)
+    val bookerAdditionalInfo = VisitorRequestAdditionalInfo(visitorRequestReference)
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_REJECTED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -155,7 +155,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
     verifyBookerEmailSent(templateId, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(visitorRequest), templateVars)
   }
 
-  private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorRejectedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
+  private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorRequestAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorRejectedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestRejectedEmail(additionalInfo) }
     await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_REJECTED_ALREADY_LINKED, "00000000-0000-0000-0000-000000000001") }
@@ -171,7 +171,7 @@ class BookerVisitorRejectedAlreadyLinkedEventEmailTest : EventsIntegrationTestBa
     }
   }
 
-  private fun verifyBookerEmailNotSent(additionalInfo: VisitorRejectedAdditionalInfo) {
+  private fun verifyBookerEmailNotSent(additionalInfo: VisitorRequestAdditionalInfo) {
     await untilAsserted { verify(bookerVisitorRejectedEventNotifierSpy, times(1)).processEvent(any()) }
     await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestRejectedEmail(additionalInfo) }
     await untilAsserted { verify(emailSenderService, times(0)).sendBookerVisitorEmail(any(), any(), any(), any()) }

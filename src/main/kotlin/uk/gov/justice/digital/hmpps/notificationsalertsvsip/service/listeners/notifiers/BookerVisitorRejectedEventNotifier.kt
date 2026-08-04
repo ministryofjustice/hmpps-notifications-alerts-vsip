@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component
 import tools.jackson.databind.ObjectMapper
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitorRequestNotificationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRejectedAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRequestAdditionalInfo
 
 const val BOOKER_VISITOR_REJECTED = "prison-visit-booker.visitor-rejected"
 
@@ -16,9 +16,9 @@ class BookerVisitorRejectedEventNotifier(
   private val objectMapper: ObjectMapper,
 ) : EventNotifier(objectMapper) {
   override fun processEvent(domainEvent: DomainEvent) {
-    val visitorRejectedAdditionalInfo: VisitorRejectedAdditionalInfo = objectMapper.readValue(domainEvent.additionalInformation, VisitorRejectedAdditionalInfo::class.java)
-    LOG.info("Enter booking event with info : $visitorRejectedAdditionalInfo")
+    val visitorRequestAdditionalInfo: VisitorRequestAdditionalInfo = objectMapper.readValue(domainEvent.additionalInformation, VisitorRequestAdditionalInfo::class.java)
+    LOG.info("Enter booking event with info : {}", visitorRequestAdditionalInfo)
 
-    visitorRequestNotificationService.sendVisitorRequestRejectedEmail(visitorRejectedAdditionalInfo)
+    visitorRequestNotificationService.sendVisitorRequestRejectedEmail(visitorRequestAdditionalInfo)
   }
 }

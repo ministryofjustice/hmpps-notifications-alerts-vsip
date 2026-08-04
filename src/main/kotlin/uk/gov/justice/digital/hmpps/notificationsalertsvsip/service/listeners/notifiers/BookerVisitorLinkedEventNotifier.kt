@@ -7,10 +7,10 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitorReque
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorLinkedAdditionalInfo
 
-const val BOOKER_VISITOR_APPROVED = "prison-visit-booker.visitor-approved"
+const val BOOKER_VISITOR_LINKED = "prison-visit-booker.visitor-linked"
 
-@Component(value = BOOKER_VISITOR_APPROVED)
-class BookerVisitorApprovedEventNotifier(
+@Component(value = BOOKER_VISITOR_LINKED)
+class BookerVisitorLinkedEventNotifier(
   private val visitorRequestNotificationService: VisitorRequestNotificationService,
   @param:Qualifier("objectMapper")
   private val objectMapper: ObjectMapper,

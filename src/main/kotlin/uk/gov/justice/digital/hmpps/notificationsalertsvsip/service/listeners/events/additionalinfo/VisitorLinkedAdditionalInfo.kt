@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.e
 
 import jakarta.validation.constraints.NotBlank
 
-data class VisitorApprovedAdditionalInfo(
+data class VisitorLinkedAdditionalInfo(
   @field:NotBlank
   val bookerReference: String,
   @field:NotBlank

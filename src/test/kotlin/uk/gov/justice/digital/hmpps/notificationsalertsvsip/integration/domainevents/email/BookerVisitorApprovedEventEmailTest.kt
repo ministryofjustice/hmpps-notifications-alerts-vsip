@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateN
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domainevents.EventsIntegrationTestBase
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorApprovedAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorLinkedAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BOOKER_VISITOR_APPROVED
 import java.time.LocalDate
 
@@ -35,7 +35,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     )
 
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
-    val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
+    val bookerAdditionalInfo = VisitorLinkedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -65,7 +65,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     val visitorId = 9999L
 
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
-    val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
+    val bookerAdditionalInfo = VisitorLinkedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -85,7 +85,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     val visitorId = 9999L
 
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
-    val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
+    val bookerAdditionalInfo = VisitorLinkedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -103,7 +103,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // Given
     val visitorId = 1234L
 
-    val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
+    val bookerAdditionalInfo = VisitorLinkedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -121,7 +121,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     // Given
     val visitorId = 1234L
 
-    val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
+    val bookerAdditionalInfo = VisitorLinkedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -144,7 +144,7 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     )
 
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
-    val bookerAdditionalInfo = VisitorApprovedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
+    val bookerAdditionalInfo = VisitorLinkedAdditionalInfo(bookerReference, prisonerId, visitorId.toString())
     val domainEvent = createDomainEventJson(BOOKER_VISITOR_APPROVED, createAdditionalInformationJson(bookerAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
@@ -167,9 +167,9 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     verifyBookerEmailSent(templateId, bookerAdditionalInfo, bookerInfo, VisitorRequestVisitorInfoDto(contact1), templateVars)
   }
 
-  private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorApprovedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
+  private fun verifyBookerEmailSent(templateId: String, additionalInfo: VisitorLinkedAdditionalInfo, bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto, templateVars: Map<String, Any>) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestApprovedEmail(additionalInfo) }
+    await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorLinkedEmail(additionalInfo) }
     await untilAsserted { verify(emailSenderService, times(1)).sendBookerVisitorEmail(bookerInfoDto, visitorInfo, BookerEventType.VISITOR_APPROVED, "00000000-0000-0000-0000-000000000001") }
 
     await untilAsserted {
@@ -183,9 +183,9 @@ class BookerVisitorApprovedEventEmailTest : EventsIntegrationTestBase() {
     }
   }
 
-  private fun verifyBookerEmailNotSent(additionalInfo: VisitorApprovedAdditionalInfo) {
+  private fun verifyBookerEmailNotSent(additionalInfo: VisitorLinkedAdditionalInfo) {
     await untilAsserted { verify(bookerVisitorApprovedEventNotifierSpy, times(1)).processEvent(any()) }
-    await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorRequestApprovedEmail(additionalInfo) }
+    await untilAsserted { verify(visitorRequestNotificationService, times(1)).sendVisitorLinkedEmail(additionalInfo) }
     await untilAsserted { verify(emailSenderService, times(0)).sendBookerVisitorEmail(any(), any(), any(), any()) }
   }
 }
