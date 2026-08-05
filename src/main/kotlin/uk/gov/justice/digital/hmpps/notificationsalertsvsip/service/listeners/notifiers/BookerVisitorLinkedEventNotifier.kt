@@ -7,17 +7,17 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitorReque
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorLinkedAdditionalInfo
 
-const val BOOKER_VISITOR_APPROVED = "prison-visit-booker.visitor-approved"
+const val BOOKER_VISITOR_LINKED = "prison-visit-booker.visitor-linked"
 
-@Component(value = BOOKER_VISITOR_APPROVED)
-class BookerVisitorApprovedEventNotifier(
+@Component(value = BOOKER_VISITOR_LINKED)
+class BookerVisitorLinkedEventNotifier(
   private val visitorRequestNotificationService: VisitorRequestNotificationService,
   @param:Qualifier("objectMapper")
   private val objectMapper: ObjectMapper,
 ) : EventNotifier(objectMapper) {
   override fun processEvent(domainEvent: DomainEvent) {
     val visitorLinkedAdditionalInfo: VisitorLinkedAdditionalInfo = objectMapper.readValue(domainEvent.additionalInformation, VisitorLinkedAdditionalInfo::class.java)
-    LOG.info("Enter BookerVisitorApprovedEventNotifier event with info : {}", visitorLinkedAdditionalInfo)
+    LOG.info("Enter BookerVisitorLinkedEventNotifier event with info : {}", visitorLinkedAdditionalInfo)
 
     visitorRequestNotificationService.sendVisitorLinkedEmail(visitorLinkedAdditionalInfo)
   }

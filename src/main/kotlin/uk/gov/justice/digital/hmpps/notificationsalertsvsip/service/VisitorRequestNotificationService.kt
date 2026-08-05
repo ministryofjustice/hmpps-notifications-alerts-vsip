@@ -10,8 +10,8 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registr
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.BookerRegistryService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerContactRegistryService
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorApprovedAdditionalInfo
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRejectedAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorLinkedAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRequestAdditionalInfo
 
 @Service
 class VisitorRequestNotificationService(
@@ -24,9 +24,9 @@ class VisitorRequestNotificationService(
     val LOG: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun sendVisitorRequestApprovedEmail(additionalInfo: VisitorApprovedAdditionalInfo) {
+  fun sendVisitorLinkedEmail(additionalInfo: VisitorLinkedAdditionalInfo) {
     val bookerEventType = BookerEventType.VISITOR_APPROVED
-    LOG.info("Received call to send approval notification for event type $bookerEventType, additional info - $additionalInfo")
+    LOG.info("Received call to send approval notification for event type $bookerEventType, additional info - $additionalInfo (visitor linked)")
     val bookerDetails = bookerRegistryService.getBookerByBookerReference(additionalInfo.bookerReference)
 
     val visitorDetails = VisitorRequestVisitorInfoDto(
@@ -40,7 +40,7 @@ class VisitorRequestNotificationService(
     emailSenderService.sendBookerVisitorEmail(bookerDetails, visitorDetails, bookerEventType, replyToEmailId)
   }
 
-  fun sendVisitorRequestRejectedEmail(additionalInfo: VisitorRejectedAdditionalInfo) {
+  fun sendVisitorRequestRejectedEmail(additionalInfo: VisitorRequestAdditionalInfo) {
     LOG.info("Received call to send rejection notification, additional info - $additionalInfo")
 
     val visitorRequest = bookerRegistryService.getVisitorRequestByReference(additionalInfo.requestReference)
@@ -49,6 +49,18 @@ class VisitorRequestNotificationService(
       "ALREADY_LINKED" -> BookerEventType.VISITOR_REJECTED_ALREADY_LINKED
       else -> throw IllegalStateException("Unexpected rejection reason ${visitorRequest.rejectionReason}")
     }
+    val bookerInfo = BookerInfoDto(reference = visitorRequest.bookerReference, email = visitorRequest.bookerEmail)
+    val visitorDetails = VisitorRequestVisitorInfoDto(visitorRequest)
+
+    val replyToEmailId = replyToEmailResolver.getReplyToEmailIdForPrisoner(visitorRequest.prisonerId)
+    emailSenderService.sendBookerVisitorEmail(bookerInfo, visitorDetails, bookerEventType, replyToEmailId)
+  }
+
+  fun sendVisitorRequestApprovedEmail(additionalInfo: VisitorRequestAdditionalInfo) {
+    val bookerEventType = BookerEventType.VISITOR_APPROVED
+    LOG.info("Received call to send approval notification for event type $bookerEventType, additional info - $additionalInfo (request approved)")
+
+    val visitorRequest = bookerRegistryService.getVisitorRequestByReference(additionalInfo.requestReference)
     val bookerInfo = BookerInfoDto(reference = visitorRequest.bookerReference, email = visitorRequest.bookerEmail)
     val visitorDetails = VisitorRequestVisitorInfoDto(visitorRequest)
 

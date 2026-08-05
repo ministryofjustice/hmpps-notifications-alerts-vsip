@@ -7,18 +7,18 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.VisitorReque
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.DomainEvent
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRequestAdditionalInfo
 
-const val BOOKER_VISITOR_REJECTED = "prison-visit-booker.visitor-rejected"
+const val BOOKER_VISITOR_REQUEST_APPROVED = "prison-visit-booker.visitor-request-approved"
 
-@Component(value = BOOKER_VISITOR_REJECTED)
-class BookerVisitorRejectedEventNotifier(
+@Component(value = BOOKER_VISITOR_REQUEST_APPROVED)
+class BookerVisitorRequestApprovedEventNotifier(
   private val visitorRequestNotificationService: VisitorRequestNotificationService,
   @param:Qualifier("objectMapper")
   private val objectMapper: ObjectMapper,
 ) : EventNotifier(objectMapper) {
   override fun processEvent(domainEvent: DomainEvent) {
     val visitorRequestAdditionalInfo: VisitorRequestAdditionalInfo = objectMapper.readValue(domainEvent.additionalInformation, VisitorRequestAdditionalInfo::class.java)
-    LOG.info("Enter BookerVisitorRejectedEventNotifier event with info : {}", visitorRequestAdditionalInfo)
+    LOG.info("Enter BookerVisitorRequestApprovedEventNotifier event with info : {}", visitorRequestAdditionalInfo)
 
-    visitorRequestNotificationService.sendVisitorRequestRejectedEmail(visitorRequestAdditionalInfo)
+    visitorRequestNotificationService.sendVisitorRequestApprovedEmail(visitorRequestAdditionalInfo)
   }
 }

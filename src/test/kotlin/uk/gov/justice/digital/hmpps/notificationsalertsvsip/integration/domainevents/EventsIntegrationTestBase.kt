@@ -46,10 +46,13 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.ev
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.EventFeatureSwitch
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.SQSMessage
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorApprovedAdditionalInfo
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRejectedAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorLinkedAdditionalInfo
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRequestAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorApprovedEventNotifier
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorLinkedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorRejectedEventNotifier
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorRequestApprovedEventNotifier
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorRequestRejectedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitBookedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitCancelledEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitChangedEventNotifier
@@ -155,7 +158,16 @@ abstract class EventsIntegrationTestBase {
   lateinit var bookerVisitorApprovedEventNotifierSpy: BookerVisitorApprovedEventNotifier
 
   @MockitoSpyBean
+  lateinit var bookerVisitorLinkedEventNotifierSpy: BookerVisitorLinkedEventNotifier
+
+  @MockitoSpyBean
   lateinit var bookerVisitorRejectedEventNotifierSpy: BookerVisitorRejectedEventNotifier
+
+  @MockitoSpyBean
+  lateinit var bookerVisitorRequestApprovedEventNotifierSpy: BookerVisitorRequestApprovedEventNotifier
+
+  @MockitoSpyBean
+  lateinit var bookerVisitorRequestRejectedEventNotifierSpy: BookerVisitorRequestRejectedEventNotifier
 
   @MockitoBean
   lateinit var notificationClient: NotificationClient
@@ -241,7 +253,7 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createAdditionalInformationJson(visitorApprovedAdditionalInfo: VisitorApprovedAdditionalInfo): String {
+  fun createAdditionalInformationJson(visitorApprovedAdditionalInfo: VisitorLinkedAdditionalInfo): String {
     val builder = StringBuilder()
     builder.append("{")
     builder.append("\"bookerReference\":\"${visitorApprovedAdditionalInfo.bookerReference}\",")
@@ -251,7 +263,7 @@ abstract class EventsIntegrationTestBase {
     return builder.toString()
   }
 
-  fun createAdditionalInformationJson(visitorRejectedAdditionalInfo: VisitorRejectedAdditionalInfo): String {
+  fun createAdditionalInformationJson(visitorRejectedAdditionalInfo: VisitorRequestAdditionalInfo): String {
     val builder = StringBuilder()
     builder.append("{")
     builder.append("\"requestReference\":\"${visitorRejectedAdditionalInfo.requestReference}\"")
