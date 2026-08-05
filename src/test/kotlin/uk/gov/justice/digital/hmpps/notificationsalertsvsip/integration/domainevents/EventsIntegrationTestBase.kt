@@ -48,9 +48,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.ev
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorLinkedAdditionalInfo
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.events.additionalinfo.VisitorRequestAdditionalInfo
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorApprovedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorLinkedEventNotifier
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorRejectedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorRequestApprovedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.BookerVisitorRequestRejectedEventNotifier
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.listeners.notifiers.PrisonVisitBookedEventNotifier
@@ -155,13 +153,7 @@ abstract class EventsIntegrationTestBase {
   lateinit var prisonVisitRequestApprovedEventNotifierSpy: PrisonVisitRequestApprovedEventNotifier
 
   @MockitoSpyBean
-  lateinit var bookerVisitorApprovedEventNotifierSpy: BookerVisitorApprovedEventNotifier
-
-  @MockitoSpyBean
   lateinit var bookerVisitorLinkedEventNotifierSpy: BookerVisitorLinkedEventNotifier
-
-  @MockitoSpyBean
-  lateinit var bookerVisitorRejectedEventNotifierSpy: BookerVisitorRejectedEventNotifier
 
   @MockitoSpyBean
   lateinit var bookerVisitorRequestApprovedEventNotifierSpy: BookerVisitorRequestApprovedEventNotifier
