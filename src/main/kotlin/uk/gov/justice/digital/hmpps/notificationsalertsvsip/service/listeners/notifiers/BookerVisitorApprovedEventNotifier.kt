@@ -17,7 +17,7 @@ class BookerVisitorApprovedEventNotifier(
 ) : EventNotifier(objectMapper) {
   override fun processEvent(domainEvent: DomainEvent) {
     val visitorLinkedAdditionalInfo: VisitorLinkedAdditionalInfo = objectMapper.readValue(domainEvent.additionalInformation, VisitorLinkedAdditionalInfo::class.java)
-    LOG.info("Enter booking event with info : {}", visitorLinkedAdditionalInfo)
+    LOG.info("Enter BookerVisitorApprovedEventNotifier event with info : {}", visitorLinkedAdditionalInfo)
 
     visitorRequestNotificationService.sendVisitorLinkedEmail(visitorLinkedAdditionalInfo)
   }

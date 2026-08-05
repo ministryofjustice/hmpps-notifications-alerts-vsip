@@ -17,7 +17,7 @@ class BookerVisitorRequestRejectedEventNotifier(
 ) : EventNotifier(objectMapper) {
   override fun processEvent(domainEvent: DomainEvent) {
     val visitorRequestAdditionalInfo: VisitorRequestAdditionalInfo = objectMapper.readValue(domainEvent.additionalInformation, VisitorRequestAdditionalInfo::class.java)
-    LOG.info("Enter booking event with info : {}", visitorRequestAdditionalInfo)
+    LOG.info("Enter BookerVisitorRequestRejectedEventNotifier event with info : {}", visitorRequestAdditionalInfo)
 
     visitorRequestNotificationService.sendVisitorRequestRejectedEmail(visitorRequestAdditionalInfo)
   }
