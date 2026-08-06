@@ -17,7 +17,7 @@ class VisitorRejectedAlreadyLinkedEventBookerEmailHandler : BaseBookerEmailNotif
   override fun handle(bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto): SendEmailNotificationDto {
     LOG.info("handle visitor rejected already linked event (email) - Entered, booker reference: {}, contact details: {}", bookerInfoDto.reference, visitorInfo)
     val templateName = getTemplateName(BOOKER_VISITOR_REJECTED_ALREADY_LINKED, visitorInfo.languagePreference)
-    val templateVars = mutableMapOf(
+    val templateVars = mapOf(
       "visitor" to visitorInfo.firstName.plus(" ").plus(visitorInfo.lastName),
     )
 

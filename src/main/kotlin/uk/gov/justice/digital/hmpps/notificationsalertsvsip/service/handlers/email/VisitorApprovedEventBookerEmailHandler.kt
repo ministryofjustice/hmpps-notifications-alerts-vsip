@@ -17,7 +17,7 @@ class VisitorApprovedEventBookerEmailHandler : BaseBookerEmailNotificationHandle
   override fun handle(bookerInfoDto: BookerInfoDto, visitorInfo: VisitorRequestVisitorInfoDto): SendEmailNotificationDto {
     LOG.info("handle visitor approved event (email) - Entered, booker reference: {}, contact details: {}", bookerInfoDto.reference, visitorInfo)
     val templateName = getTemplateName(BOOKER_VISITOR_APPROVED, visitorInfo.languagePreference)
-    val templateVars = mutableMapOf(
+    val templateVars = mapOf(
       "visitor" to visitorInfo.firstName.plus(" ").plus(visitorInfo.lastName),
     )
 
