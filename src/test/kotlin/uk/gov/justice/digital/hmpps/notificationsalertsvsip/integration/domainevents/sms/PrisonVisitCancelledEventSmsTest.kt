@@ -132,7 +132,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_CANCEL, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -187,7 +187,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_CANCEL, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "8am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -229,7 +229,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_CANCEL, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "12:01am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -271,7 +271,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_CANCEL_NO_PRISON_NUMBER, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -370,7 +370,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_CANCEL, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "1:05am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -450,7 +450,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_REQUEST_REJECTED, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -514,7 +514,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_REQUEST_REJECTED, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -579,7 +579,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_REQUEST_REJECTED, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -630,7 +630,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_REQUEST_REJECTED, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -672,7 +672,7 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_CANCEL, LanguagePreference.CY)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,

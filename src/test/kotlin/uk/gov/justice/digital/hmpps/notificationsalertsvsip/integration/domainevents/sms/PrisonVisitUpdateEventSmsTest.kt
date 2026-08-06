@@ -120,7 +120,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_UPDATE, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -159,7 +159,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_UPDATE, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "8am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -198,7 +198,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_UPDATE, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "12:01am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -295,7 +295,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_UPDATE, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "1:05am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -365,7 +365,7 @@ class PrisonVisitUpdateEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_UPDATE, LanguagePreference.CY)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,

@@ -57,7 +57,7 @@ class PrisonVisitRequestApprovedEventSmsTest : EventsIntegrationTestBase() {
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -101,13 +101,13 @@ class PrisonVisitRequestApprovedEventSmsTest : EventsIntegrationTestBase() {
     val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
       "ref number" to bookingReference,
       "prison_cy" to prisonWithWelshName.prisonNameInWelsh!!,
-      "servicename_cy" to "Ymweld â rhywun yn y carchar",
+      "servicename_cy" to EXPECTED_WELSH_SERVICE_NAME,
       "dayofweek_cy" to expectedWelshDayOfWeek,
       "date_cy" to expectedWelshVisitDate,
     )

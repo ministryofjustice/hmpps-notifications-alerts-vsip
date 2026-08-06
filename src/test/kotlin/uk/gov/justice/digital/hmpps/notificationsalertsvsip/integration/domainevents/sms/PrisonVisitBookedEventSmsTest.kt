@@ -118,7 +118,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -162,7 +162,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "12:01am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -196,7 +196,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "8am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -323,7 +323,7 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.EN)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "1:05am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -367,13 +367,13 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
-      "servicename" to "Visit someone in prison",
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
       "ref number" to bookingReference,
       "prison_cy" to prisonWithWelshName.prisonNameInWelsh!!,
-      "servicename_cy" to "Ymweld â rhywun yn y carchar",
+      "servicename_cy" to EXPECTED_WELSH_SERVICE_NAME,
       "dayofweek_cy" to expectedWelshDayOfWeek,
       "date_cy" to expectedWelshVisitDate,
     )
