@@ -54,6 +54,12 @@ booker-registry:
 
 
 notify:
+  # TODO: Remove and update test assertions once actual welsh templates Ids are in application.yml
+  email-templates:
+    cy:
+      BOOKER_VISITOR_APPROVED: 00000000-0000-0000-0000-000000000101
+      BOOKER_VISITOR_REJECTED: 00000000-0000-0000-0000-000000000102
+      BOOKER_VISITOR_REJECTED_ALREADY_LINKED: 00000000-0000-0000-0000-000000000103
   sms:
     enabled: true
   email:

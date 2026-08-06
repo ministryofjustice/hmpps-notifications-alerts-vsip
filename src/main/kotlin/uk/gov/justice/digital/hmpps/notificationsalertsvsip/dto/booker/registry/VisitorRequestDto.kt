@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import java.time.LocalDate
 
 @Schema(description = "Name of visitor within the visitor request")
@@ -41,4 +42,7 @@ data class VisitorRequestDto(
 
   @param:Schema(description = "If rejected, this field will contain the rejection reason", example = "REJECT", required = true)
   val rejectionReason: String? = null,
+
+  @param:Schema(description = "Booker language preference", example = "en", required = false)
+  val languagePreference: LanguagePreference = LanguagePreference.EN,
 )

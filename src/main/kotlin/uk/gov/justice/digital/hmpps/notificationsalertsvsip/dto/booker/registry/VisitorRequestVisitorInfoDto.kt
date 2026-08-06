@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry
 
 import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 
 @Schema(description = "Name of visitor within the visitor request")
 data class VisitorRequestVisitorInfoDto(
@@ -10,14 +11,19 @@ data class VisitorRequestVisitorInfoDto(
 
   @param:Schema(description = "Last name", example = "Smith", required = true)
   val lastName: String,
+
+  @param:Schema(description = "Booker language preference", example = "en", required = false)
+  val languagePreference: LanguagePreference = LanguagePreference.EN,
 ) {
   constructor(visitorRequestDto: VisitorRequestDto) : this(
     firstName = visitorRequestDto.firstName,
     lastName = visitorRequestDto.lastName,
+    languagePreference = visitorRequestDto.languagePreference,
   )
 
   constructor(contactWithOptionalPrisonerRelationshipDto: ContactWithOptionalPrisonerRelationshipDto) : this(
     firstName = contactWithOptionalPrisonerRelationshipDto.firstName,
     lastName = contactWithOptionalPrisonerRelationshipDto.lastName,
+    languagePreference = LanguagePreference.EN,
   )
 }

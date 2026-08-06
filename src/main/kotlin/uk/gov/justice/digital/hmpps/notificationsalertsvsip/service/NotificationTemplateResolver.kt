@@ -27,7 +27,7 @@ class NotificationTemplateResolver(private val notifyProperties: NotifyPropertie
     val fallbackTemplate = notifyProperties.emailTemplates[LanguagePreference.EN]?.get(template)
 
     if (fallbackTemplate != null) {
-      LOG.error(
+      LOG.warn(
         "Email template {} not configured for language {}, falling back to en template",
         template,
         languagePreference.code,
