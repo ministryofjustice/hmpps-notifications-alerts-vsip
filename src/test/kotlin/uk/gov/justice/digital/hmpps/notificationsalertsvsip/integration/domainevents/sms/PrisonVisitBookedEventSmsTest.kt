@@ -25,6 +25,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
   lateinit var visit: VisitDto
@@ -345,9 +346,10 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit booked message is received and language is welsh but no welsh template exists, then booking message is sent in english`() {
+  fun `when visit booked message is received and language is welsh then booking message is sent with welsh template vars`() {
     // Given
     val welshVisit = visit.copy(visitContact = visit.visitContact.copy(languagePreference = LanguagePreference.CY))
+    val prisonWithWelshName = prison.copy(prisonNameInWelsh = "Carchar Hewell")
     val bookingReference = welshVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(welshVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_BOOKED, createAdditionalInformationJson(visitAdditionalInfo))
@@ -356,19 +358,24 @@ class PrisonVisitBookedEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_BOOKING_OR_REQUEST_APPROVED, LanguagePreference.CY)
     val visitDate = welshVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedWelshVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN, Locale.forLanguageTag("cy-GB")))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
       "ref number" to bookingReference,
+      "prison_cy" to prisonWithWelshName.prisonNameInWelsh!!,
+      "dayofweek_cy" to expectedWelshDayOfWeek,
+      "date_cy" to expectedWelshVisitDate,
     )
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, welshVisit)
-    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
 
     // Then
     await untilAsserted { verify(prisonVisitBookedEventNotifierSpy, times(1)).processEvent(any()) }
