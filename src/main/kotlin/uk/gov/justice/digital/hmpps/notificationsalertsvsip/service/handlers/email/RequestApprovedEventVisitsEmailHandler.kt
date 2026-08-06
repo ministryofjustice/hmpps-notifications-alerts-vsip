@@ -31,7 +31,7 @@ class RequestApprovedEventVisitsEmailHandler : BaseVisitsEmailNotificationHandle
       "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
       "end time" to getFormattedTime(visit.endTimestamp.toLocalTime()),
       "arrival time" to "45",
-      "prison" to (prisonRegisterService.getPrison(visit.prisonCode) ?.prisonName ?: visit.prisonCode),
+      "prison" to (prisonRegisterService.getPrison(visit.prisonCode)?.prisonName ?: visit.prisonCode),
       "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
       "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
       "main contact name" to visit.visitContact.name,
