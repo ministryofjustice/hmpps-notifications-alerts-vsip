@@ -38,12 +38,14 @@ class RequestApprovedEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() 
     )
 
     when (visit.visitContact.languagePreference) {
-      LanguagePreference.CY -> templateVars.putAll(mapOf(
-        "prison_cy" to (prison?.prisonNameInWelsh ?: prison?.prisonName ?: visit.prisonCode),
-        "servicename_cy" to welshServiceName,
-        "dayofweek_cy" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate(), Locale.forLanguageTag("cy-GB")),
-        "date_cy" to getFormattedDate(visit.startTimestamp.toLocalDate(), Locale.forLanguageTag("cy-GB")),
-      ))
+      LanguagePreference.CY -> templateVars.putAll(
+        mapOf(
+          "prison_cy" to (prison?.prisonNameInWelsh ?: prison?.prisonName ?: visit.prisonCode),
+          "servicename_cy" to welshServiceName,
+          "dayofweek_cy" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate(), Locale.forLanguageTag("cy-GB")),
+          "date_cy" to getFormattedDate(visit.startTimestamp.toLocalDate(), Locale.forLanguageTag("cy-GB")),
+        ),
+      )
 
       else -> Unit
     }
