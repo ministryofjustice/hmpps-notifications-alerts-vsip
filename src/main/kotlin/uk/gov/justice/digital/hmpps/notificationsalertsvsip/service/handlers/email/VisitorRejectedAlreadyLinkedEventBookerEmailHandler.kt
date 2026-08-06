@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.SendEmailNotific
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestVisitorInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames.BOOKER_VISITOR_REJECTED_ALREADY_LINKED
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 
 @Service
 class VisitorRejectedAlreadyLinkedEventBookerEmailHandler : BaseBookerEmailNotificationHandler() {
@@ -21,11 +20,6 @@ class VisitorRejectedAlreadyLinkedEventBookerEmailHandler : BaseBookerEmailNotif
     val templateVars = mutableMapOf(
       "visitor" to visitorInfo.firstName.plus(" ").plus(visitorInfo.lastName),
     )
-
-    when (visitorInfo.languagePreference) {
-      LanguagePreference.CY -> Unit
-      else -> Unit
-    }
 
     return SendEmailNotificationDto(templateName, templateVars)
   }
