@@ -75,6 +75,8 @@ abstract class EventsIntegrationTestBase {
 
   companion object {
     const val EXPECTED_DATE_PATTERN = "d MMMM yyyy"
+    const val EXPECTED_SERVICE_NAME = "Visit someone in prison"
+    const val EXPECTED_WELSH_SERVICE_NAME = "Ymweld â rhywun yn y carchar"
     private val localStackContainer = LocalStackContainer.instance
     private val objectMapper = jacksonObjectMapper()
     val visitSchedulerMockServer = VisitSchedulerMockServer(objectMapper)

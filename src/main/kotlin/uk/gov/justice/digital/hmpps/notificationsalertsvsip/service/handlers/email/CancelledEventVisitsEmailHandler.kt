@@ -31,7 +31,7 @@ class CancelledEventVisitsEmailHandler : BaseVisitsEmailNotificationHandler() {
       "ref number" to visit.reference,
       "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
       "end time" to getFormattedTime(visit.endTimestamp.toLocalTime()),
-      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
+      "prison" to (prisonRegisterService.getPrison(visit.prisonCode)?.prisonName ?: visit.prisonCode),
       "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
       "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
       "main contact name" to visit.visitContact.name,

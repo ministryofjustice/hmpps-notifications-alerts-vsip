@@ -23,6 +23,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
   lateinit var visit: VisitDto
@@ -82,6 +83,7 @@ class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
@@ -176,13 +178,20 @@ class PrisonVisitRequestedEventSmsTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_REQUESTED, LanguagePreference.CY)
     val visitDate = welshVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedWelshVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN, Locale.forLanguageTag("cy-GB")))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
+      "servicename" to EXPECTED_SERVICE_NAME,
       "time" to "10:30am",
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
       "ref number" to bookingReference,
+      "prison_cy" to prison.prisonName,
+      "servicename_cy" to EXPECTED_WELSH_SERVICE_NAME,
+      "dayofweek_cy" to expectedWelshDayOfWeek,
+      "date_cy" to expectedWelshVisitDate,
     )
 
     // When

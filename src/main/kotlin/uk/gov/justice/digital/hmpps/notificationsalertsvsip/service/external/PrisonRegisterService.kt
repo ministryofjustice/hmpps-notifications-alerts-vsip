@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.client.PrisonRegisterClient
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonContactDetailsDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prison.register.PrisonDto
 
 @Service
 class PrisonRegisterService(
@@ -19,8 +20,8 @@ class PrisonRegisterService(
     return prisonRegisterClient.getSocialVisitContact(prisonCode)
   }
 
-  fun getPrisonName(prisonCode: String): String {
-    LOG.info("PrisonRegisterService getPrisonName entered, prison code - $prisonCode")
-    return prisonRegisterClient.getPrison(prisonCode)?.prisonName ?: prisonCode
+  fun getPrison(prisonCode: String): PrisonDto? {
+    LOG.info("PrisonRegisterService getPrison entered, prison code - $prisonCode")
+    return prisonRegisterClient.getPrison(prisonCode)
   }
 }

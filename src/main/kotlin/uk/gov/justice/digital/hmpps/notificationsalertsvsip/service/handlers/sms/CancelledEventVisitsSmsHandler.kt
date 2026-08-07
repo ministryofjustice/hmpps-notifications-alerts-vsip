@@ -32,7 +32,8 @@ class CancelledEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() {
   private fun getTemplateVars(visit: VisitDto, prisonContactNumber: String?): Map<String, String> {
     val templateVars = mutableMapOf(
       "ref number" to visit.reference,
-      "prison" to prisonRegisterService.getPrisonName(visit.prisonCode),
+      "servicename" to serviceName,
+      "prison" to (prisonRegisterService.getPrison(visit.prisonCode)?.prisonName ?: visit.prisonCode),
       "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
       "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
       "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),

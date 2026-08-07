@@ -11,6 +11,8 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.Pri
 
 @Service
 abstract class BaseVisitsSmsNotificationHandler {
+  protected val serviceName = "Visit someone in prison"
+  protected val welshServiceName = "Ymweld â rhywun yn y carchar"
 
   @Autowired
   lateinit var prisonRegisterService: PrisonRegisterService
