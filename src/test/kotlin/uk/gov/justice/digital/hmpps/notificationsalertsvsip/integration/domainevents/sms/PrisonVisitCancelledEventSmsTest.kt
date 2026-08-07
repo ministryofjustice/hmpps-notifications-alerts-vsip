@@ -26,6 +26,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
   companion object {
@@ -659,16 +660,19 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit cancelled message is received and language is welsh but no welsh template exists, then cancelled message is sent in english`() {
+  fun `when visit cancelled message is received and language is welsh then cancellation message is sent with welsh template vars`() {
     // Given
     val welshVisit = visit.copy(visitContact = visit.visitContact.copy(languagePreference = LanguagePreference.CY))
+    val prisonWithWelshName = prison.copy(prisonNameInWelsh = "Carchar Hewell")
     val bookingReference = welshVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(welshVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
     val visitDate = welshVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedWelshVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN, Locale.forLanguageTag("cy-GB")))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
     val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_CANCEL, LanguagePreference.CY)
     val templateVars = mutableMapOf<String, Any>(
       "prison" to prison.prisonName,
@@ -679,13 +683,17 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "reference" to bookingReference,
       "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
       "ref number" to bookingReference,
+      "prison_cy" to prisonWithWelshName.prisonNameInWelsh!!,
+      "servicename_cy" to EXPECTED_WELSH_SERVICE_NAME,
+      "dayofweek_cy" to expectedWelshDayOfWeek,
+      "date_cy" to expectedWelshVisitDate,
     )
     val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, welshVisit)
-    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
       notificationClient.sendSms(
@@ -705,6 +713,126 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       verify(notificationClient, times(1)).sendSms(
         templateId,
         welshVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      )
+    }
+    await untilAsserted {
+      verify(visitSchedulerService, times(1)).createNotifyNotification(any())
+    }
+  }
+
+  @Test
+  fun `when visit cancelled message is received and language is welsh but no prison contact number then cancellation message is sent with welsh template vars`() {
+    // Given
+    val welshVisit = visit.copy(visitContact = visit.visitContact.copy(languagePreference = LanguagePreference.CY))
+    val prisonWithWelshName = prison.copy(prisonNameInWelsh = "Carchar Hewell")
+    val bookingReference = welshVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(welshVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+    val visitDate = welshVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedWelshVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN, Locale.forLanguageTag("cy-GB")))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
+    val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_CANCEL_NO_PRISON_NUMBER, LanguagePreference.CY)
+    val templateVars = mutableMapOf<String, Any>(
+      "prison" to prison.prisonName,
+      "servicename" to EXPECTED_SERVICE_NAME,
+      "time" to "10:30am",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "reference" to bookingReference,
+      "ref number" to bookingReference,
+      "prison_cy" to prisonWithWelshName.prisonNameInWelsh!!,
+      "servicename_cy" to EXPECTED_WELSH_SERVICE_NAME,
+      "dayofweek_cy" to expectedWelshDayOfWeek,
+      "date_cy" to expectedWelshVisitDate,
+    )
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, welshVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null, HttpStatus.NOT_FOUND)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(welshVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendSms(
+        templateId,
+        welshVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      )
+    }
+  }
+
+  @Test
+  fun `when visit cancelled message is received once a visit is rejected and language is welsh then rejected message is sent with welsh template vars`() {
+    // Given
+    val rejectedVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("John Smith", "01234567890", languagePreference = LanguagePreference.CY),
+      visitors = emptyList(),
+      visitSubStatus = "REJECTED",
+    )
+    val prisonWithWelshName = prison.copy(prisonNameInWelsh = "Carchar Hewell")
+    val bookingReference = rejectedVisit.reference
+    val visitAdditionalInfo = VisitAdditionalInfo(rejectedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+    val visitDate = rejectedVisit.startTimestamp.toLocalDate()
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedWelshVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN, Locale.forLanguageTag("cy-GB")))
+    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
+    val templateId = notificationTemplateResolver.getSmsTemplate(SmsTemplateNames.VISIT_REQUEST_REJECTED, LanguagePreference.CY)
+    val templateVars = mutableMapOf<String, Any>(
+      "prison" to prison.prisonName,
+      "servicename" to EXPECTED_SERVICE_NAME,
+      "time" to "10:30am",
+      "dayofweek" to expectedDayOfWeek,
+      "date" to expectedVisitDate,
+      "reference" to bookingReference,
+      "prison phone number" to prisonContactDetailsDto.phoneNumber!!,
+      "ref number" to bookingReference,
+      "prison_cy" to prisonWithWelshName.prisonNameInWelsh!!,
+      "servicename_cy" to EXPECTED_WELSH_SERVICE_NAME,
+      "dayofweek_cy" to expectedWelshDayOfWeek,
+      "date_cy" to expectedWelshVisitDate,
+    )
+    val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    visitSchedulerMockServer.stubGetVisit(bookingReference, rejectedVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendSms(
+        templateId,
+        rejectedVisit.visitContact.telephone,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // Then
+    await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
+    await untilAsserted { verify(visitNotificationService, times(1)).sendMessage(VisitEventType.CANCELLED, visitAdditionalInfo) }
+    await untilAsserted { verify(smsSenderService, times(1)).sendVisitsSms(rejectedVisit, VisitEventType.CANCELLED, visitAdditionalInfo.eventAuditId) }
+    await untilAsserted {
+      verify(notificationClient, times(1)).sendSms(
+        templateId,
+        rejectedVisit.visitContact.telephone,
         templateVars,
         visitAdditionalInfo.eventAuditId,
       )

@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.SmsTemplateNam
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDate
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedDayOfWeek
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.utils.DateUtils.Companion.getFormattedTime
+import java.util.Locale
 
 @Service
 class CancelledEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() {
@@ -30,10 +31,12 @@ class CancelledEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() {
   }
 
   private fun getTemplateVars(visit: VisitDto, prisonContactNumber: String?): Map<String, String> {
+    val prison = prisonRegisterService.getPrison(visit.prisonCode)
+
     val templateVars = mutableMapOf(
       "ref number" to visit.reference,
       "servicename" to serviceName,
-      "prison" to (prisonRegisterService.getPrison(visit.prisonCode)?.prisonName ?: visit.prisonCode),
+      "prison" to (prison?.prisonName ?: visit.prisonCode),
       "time" to getFormattedTime(visit.startTimestamp.toLocalTime()),
       "dayofweek" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate()),
       "date" to getFormattedDate(visit.startTimestamp.toLocalDate()),
@@ -42,8 +45,17 @@ class CancelledEventVisitsSmsHandler : BaseVisitsSmsNotificationHandler() {
     if (!prisonContactNumber.isNullOrEmpty()) {
       templateVars["prison phone number"] = prisonContactNumber
     }
+
     when (visit.visitContact.languagePreference) {
-      LanguagePreference.CY -> templateVars.putAll(emptyMap<String, String>())
+      LanguagePreference.CY -> templateVars.putAll(
+        mapOf(
+          "prison_cy" to (prison?.prisonNameInWelsh ?: prison?.prisonName ?: visit.prisonCode),
+          "servicename_cy" to welshServiceName,
+          "dayofweek_cy" to getFormattedDayOfWeek(visit.startTimestamp.toLocalDate(), Locale.forLanguageTag("cy-GB")),
+          "date_cy" to getFormattedDate(visit.startTimestamp.toLocalDate(), Locale.forLanguageTag("cy-GB")),
+        ),
+      )
+
       else -> Unit
     }
 
