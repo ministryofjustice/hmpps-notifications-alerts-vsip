@@ -589,10 +589,10 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     )
 
     // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, rejectedVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null, HttpStatus.NOT_FOUND)
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
@@ -640,10 +640,10 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     )
 
     // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, rejectedVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null, HttpStatus.NOT_FOUND)
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
@@ -690,8 +690,6 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     )
     val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
 
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, welshVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
@@ -704,6 +702,9 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
@@ -751,11 +752,12 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       "date_cy" to expectedWelshVisitDate,
     )
 
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, welshVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null, HttpStatus.NOT_FOUND)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
@@ -810,8 +812,6 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
     )
     val notificationClientResponse = buildSendSmsResponse(reference = visitAdditionalInfo.eventAuditId)
 
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, rejectedVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
@@ -824,6 +824,9 @@ class PrisonVisitCancelledEventSmsTest : EventsIntegrationTestBase() {
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
     await untilAsserted { verify(prisonVisitCancelledEventNotifierSpy, times(1)).processEvent(any()) }
