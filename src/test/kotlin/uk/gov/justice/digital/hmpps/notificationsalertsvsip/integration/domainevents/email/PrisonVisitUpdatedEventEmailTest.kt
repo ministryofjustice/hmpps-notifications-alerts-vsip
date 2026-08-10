@@ -28,6 +28,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
   lateinit var visit: VisitDto
@@ -563,7 +564,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit updated message is received and language is welsh but no welsh template exists, then update message is sent in english`() {
+  fun `when visit updated message is received with welsh language then updated email is sent with welsh template vars`() {
     // Given
     val welshVisit = visit.copy(visitContact = visit.visitContact.copy(languagePreference = LanguagePreference.CY))
     val bookingReference = welshVisit.reference
@@ -576,6 +577,8 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     val visitDate = welshVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val expectedWelshVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN, Locale.forLanguageTag("cy-GB")))
+    val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
     val templateVars = mutableMapOf<String, Any>(
       "ref number" to bookingReference,
       "prison" to prison.prisonName,
@@ -591,6 +594,9 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
       "prisoner" to "Prisoner One",
       "prisoner_cy" to "Prisoner One",
       "visitors" to prisonVisitors,
+      "prison_cy" to prison.prisonName,
+      "dayofweek_cy" to expectedWelshDayOfWeek,
+      "date_cy" to expectedWelshVisitDate,
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
     )
