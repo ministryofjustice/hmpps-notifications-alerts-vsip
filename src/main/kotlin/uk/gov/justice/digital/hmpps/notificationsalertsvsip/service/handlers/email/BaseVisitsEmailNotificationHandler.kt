@@ -58,9 +58,11 @@ abstract class BaseVisitsEmailNotificationHandler {
         prisoner?.let {
           mapOf(
             "openingsentence_cy" to "ymweliad i weld $it",
+            "prisoner_cy" to "$it",
           )
         } ?: mapOf(
           "openingsentence_cy" to "ymweliad â'r carchar",
+          "prisoner_cy" to "y carcharor",
         ),
       )
 

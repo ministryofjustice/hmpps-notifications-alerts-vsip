@@ -589,6 +589,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
       "opening sentence" to "visit to see Prisoner One",
       "openingsentence_cy" to "ymweliad i weld Prisoner One",
       "prisoner" to "Prisoner One",
+      "prisoner_cy" to "Prisoner One",
       "visitors" to prisonVisitors,
       "phone" to prisonContactDetailsDto.phoneNumber!!,
       "website" to prisonContactDetailsDto.webAddress!!,
