@@ -28,6 +28,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   lateinit var visit: VisitDto
@@ -457,21 +458,22 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
   }
 
   @Test
-  fun `when visit cancelled message is received with welsh language but no welsh template exists then cancelled email is sent in english`() {
+  fun `when visit cancelled message is received with welsh language then cancelled email is sent with welsh template vars`() {
     // Given
     val welshVisit = visit.copy(visitContact = visit.visitContact.copy(languagePreference = LanguagePreference.CY))
+    val prisonWithWelshName = prison.copy(prisonNameInWelsh = "Carchar Hewell")
     val visitAdditionalInfo = VisitAdditionalInfo(welshVisit.reference, "123456")
     val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
     val jsonSqsMessage = createSQSMessage(domainEvent)
 
     val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED, LanguagePreference.CY)
-    val templateVars = createTemplateVars(welshVisit)
+    val templateVars = createTemplateVars(welshVisit, prisonDto = prisonWithWelshName)
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(welshVisit.reference, welshVisit)
-    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
     prisonerOffenderSearchMockServer.stubGetPrisoner(welshVisit.prisonerId, prisonerSearchResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
     Mockito.`when`(
@@ -489,14 +491,150 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     verifyEmailSent(templateId, welshVisit, visitAdditionalInfo, templateVars)
   }
 
-  private fun createTemplateVars(visit: VisitDto, openingSentence: String? = "visit to see $prisonerSearchResult", prisoner: String? = prisonerSearchResult.toString(), phone: String? = prisonContactDetailsDto.phoneNumber, webAddress: String? = prisonContactDetailsDto.webAddress): Map<String, Any> {
+  @Test
+  fun `when visit cancelled by prison message is received with welsh language then cancelled by prison email is sent with welsh template vars`() {
+    // Given
+    val cancelledByPrisonVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("Contact One", email = "example@email.com", languagePreference = LanguagePreference.CY),
+      visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      outcomeStatus = "ESTABLISHMENT_CANCELLED",
+      visitSubStatus = "CANCELLED",
+    )
+    val visitAdditionalInfo = VisitAdditionalInfo(cancelledByPrisonVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED_BY_PRISON, LanguagePreference.CY)
+    val templateVars = createTemplateVars(cancelledByPrisonVisit, phone = GOV_UK_PRISON_PAGE, webAddress = GOV_UK_PRISON_PAGE)
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    visitSchedulerMockServer.stubGetVisit(cancelledByPrisonVisit.reference, cancelledByPrisonVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(cancelledByPrisonVisit.prisonerId, prisonerSearchResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, null)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        cancelledByPrisonVisit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+        "00000000-0000-0000-0000-000000000002",
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+
+    // Then
+    verifyEmailSent(templateId, cancelledByPrisonVisit, visitAdditionalInfo, templateVars)
+  }
+
+  @Test
+  fun `when visit cancelled by prisoner message is received with welsh language then cancelled by prisoner email is sent with welsh template vars`() {
+    // Given
+    val cancelledByPrisonerVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("Contact One", email = "example@email.com", languagePreference = LanguagePreference.CY),
+      visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      outcomeStatus = "PRISONER_CANCELLED",
+      visitSubStatus = "CANCELLED",
+    )
+    val visitAdditionalInfo = VisitAdditionalInfo(cancelledByPrisonerVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_CANCELLED_BY_PRISONER, LanguagePreference.CY)
+    val templateVars = createTemplateVars(cancelledByPrisonerVisit)
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    visitSchedulerMockServer.stubGetVisit(cancelledByPrisonerVisit.reference, cancelledByPrisonerVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(cancelledByPrisonerVisit.prisonerId, prisonerSearchResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        cancelledByPrisonerVisit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+        "00000000-0000-0000-0000-000000000002",
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+
+    // Then
+    verifyEmailSent(templateId, cancelledByPrisonerVisit, visitAdditionalInfo, templateVars)
+  }
+
+  @Test
+  fun `when rejected visit cancellation message is received with welsh language then request rejected email is sent with welsh template vars`() {
+    // Given
+    val rejectedVisit = createVisitDto(
+      bookingReference = "bi-vn-wn-ml",
+      visitDate = LocalDate.now().plusMonths(1),
+      visitTime = LocalTime.of(10, 30),
+      duration = Duration.of(30, ChronoUnit.MINUTES),
+      visitContact = ContactDto("Contact One", email = "example@email.com", languagePreference = LanguagePreference.CY),
+      visitors = listOf(VisitorDto(1234), VisitorDto(9876)),
+      outcomeStatus = null,
+      visitSubStatus = "REJECTED",
+    )
+    val visitAdditionalInfo = VisitAdditionalInfo(rejectedVisit.reference, "123456")
+    val domainEvent = createDomainEventJson(PRISON_VISIT_CANCELLED, createAdditionalInformationJson(visitAdditionalInfo))
+    val jsonSqsMessage = createSQSMessage(domainEvent)
+
+    val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.VISIT_REQUEST_REJECTED, LanguagePreference.CY)
+    val templateVars = createTemplateVars(rejectedVisit)
+    val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
+
+    visitSchedulerMockServer.stubGetVisit(rejectedVisit.reference, rejectedVisit)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(rejectedVisit.prisonerId, prisonerSearchResult)
+    prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
+    Mockito.`when`(
+      notificationClient.sendEmail(
+        templateId,
+        rejectedVisit.visitContact.email,
+        templateVars,
+        visitAdditionalInfo.eventAuditId,
+        "00000000-0000-0000-0000-000000000002",
+      ),
+    ).thenReturn(notificationClientResponse)
+    visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+
+    // Then
+    verifyEmailSent(templateId, rejectedVisit, visitAdditionalInfo, templateVars)
+  }
+
+  private fun createTemplateVars(
+    visit: VisitDto,
+    openingSentence: String? = "visit to see $prisonerSearchResult",
+    prisoner: String? = prisonerSearchResult.toString(),
+    phone: String? = prisonContactDetailsDto.phoneNumber,
+    webAddress: String? = prisonContactDetailsDto.webAddress,
+    prisonDto: PrisonDto = prison,
+  ): Map<String, Any> {
     val visitDate = visit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
     val templateVars = mutableMapOf<String, Any>(
       "ref number" to visit.reference,
-      "prison" to prison.prisonName,
+      "prison" to prisonDto.prisonName,
       "dayofweek" to expectedDayOfWeek,
       "date" to expectedVisitDate,
       "time" to "10:30am",
@@ -509,10 +647,21 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     )
 
     if (visit.visitContact.languagePreference == LanguagePreference.CY) {
+      val expectedWelshVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN, Locale.forLanguageTag("cy-GB")))
+      val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
+
+      templateVars["prison_cy"] = prisonDto.prisonNameInWelsh ?: prisonDto.prisonName
+      templateVars["dayofweek_cy"] = expectedWelshDayOfWeek
+      templateVars["date_cy"] = expectedWelshVisitDate
       templateVars["openingsentence_cy"] = if (prisoner == "the prisoner") {
         "ymweliad â'r carchar"
       } else {
         "ymweliad i weld $prisoner"
+      }
+      templateVars["prisoner_cy"] = if (prisoner == "the prisoner") {
+        "y carcharor"
+      } else {
+        prisoner
       }
     }
 
