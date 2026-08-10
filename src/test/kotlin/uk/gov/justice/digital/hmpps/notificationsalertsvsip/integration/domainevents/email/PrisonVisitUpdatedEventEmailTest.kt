@@ -567,6 +567,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
   fun `when visit updated message is received with welsh language then updated email is sent with welsh template vars`() {
     // Given
     val welshVisit = visit.copy(visitContact = visit.visitContact.copy(languagePreference = LanguagePreference.CY))
+    val prisonWithWelshName = prison.copy(prisonNameInWelsh = "Carchar Hewell")
     val bookingReference = welshVisit.reference
     val visitAdditionalInfo = VisitAdditionalInfo(welshVisit.reference, "123456")
 
@@ -594,7 +595,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
       "prisoner" to "Prisoner One",
       "prisoner_cy" to "Prisoner One",
       "visitors" to prisonVisitors,
-      "prison_cy" to prison.prisonName,
+      "prison_cy" to prisonWithWelshName.prisonNameInWelsh!!,
       "dayofweek_cy" to expectedWelshDayOfWeek,
       "date_cy" to expectedWelshVisitDate,
       "phone" to prisonContactDetailsDto.phoneNumber!!,
@@ -604,7 +605,7 @@ class PrisonVisitUpdatedEventEmailTest : EventsIntegrationTestBase() {
     // When
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(bookingReference, welshVisit)
-    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prison)
+    prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
     prisonerOffenderSearchMockServer.stubGetPrisoner(welshVisit.prisonerId, prisonerSearchResult)
     prisonerContactRegisterMockServer.stubSearchContacts(welshVisit.prisonerId, welshVisit.visitors.map { it.nomisPersonId }, false, prisonerContactsResult)
     prisonRegisterMockServer.stubGetPrisonSocialVisitContactDetails(prison.prisonId, prisonContactDetailsDto)
