@@ -280,6 +280,7 @@ class PrisonVisitRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
       "main contact name" to "Contact One",
       "closed visit" to "false",
       "opening sentence" to "visit to see Prisoner One",
+      "openingsentence_cy" to "ymweliad i weld Prisoner One",
       "prisoner" to "Prisoner One",
       "visitors" to prisonVisitors,
       "phone" to prisonContactDetailsDto.phoneNumber!!,

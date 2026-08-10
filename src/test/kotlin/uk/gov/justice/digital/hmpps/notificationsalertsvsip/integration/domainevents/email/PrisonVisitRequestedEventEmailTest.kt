@@ -27,6 +27,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 class PrisonVisitRequestedEventEmailTest : EventsIntegrationTestBase() {
   lateinit var visit: VisitDto
@@ -201,18 +202,24 @@ class PrisonVisitRequestedEventEmailTest : EventsIntegrationTestBase() {
     val templateId = notificationTemplateResolver.getEmailTemplate(VISIT_REQUESTED, LanguagePreference.CY)
     val visitDate = welshVisit.startTimestamp.toLocalDate()
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
+    val expectedWelshVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN, Locale.forLanguageTag("cy-GB")))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val expectedWelshDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("cy-GB")))
     val templateVars = mutableMapOf<String, Any>(
       "ref number" to bookingReference,
       "prison" to prison.prisonName,
+      "prison_cy" to prison.prisonName,
       "time" to "10:30am",
       "end time" to "11am",
       "arrival time" to "45",
       "dayofweek" to expectedDayOfWeek,
+      "dayofweek_cy" to expectedWelshDayOfWeek,
       "date" to expectedVisitDate,
+      "date_cy" to expectedWelshVisitDate,
       "main contact name" to "Contact One",
       "closed visit" to "false",
       "opening sentence" to "visit to see Prisoner One",
+      "openingsentence_cy" to "ymweliad i weld Prisoner One",
       "prisoner" to "Prisoner One",
       "visitors" to prisonVisitors,
       "phone" to prisonContactDetailsDto.phoneNumber!!,

@@ -41,17 +41,29 @@ abstract class BaseVisitsEmailNotificationHandler {
   ): String = notificationTemplateResolver.getEmailTemplate(template = template, languagePreference = languagePreference)
 
   protected fun getPrisoner(visit: VisitDto): Map<String, Any> {
-    val templateVars: MutableMap<String, Any> = prisonerSearchService.getPrisoner(visit.prisonerId)?.let { prisoner ->
+    val prisoner = prisonerSearchService.getPrisoner(visit.prisonerId)
+
+    val templateVars: MutableMap<String, Any> = prisoner?.let {
       mutableMapOf(
-        "opening sentence" to "visit to see $prisoner",
-        "prisoner" to "$prisoner",
+        "opening sentence" to "visit to see $it",
+        "prisoner" to "$it",
       )
     } ?: mutableMapOf(
       "opening sentence" to "visit to the prison",
       "prisoner" to "the prisoner",
     )
+
     when (visit.visitContact.languagePreference) {
-      LanguagePreference.CY -> templateVars.putAll(emptyMap<String, Any>())
+      LanguagePreference.CY -> templateVars.putAll(
+        prisoner?.let {
+          mapOf(
+            "openingsentence_cy" to "ymweliad i weld $it",
+          )
+        } ?: mapOf(
+          "openingsentence_cy" to "ymweliad â'r carchar",
+        ),
+      )
+
       else -> Unit
     }
 
@@ -64,10 +76,6 @@ abstract class BaseVisitsEmailNotificationHandler {
       "phone" to (prisonContactDetails?.phoneNumber ?: GOV_UK_PRISON_PAGE),
       "website" to (prisonContactDetails?.webAddress ?: GOV_UK_PRISON_PAGE),
     )
-    when (visit.visitContact.languagePreference) {
-      LanguagePreference.CY -> templateVars.putAll(emptyMap<String, String>())
-      else -> Unit
-    }
 
     return templateVars
   }
