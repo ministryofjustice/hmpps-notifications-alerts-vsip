@@ -494,7 +494,7 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
     val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
 
-    return mapOf<String, Any>(
+    val templateVars = mutableMapOf<String, Any>(
       "ref number" to visit.reference,
       "prison" to prison.prisonName,
       "dayofweek" to expectedDayOfWeek,
@@ -507,6 +507,16 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       "phone" to phone!!,
       "website" to webAddress!!,
     )
+
+    if (visit.visitContact.languagePreference == LanguagePreference.CY) {
+      templateVars["openingsentence_cy"] = if (prisoner == "the prisoner") {
+        "ymweliad â'r carchar"
+      } else {
+        "ymweliad i weld $prisoner"
+      }
+    }
+
+    return templateVars
   }
 
   private fun verifyEmailSent(templateId: String, visit: VisitDto, visitAdditionalInfo: VisitAdditionalInfo, templateVars: Map<String, Any>) {
