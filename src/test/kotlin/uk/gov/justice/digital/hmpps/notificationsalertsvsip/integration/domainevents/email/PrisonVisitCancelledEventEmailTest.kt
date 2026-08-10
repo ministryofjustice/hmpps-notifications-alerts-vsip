@@ -470,8 +470,6 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     val templateVars = createTemplateVars(welshVisit, prisonDto = prisonWithWelshName)
     val notificationClientResponse = buildSendEmailResponse(reference = visitAdditionalInfo.eventAuditId)
 
-    // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
     visitSchedulerMockServer.stubGetVisit(welshVisit.reference, welshVisit)
     prisonRegisterMockServer.stubGetPrison(prison.prisonId, prisonWithWelshName)
     prisonerOffenderSearchMockServer.stubGetPrisoner(welshVisit.prisonerId, prisonerSearchResult)
@@ -486,6 +484,9 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
       ),
     ).thenReturn(notificationClientResponse)
     visitSchedulerMockServer.stubCreateNotifyNotification(HttpStatus.OK)
+
+    // When
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
     verifyEmailSent(templateId, welshVisit, visitAdditionalInfo, templateVars)
@@ -629,8 +630,8 @@ class PrisonVisitCancelledEventEmailTest : EventsIntegrationTestBase() {
     prisonDto: PrisonDto = prison,
   ): Map<String, Any> {
     val visitDate = visit.startTimestamp.toLocalDate()
-    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN))
-    val expectedDayOfWeek = visitDate.dayOfWeek.toString().lowercase().replaceFirstChar { it.titlecase() }
+    val expectedVisitDate = visitDate.format(DateTimeFormatter.ofPattern(EXPECTED_DATE_PATTERN, Locale.UK))
+    val expectedDayOfWeek = visitDate.format(DateTimeFormatter.ofPattern("EEEE", Locale.UK))
 
     val templateVars = mutableMapOf<String, Any>(
       "ref number" to visit.reference,
