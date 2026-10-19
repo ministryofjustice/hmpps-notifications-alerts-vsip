@@ -12,18 +12,23 @@ data class VisitorRequestVisitorInfoDto(
   @param:Schema(description = "Last name", example = "Smith", required = true)
   val lastName: String,
 
+  @param:Schema(description = "Prisoner ID", example = "A1234BC", required = true)
+  val prisonerId: String,
+
   @param:Schema(description = "Booker language preference", example = "en", required = false)
   val languagePreference: LanguagePreference = LanguagePreference.EN,
 ) {
   constructor(visitorRequestDto: VisitorRequestDto) : this(
     firstName = visitorRequestDto.firstName,
     lastName = visitorRequestDto.lastName,
+    prisonerId = visitorRequestDto.prisonerId,
     languagePreference = visitorRequestDto.languagePreference,
   )
 
-  constructor(contactWithOptionalPrisonerRelationshipDto: ContactWithOptionalPrisonerRelationshipDto) : this(
+  constructor(contactWithOptionalPrisonerRelationshipDto: ContactWithOptionalPrisonerRelationshipDto, prisonerId: String) : this(
     firstName = contactWithOptionalPrisonerRelationshipDto.firstName,
     lastName = contactWithOptionalPrisonerRelationshipDto.lastName,
+    prisonerId = prisonerId,
     languagePreference = LanguagePreference.EN,
   )
 }

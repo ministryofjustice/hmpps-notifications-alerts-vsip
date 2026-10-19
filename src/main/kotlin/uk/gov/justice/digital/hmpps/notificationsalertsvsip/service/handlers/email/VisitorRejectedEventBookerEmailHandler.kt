@@ -19,7 +19,7 @@ class VisitorRejectedEventBookerEmailHandler : BaseBookerEmailNotificationHandle
     val templateName = getTemplateName(BOOKER_VISITOR_REJECTED, visitorInfo.languagePreference)
     val templateVars = mapOf(
       "visitor" to visitorInfo.firstName.plus(" ").plus(visitorInfo.lastName),
-    )
+    ) + getPrisoner(visitorInfo)
 
     return SendEmailNotificationDto(templateName, templateVars)
   }
