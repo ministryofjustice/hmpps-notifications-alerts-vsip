@@ -18,10 +18,7 @@ abstract class BaseBookerEmailNotificationHandler {
   @Autowired
   lateinit var prisonerPersonalisationService: PrisonerPersonalisationService
 
-  protected fun getPrisoner(visitorInfo: VisitorRequestVisitorInfoDto): Map<String, String> = when (visitorInfo.languagePreference) {
-    LanguagePreference.EN -> prisonerPersonalisationService.getPersonalisations(visitorInfo.prisonerId, visitorInfo.languagePreference).filterKeys { it == "prisoner" }
-    else -> emptyMap()
-  }
+  protected fun getPrisoner(visitorInfo: VisitorRequestVisitorInfoDto): Map<String, String> = prisonerPersonalisationService.getPersonalisations(visitorInfo.prisonerId, visitorInfo.languagePreference).filterKeys { it == "prisoner" }
 
   protected fun getTemplateName(
     template: EmailTemplateNames,

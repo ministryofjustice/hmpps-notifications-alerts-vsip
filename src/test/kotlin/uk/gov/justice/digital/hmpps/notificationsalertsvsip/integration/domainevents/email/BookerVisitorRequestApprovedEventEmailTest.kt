@@ -86,8 +86,9 @@ class BookerVisitorRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     }
   }
 
-  @Test
-  fun `when visitor request approved event is received with a welsh language preference a welsh visitor approved email is sent to the booker`() {
+  @ParameterizedTest
+  @ValueSource(booleans = [true, false])
+  fun `when visitor request approved event is received with a welsh language preference a welsh visitor approved email is sent to the booker`(prisonerFound: Boolean) {
     // Given
     val prisonerId = "A1234BC"
     val bookerReference = "booker-ref"
@@ -101,8 +102,10 @@ class BookerVisitorRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
       languagePreference = LanguagePreference.CY,
     )
     val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_APPROVED, LanguagePreference.CY)
+    val prisoner = if (prisonerFound) PrisonerSearchResultDto("PRISONER", "ONE") else null
     val templateVars = mapOf(
       "visitor" to "${visitorRequest.firstName} ${visitorRequest.lastName}",
+      "prisoner" to if (prisonerFound) "Prisoner One" else "the prisoner",
     )
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
     val bookerAdditionalInfo = VisitorRequestAdditionalInfo(visitorRequestReference)
@@ -120,6 +123,7 @@ class BookerVisitorRequestApprovedEventEmailTest : EventsIntegrationTestBase() {
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
     // When
+    prisonerOffenderSearchMockServer.stubGetPrisoner(prisonerId, prisoner)
     bookerRegistryMockServer.stubGetVisitorRequestByReference(visitorRequestReference, visitorRequest)
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
