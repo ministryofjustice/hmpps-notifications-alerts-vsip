@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationTemplateResolver
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonerPersonalisationService
 
 @Service
 abstract class BaseBookerEmailNotificationHandler {
@@ -16,10 +16,10 @@ abstract class BaseBookerEmailNotificationHandler {
   lateinit var notificationTemplateResolver: NotificationTemplateResolver
 
   @Autowired
-  lateinit var prisonerSearchService: PrisonerSearchService
+  lateinit var prisonerPersonalisationService: PrisonerPersonalisationService
 
   protected fun getPrisoner(visitorInfo: VisitorRequestVisitorInfoDto): Map<String, String> = when (visitorInfo.languagePreference) {
-    LanguagePreference.EN -> mapOf("prisoner" to (prisonerSearchService.getPrisoner(visitorInfo.prisonerId)?.toString() ?: "the prisoner"))
+    LanguagePreference.EN -> prisonerPersonalisationService.getPersonalisations(visitorInfo.prisonerId, visitorInfo.languagePreference).filterKeys { it == "prisoner" }
     else -> emptyMap()
   }
 
