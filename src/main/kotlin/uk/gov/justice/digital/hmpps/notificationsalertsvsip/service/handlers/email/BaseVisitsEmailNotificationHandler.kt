@@ -9,9 +9,9 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.visit.scheduler.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationTemplateResolver
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonerPersonalisationService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonRegisterService
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerContactRegistryService
-import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.external.PrisonerSearchService
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -25,7 +25,7 @@ abstract class BaseVisitsEmailNotificationHandler {
   lateinit var prisonRegisterService: PrisonRegisterService
 
   @Autowired
-  lateinit var prisonerSearchService: PrisonerSearchService
+  lateinit var prisonerPersonalisationService: PrisonerPersonalisationService
 
   @Autowired
   lateinit var prisonerContactRegistryService: PrisonerContactRegistryService
@@ -40,37 +40,7 @@ abstract class BaseVisitsEmailNotificationHandler {
     languagePreference: LanguagePreference = LanguagePreference.EN,
   ): String = notificationTemplateResolver.getEmailTemplate(template = template, languagePreference = languagePreference)
 
-  protected fun getPrisoner(visit: VisitDto): Map<String, Any> {
-    val prisoner = prisonerSearchService.getPrisoner(visit.prisonerId)
-
-    val templateVars: MutableMap<String, Any> = prisoner?.let {
-      mutableMapOf(
-        "opening sentence" to "visit to see $it",
-        "prisoner" to "$it",
-      )
-    } ?: mutableMapOf(
-      "opening sentence" to "visit to the prison",
-      "prisoner" to "the prisoner",
-    )
-
-    when (visit.visitContact.languagePreference) {
-      LanguagePreference.CY -> templateVars.putAll(
-        prisoner?.let {
-          mapOf(
-            "openingsentence_cy" to "ymweliad i weld $it",
-            "prisoner_cy" to "$it",
-          )
-        } ?: mapOf(
-          "openingsentence_cy" to "ymweliad â'r carchar",
-          "prisoner_cy" to "y carcharor",
-        ),
-      )
-
-      else -> Unit
-    }
-
-    return templateVars
-  }
+  protected fun getPrisoner(visit: VisitDto): Map<String, Any> = prisonerPersonalisationService.getPersonalisations(visit.prisonerId, visit.visitContact.languagePreference)
 
   protected fun getPrisonContactDetails(visit: VisitDto): Map<String, String> {
     val prisonContactDetails = prisonRegisterService.getPrisonSocialVisitsContactDetails(visit.prisonCode)

@@ -34,6 +34,7 @@ class VisitorRequestNotificationService(
         prisonerId = additionalInfo.prisonerId,
         visitorId = additionalInfo.visitorId,
       ),
+      prisonerId = additionalInfo.prisonerId,
     )
 
     val replyToEmailId = replyToEmailResolver.getReplyToEmailIdForPrisoner(additionalInfo.prisonerId)

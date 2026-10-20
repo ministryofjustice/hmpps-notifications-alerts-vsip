@@ -2,7 +2,8 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domaine
 
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.times
@@ -10,6 +11,7 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestVisitorInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.contact.registry.ContactWithOptionalPrisonerRelationshipDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.search.PrisonerSearchResultDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
@@ -20,8 +22,9 @@ import java.time.LocalDate
 
 class BookerVisitorLinkedEventEmailTest : EventsIntegrationTestBase() {
 
-  @Test
-  fun `when visitor linked event is received a visitor approved email is sent to the booker`() {
+  @ParameterizedTest
+  @ValueSource(booleans = [true, false])
+  fun `when visitor linked event is received a visitor approved email is sent to the booker`(prisonerFound: Boolean) {
     // Given
     val prisonerId = "A1234BC"
     val bookerReference = "booker-ref"
@@ -29,8 +32,10 @@ class BookerVisitorLinkedEventEmailTest : EventsIntegrationTestBase() {
     val visitorId = 1234L
     val contact = ContactWithOptionalPrisonerRelationshipDto(visitorId, "Visitor", "One", (LocalDate.now().minusYears(30)))
     val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_APPROVED, LanguagePreference.EN)
+    val prisoner = if (prisonerFound) PrisonerSearchResultDto("PRISONER", "ONE") else null
     val templateVars = mapOf(
       "visitor" to "${contact.firstName} ${contact.lastName}",
+      "prisoner" to if (prisonerFound) "Prisoner One" else "the prisoner",
     )
 
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
@@ -49,9 +54,10 @@ class BookerVisitorLinkedEventEmailTest : EventsIntegrationTestBase() {
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
     // When
-    domainEventListenerService.onDomainEvent(jsonSqsMessage)
+    prisonerOffenderSearchMockServer.stubGetPrisoner(prisonerId, prisoner)
     bookerRegistryMockServer.stubGetBooker(bookerReference, bookerInfo)
     prisonerContactRegisterMockServer.stubSearchContacts(prisonerId, listOf(visitorId), false, listOf(contact))
+    domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
     // Then
     await untilAsserted { verify(bookerVisitorLinkedEventNotifierSpy, times(1)).processEvent(any()) }
@@ -59,7 +65,7 @@ class BookerVisitorLinkedEventEmailTest : EventsIntegrationTestBase() {
     await untilAsserted {
       verify(emailSenderService, times(1)).sendBookerVisitorEmail(
         bookerInfo,
-        VisitorRequestVisitorInfoDto(contact),
+        VisitorRequestVisitorInfoDto(contact, prisonerId),
         BookerEventType.VISITOR_APPROVED,
         "00000000-0000-0000-0000-000000000001",
       )

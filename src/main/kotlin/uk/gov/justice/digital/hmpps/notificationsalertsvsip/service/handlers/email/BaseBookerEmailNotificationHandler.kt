@@ -8,11 +8,17 @@ import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.NotificationTemplateResolver
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.service.PrisonerPersonalisationService
 
 @Service
 abstract class BaseBookerEmailNotificationHandler {
   @Autowired
   lateinit var notificationTemplateResolver: NotificationTemplateResolver
+
+  @Autowired
+  lateinit var prisonerPersonalisationService: PrisonerPersonalisationService
+
+  protected fun getPrisoner(visitorInfo: VisitorRequestVisitorInfoDto): Map<String, String> = prisonerPersonalisationService.getPersonalisations(visitorInfo.prisonerId, visitorInfo.languagePreference).filterKeys { it == "prisoner" }
 
   protected fun getTemplateName(
     template: EmailTemplateNames,

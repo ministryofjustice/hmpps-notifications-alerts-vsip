@@ -2,7 +2,8 @@ package uk.gov.justice.digital.hmpps.notificationsalertsvsip.integration.domaine
 
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.times
@@ -10,6 +11,7 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.BookerInfoDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.booker.registry.VisitorRequestVisitorInfoDto
+import uk.gov.justice.digital.hmpps.notificationsalertsvsip.dto.prisoner.search.PrisonerSearchResultDto
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.EmailTemplateNames
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.LanguagePreference
 import uk.gov.justice.digital.hmpps.notificationsalertsvsip.enums.booker.registry.BookerEventType
@@ -20,8 +22,9 @@ import java.time.LocalDate
 
 class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
 
-  @Test
-  fun `when visitor request rejected event is received a visitor rejected email is sent to the booker`() {
+  @ParameterizedTest
+  @ValueSource(booleans = [true, false])
+  fun `when visitor request rejected event is received a visitor rejected email is sent to the booker`(prisonerFound: Boolean) {
     // Given
     val prisonerId = "A1234BC"
     val bookerReference = "booker-ref"
@@ -35,8 +38,10 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
       rejectionReason = "REJECT",
     )
     val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_REJECTED, LanguagePreference.EN)
+    val prisoner = if (prisonerFound) PrisonerSearchResultDto("PRISONER", "ONE") else null
     val templateVars = mapOf(
       "visitor" to "${visitorRequest.firstName} ${visitorRequest.lastName}",
+      "prisoner" to if (prisonerFound) "Prisoner One" else "the prisoner",
     )
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
     val bookerAdditionalInfo = VisitorRequestAdditionalInfo(visitorRequestReference)
@@ -54,6 +59,7 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
     // When
+    prisonerOffenderSearchMockServer.stubGetPrisoner(prisonerId, prisoner)
     bookerRegistryMockServer.stubGetVisitorRequestByReference(visitorRequestReference, visitorRequest)
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
@@ -79,8 +85,9 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
     }
   }
 
-  @Test
-  fun `when visitor request rejected event is received with a welsh language preference a welsh visitor rejected email is sent to the booker`() {
+  @ParameterizedTest
+  @ValueSource(booleans = [true, false])
+  fun `when visitor request rejected event is received with a welsh language preference a welsh visitor rejected email is sent to the booker`(prisonerFound: Boolean) {
     // Given
     val prisonerId = "A1234BC"
     val bookerReference = "booker-ref"
@@ -95,8 +102,10 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
       languagePreference = LanguagePreference.CY,
     )
     val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_REJECTED, LanguagePreference.CY)
+    val prisoner = if (prisonerFound) PrisonerSearchResultDto("PRISONER", "ONE") else null
     val templateVars = mapOf(
       "visitor" to "${visitorRequest.firstName} ${visitorRequest.lastName}",
+      "prisoner" to if (prisonerFound) "Prisoner One" else "the prisoner",
     )
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
     val bookerAdditionalInfo = VisitorRequestAdditionalInfo(visitorRequestReference)
@@ -114,6 +123,7 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
     // When
+    prisonerOffenderSearchMockServer.stubGetPrisoner(prisonerId, prisoner)
     bookerRegistryMockServer.stubGetVisitorRequestByReference(visitorRequestReference, visitorRequest)
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
@@ -139,8 +149,9 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
     }
   }
 
-  @Test
-  fun `when visitor request rejected event is received with reason already linked a visitor rejected already linked email is sent to the booker`() {
+  @ParameterizedTest
+  @ValueSource(booleans = [true, false])
+  fun `when visitor request rejected event is received with reason already linked a visitor rejected already linked email is sent to the booker`(prisonerFound: Boolean) {
     // Given
     val prisonerId = "A1234BC"
     val bookerReference = "booker-ref"
@@ -154,8 +165,10 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
       rejectionReason = "ALREADY_LINKED",
     )
     val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_REJECTED_ALREADY_LINKED, LanguagePreference.EN)
+    val prisoner = if (prisonerFound) PrisonerSearchResultDto("PRISONER", "ONE") else null
     val templateVars = mapOf(
       "visitor" to "${visitorRequest.firstName} ${visitorRequest.lastName}",
+      "prisoner" to if (prisonerFound) "Prisoner One" else "the prisoner",
     )
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
     val bookerAdditionalInfo = VisitorRequestAdditionalInfo(visitorRequestReference)
@@ -173,6 +186,7 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
     // When
+    prisonerOffenderSearchMockServer.stubGetPrisoner(prisonerId, prisoner)
     bookerRegistryMockServer.stubGetVisitorRequestByReference(visitorRequestReference, visitorRequest)
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
@@ -198,8 +212,9 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
     }
   }
 
-  @Test
-  fun `when visitor request rejected already linked event is received with a welsh language preference a welsh visitor rejected already linked email is sent to the booker`() {
+  @ParameterizedTest
+  @ValueSource(booleans = [true, false])
+  fun `when visitor request rejected already linked event is received with a welsh language preference a welsh visitor rejected already linked email is sent to the booker`(prisonerFound: Boolean) {
     // Given
     val prisonerId = "A1234BC"
     val bookerReference = "booker-ref"
@@ -214,8 +229,10 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
       languagePreference = LanguagePreference.CY,
     )
     val templateId = notificationTemplateResolver.getEmailTemplate(EmailTemplateNames.BOOKER_VISITOR_REJECTED_ALREADY_LINKED, LanguagePreference.CY)
+    val prisoner = if (prisonerFound) PrisonerSearchResultDto("PRISONER", "ONE") else null
     val templateVars = mapOf(
       "visitor" to "${visitorRequest.firstName} ${visitorRequest.lastName}",
+      "prisoner" to if (prisonerFound) "Prisoner One" else "the prisoner",
     )
     val bookerInfo = BookerInfoDto(bookerReference, bookerEmailAddress)
     val bookerAdditionalInfo = VisitorRequestAdditionalInfo(visitorRequestReference)
@@ -233,6 +250,7 @@ class BookerVisitorRequestRejectedEventEmailTest : EventsIntegrationTestBase() {
     ).thenReturn(buildSendEmailResponse(reference = "test"))
 
     // When
+    prisonerOffenderSearchMockServer.stubGetPrisoner(prisonerId, prisoner)
     bookerRegistryMockServer.stubGetVisitorRequestByReference(visitorRequestReference, visitorRequest)
     domainEventListenerService.onDomainEvent(jsonSqsMessage)
 
