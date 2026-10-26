@@ -176,3 +176,12 @@ To register pre-commit check to run Ktlint format:
 ```
 ./gradlew ktlintApplyToIdea addKtlintCheckGitPreCommitHook
 ```
+
+## Visit domain events
+
+The `prison-visit.booked`, `prison-visit.changed`, `prison-visit.cancelled` and
+`prison-visit-request.approved` consumers ignore events with
+`additionalInformation.visitType` set to `SOCIAL_VIDEO`. These visits are externally
+managed, so no downstream lookups, visitor notifications or notification records are
+created. Explicit `SOCIAL` events and legacy events without `visitType` retain the
+existing notification behaviour. Booker events and GOV.UK Notify callbacks are unchanged.

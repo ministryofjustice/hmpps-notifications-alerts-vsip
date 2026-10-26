@@ -9,4 +9,5 @@ data class VisitAdditionalInfo(
   val bookingReference: String,
   @field:NotBlank
   val eventAuditId: String,
+  val visitType: String? = null,
 )
