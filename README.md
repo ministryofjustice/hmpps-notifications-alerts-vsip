@@ -7,6 +7,15 @@
 
 This is a Spring Boot application, written in Kotlin, used to send notifications to users about their visits. Used by [Visits](https://developer-portal.hmpps.service.justice.gov.uk/products/v-isit-someone-in-prison-v-si-p-2).
 
+## Visit domain events
+
+The `prison-visit.booked`, `prison-visit.changed`, `prison-visit.cancelled` and
+`prison-visit-request.approved` consumers ignore events with
+`additionalInformation.visitType` set to `SOCIAL_VIDEO`. These visits are externally
+managed, so no downstream lookups, visitor notifications or notification records are
+created. Explicit `SOCIAL` events and legacy events without `visitType` retain the
+existing notification behaviour. Booker events and GOV.UK Notify callbacks are unchanged.
+
 ## Building
 
 To build the project (without tests):

@@ -21,6 +21,11 @@ class VisitNotificationService(
   }
 
   fun sendMessage(visitEventType: VisitEventType, additionalInfo: VisitAdditionalInfo) {
+    if (additionalInfo.visitType == "SOCIAL_VIDEO") {
+      LOG.info("Social video visit found for booking reference ${additionalInfo.bookingReference}, skipping notifications")
+      return
+    }
+
     LOG.info("Received call to send notification for event type $visitEventType, visit - ${additionalInfo.bookingReference}")
 
     val visit = visitSchedulerService.getVisit(additionalInfo.bookingReference)
